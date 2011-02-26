@@ -1,0 +1,79 @@
+A lista seguir possui uma ordem de precedência (pg 27). Não pode
+trocar a ordem! 
+
+Operadores
+
+> @pre
+> .
+> ->
+> not
+> - (unary)
+> *
+> /
+> + 
+> - (binary)
+> if-then-else-endif
+> <
+> >
+> <=
+> =
+> =
+> <>
+> and
+> or
+> xor
+> implies
+
+
+Palavras reservadas
+
+> self
+> and
+> attr
+> context
+> def
+> else
+> endif
+> endpackage
+> if
+> implies
+> in
+> inv
+> let
+> not
+> oper
+> or
+> package
+> post
+> pre
+> then
+> xor
+
+Tipos básicos
+
+> Boolean: true, false
+> Integer: 1, -5, 2, 34, 26524, ...
+> Real: 1.5, 3.14,  ...
+> String: 'To be or not to be...'
+
+Operações sobre os tipos básicos
+
+
+> Integer: *, +, -, /, abs()
+> Real: *, +, -, /, floor()
+> Boolean:  and, or, xor, not, implies, if-then-else
+> String: concat(), size(), substring()
+
+Comentário em OCL
+
+> -- qualquer coisa
+> /* ~ */
+
+Operações de consulta
+
+context Typename::operationName(param1 : Type1, ... ): ReturnType
+body:  -- some expression
+
+Observações:
+
+> a + b é equivalente a a.+(b);
