@@ -64,7 +64,7 @@ Operações sobre os tipos básicos
 > Boolean:  and, or, xor, not, implies, if-then-else
 > String: concat(), size(), substring()
 
-Comentário em OCL
+Comentário em OCL (pg 90)
 
 > -- qualquer coisa
 > /* ~ */
