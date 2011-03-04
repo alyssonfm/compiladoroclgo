@@ -24,6 +24,9 @@ Operadores
 > xor
 > implies
 
+> ^^
+> ^ (pg 43)
+
 
 Palavras reservadas
 
@@ -64,7 +67,7 @@ Operações sobre os tipos básicos
 > Boolean:  and, or, xor, not, implies, if-then-else
 > String: concat(), size(), substring()
 
-Comentário em OCL (pg 90)
+Comentário em OCL (Especificação OCL - Pg. 90)
 
 > -- qualquer coisa
 > /* ~ */
