@@ -17,12 +17,13 @@ import java_cup.sym;
 	StringBuffer string = new StringBuffer();
 
 	private Symbol symbol(int type) {
-		System.out.println(yytext());
 		Symbol symbol =  new Symbol(type, yyline, yycolumn); 
 		return symbol;
 	}
 	private Symbol symbol(int type, Object value) {
-		return new Symbol(type, yyline, yycolumn, value);
+		Symbol symbol = new Symbol(type, yyline, yycolumn, value, yytext());
+		System.out.println("Token: " + symbol + " Value: " + symbol.getValue() + " RealSymbol: '" + symbol.getText() + "' Linha: "+symbol.getLine() + " Coluna: "+ symbol.getColumn());
+		return symbol;
 	}
 %}
 
@@ -84,66 +85,68 @@ Identifier = {Letter}{Alpha}*
   /* Operadores */
   
   "="          { return symbol(sym.EQ); } 
-  "<>"         { return symbol(sym.NE); } 
+  "<>"         { return symbol(sym.OPERATOR, sym.NE); } 
  
-  "<="         { return symbol(sym.LE); } 
-  ">="         { return symbol(sym.GE); } 
-  "<"          { return symbol(sym.LT); } 
-  ">"          { return symbol(sym.GT); } 
+  "<="         { return symbol(sym.OPERATOR, sym.LE); } 
+  ">="         { return symbol(sym.OPERATOR, sym.GE); } 
+  "<"          { return symbol(sym.OPERATOR, sym.LT); } 
+  ">"          { return symbol(sym.OPERATOR, sym.GT); } 
  
-  "+"          { return symbol(sym.PLUS); } 
+  "+"          { return symbol(sym.OPERATOR, sym.PLUS); } 
   "->"         { return symbol(sym.MINUS_GT); } 
-  "-"          { return symbol(sym.MINUS); } 
+  "-"          { return symbol(sym.OPERATOR, sym.MINUS); } 
  
-  "*"          { return symbol(sym.TIMES); } 
-  "/"          { return symbol(sym.DIVIDE); }
+  "*"          { return symbol(sym.OPERATOR, sym.TIMES); } 
+  "/"          { return symbol(sym.OPERATOR, sym.DIVIDE); }
   
   /* Palavras Reservadas */
   
-  "package"       { return symbol(sym.PACKAGE); } 
-  "endpackage"    { return symbol(sym.ENDPACKAGE); } 
-  "context"       { return symbol(sym.CONTEXT); }    
-  "body"          { return symbol(sym.BODY); } 
+  "package"       { return symbol(sym.KEYWORD, sym.PACKAGE); } 
+  "endpackage"    { return symbol(sym.KEYWORD, sym.ENDPACKAGE); } 
+  "context"       { return symbol(sym.KEYWORD, sym.CONTEXT); }    
+  "body"          { return symbol(sym.KEYWORD, sym.BODY); } 
   
   /* Tipos Compostos */
   
-  "Set"           { return symbol(sym.COLLECTION); } 
-  "Bag"           { return symbol(sym.COLLECTION); } 
-  "Sequence"      { return symbol(sym.COLLECTION); } 
-  "Collection"    { return symbol(sym.COLLECTION); } 
-  "OrderedSet"    { return symbol(sym.COLLECTION); } 
-  "TupleType"     { return symbol(sym.TUPLE); } 
-  "Tuple"         { return symbol(sym.TUPLE); }
+  "Set"           { return symbol(sym.COLLECTION, sym.SET); } 
+  "Bag"           { return symbol(sym.COLLECTION, sym.BAG); } 
+  "Sequence"      { return symbol(sym.COLLECTION, sym.SEQUENCE); } 
+  "Collection"    { return symbol(sym.COLLECTION, sym.COLLECTION); } 
+  "OrderedSet"    { return symbol(sym.COLLECTION, sym.ORDEREDSET); } 
+  "TupleType"     { return symbol(sym.TUPLE, sym.TUPLE); } 
+  "Tuple"         { return symbol(sym.TUPLE, sym.TUPLE); }
   
-  /* Expressões Condicionais */
+  /* Operadores Booleanos */
   
-  "if"            { return symbol(sym.IF); } 
-  "then"          { return symbol(sym.THEN); } 
-  "else"          { return symbol(sym.ELSE); } 
-  "endif"         { return symbol(sym.ENDIF); } 
+  "if"            { return symbol(sym.OPERATOR, sym.IF); } 
+  "then"          { return symbol(sym.OPERATOR, sym.THEN); } 
+  "else"          { return symbol(sym.OPERATOR, sym.ELSE); } 
+  "endif"         { return symbol(sym.OPERATOR, sym.ENDIF); } 
   
-  /* Operadores Lógicos */	
+  "implies"      { return symbol(sym.OPERATOR, sym.IMPLIES); } 
+  "and"          { return symbol(sym.OPERATOR, sym.AND); } 
+  "or"           { return symbol(sym.OPERATOR, sym.OR); } 
+  "xor"          { return symbol(sym.OPERATOR, sym.XOR); } 
+  "not"          { return symbol(sym.OPERATOR, sym.NOT); }
   
-  "implies"      { return symbol(sym.IMPLIES); } 
-  "and"          { return symbol(sym.AND); } 
-  "or"           { return symbol(sym.OR); } 
-  "xor"          { return symbol(sym.XOR); } 
-  "not"          { return symbol(sym.NOT); } 
-  "true"         { return symbol(sym.TRUE); } 
-  "false"        { return symbol(sym.FALSE); }
+  /* BOOLEAN */
+   
+  "true"         { return symbol(sym.BOOLEAN, sym.TRUE); } 
+  "false"        { return symbol(sym.BOOLEAN, sym.FALSE); }
+  
+  /* Dúvida aqui! São identificadores ou keywords? */
   
   "div"          { return symbol(sym.INT_DIVIDE); }
   "mod"          { return symbol(sym.INT_MOD); } 
   
   /* Tipos Básicos e Identifier*/
   
-  {Real}         { return symbol(sym.REAL); } 
-  {Integer}      { return symbol(sym.INTEGER); } 
+  {Real}         { return symbol(sym.TYPE, sym.REAL); } 
+  {Integer}      { return symbol(sym.TYPE, sym.INTEGER); } 
    
-  {Identifier}   { return symbol(sym.SIMPLE_NAME); } 
-  {String}       { return symbol(sym.STRING); } 
+  {Identifier}   { return symbol(sym.IDENTIFIER, sym.IDENTIFIER); } 
+  {String}       { return symbol(sym.TYPE, sym.STRING); } 
 
 } 
  
-/*[^] { log.reportError("Illegal character '"+yytext()+"'"); 
-      return symbol(sym.BAD);}*/ 
+.|\n { throw new Error("Illegal character <"+ yytext()+">");} 
