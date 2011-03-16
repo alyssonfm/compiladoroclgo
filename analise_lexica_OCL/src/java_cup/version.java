@@ -30,7 +30,7 @@ public class version {
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** The update letter. */
-  public static final char update = 'j';
+  public static final char update = 'k';
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
@@ -45,7 +45,8 @@ public class version {
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 
   /** Name of the author */
-  public static final String author_str = "Scott E. Hudson and Frank Flannery";
+  public static final String author_str =
+      "Scott E. Hudson, Frank Flannery, and C. Scott Ananian";
 
   /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .*/
 

@@ -237,8 +237,8 @@ public class Main {
       System.err.println(message);
       System.err.println();
       System.err.println(
-"Usage: " + version.program_name + " [options]\n" +
-"  and expects a specification file on standard input.\n" +
+"Usage: " + version.program_name + " [options] [filename]\n" +
+"  and expects a specification file on standard input if no filename is given.\n" +
 "  Legal options include:\n" +
 "    -package name  specify package generated classes go in [default none]\n" +
 "    -parser name   specify parser class name [default \"parser\"]\n" +
@@ -346,6 +346,15 @@ public class Main {
 	  else if (argv[i].equals("-version")) {
 	      System.out.println(version.title_str);
 	      System.exit(1);
+	  }
+	  /* CSA 24-Jul-1999; suggestion by Jean Vaucher */
+	  else if (!argv[i].startsWith("-") && i==len-1) {
+	      /* use input from file. */
+	      try {
+		  System.setIn(new FileInputStream(argv[i]));
+	      } catch (java.io.FileNotFoundException e) {
+		  usage("Unable to open \"" + argv[i] +"\" for input");
+	      }
 	  }
 	  else
 	    {
