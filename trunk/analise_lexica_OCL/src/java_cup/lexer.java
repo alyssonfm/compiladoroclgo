@@ -205,7 +205,7 @@ public class lexer {
       /* count this */
       absolute_position++;
       current_position++;
-      if (old_char == '\n')
+      if (old_char == '\n' || (old_char == '\r' && next_char!='\n'))
 	{
 	  current_line++;
 	  current_position = 1;
@@ -326,8 +326,9 @@ public class lexer {
 	  /* swallow the opener */
 	  advance(); advance();
 
-	  /* swallow to '\n', '\f', or EOF */ 
-	  while (next_char != '\n' && next_char != '\f' && next_char!=EOF_CHAR)
+	  /* swallow to '\n', '\r', '\f', or EOF */ 
+	  while (next_char != '\n' && next_char != '\r' && 
+		 next_char != '\f' && next_char!=EOF_CHAR)
 	    advance();
 
 	  return;

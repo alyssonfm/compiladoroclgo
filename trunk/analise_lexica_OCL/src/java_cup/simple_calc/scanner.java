@@ -9,12 +9,11 @@ public class scanner implements java_cup.runtime.Scanner {
 
   public scanner(java.io.InputStream is) throws java.io.IOException {
     instream = is;
-    init();
   }
   public scanner() throws java.io.IOException { this(System.in); }
 
   /* single lookahead character */
-  protected int next_char;
+  protected int next_char = -2;
 
   /* advance input by one character */
   protected void advance()
@@ -30,6 +29,7 @@ public class scanner implements java_cup.runtime.Scanner {
   public Symbol next_token()
     throws java.io.IOException
     {
+      if (next_char==-2) init(); // set stuff up first time we are called.
       for (;;)
         switch (next_char)
 	  {
