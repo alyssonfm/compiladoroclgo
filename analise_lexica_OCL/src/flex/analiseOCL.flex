@@ -12,7 +12,7 @@ import java_cup.sym;
 %column
 
 %{
-	StringBuffer string = new StringBuffer();
+	StringBuilder erros = new StringBuilder();
 	
 	private Symbol symbol(int tokenname) {
 		Symbol symbol = new Symbol(tokenname, yytext(), yyline, yycolumn);
@@ -36,60 +36,54 @@ comments          = {linecomment} | {paragraphcomment} /*Pg. 127*/
 digit  = [0-9] 
 letter = [A-Za-z] | [_] 
 alpha  = {letter} | {digit} 
-identifier = {letter}{alpha}*    
+identifier = {letter}{alpha}*
+numberid = ({integer}|{real})+{letter}+({integer}|{real})*
 /*Pg. 74 Types*/
-integer    = {digit}+ 
+string = "'" ~"'" 
+integer    = {digit}+  
 real       = {integer}"\."{integer}[eE][+-]?{integer} | 
              {integer}[eE][+-]?{integer} | {integer}"\."{integer}
 boolean = "true"|"false"    
 collections = "Set"|"Bag"|"Sequence"|"OrderedSet"|"Collection" /*Pg. 137*/
 booleanoperators = "if"|"then"|"else"|"endif"|"implies"|"and"|"or"|"xor"|"not" /*Pg. 123*/
 keywords = "self"|"package"|"endpackage"|"context"|"body"  /*Pg. 13 e 14 Especificação OCL*/
-%state STRING
 
 %%
 
-<YYINITIAL> {  	
-  {whitespace} {  }    
-  {comments}   {  }	
-  ".."         { return symbol(sym.DOT_DOT); }
-  "::"         { return symbol(sym.PATHNAME); } 
-  "."          { return symbol(sym.DOT); }
-  "->"         { return symbol(sym.MINUS_GT); }   
-  ":"          { return symbol(sym.COLON); }  
-  "("          { return symbol(sym.LEFT_PAR); } 
-  "["          { return symbol(sym.LEFT_BRK); } 
-  "{"          { return symbol(sym.LEFT_BRA); } 
-  ")"          { return symbol(sym.RIGHT_PAR); } 
-  "]"          { return symbol(sym.RIGHT_BRK); } 
-  "}"          { return symbol(sym.RIGHT_BRA); }   	
-  ","          { return symbol(sym.COMMA); } 
-  "|"          { return symbol(sym.BAR); }
-  "="          { return symbol(sym.EQ); } 
-  "<>"         { return symbol(sym.NE); } 
-  "<="         { return symbol(sym.LE); } 
-  ">="         { return symbol(sym.GE); } 
-  "<"          { return symbol(sym.LT); } 
-  ">"          { return symbol(sym.GT); } 
-  "+"          { return symbol(sym.PLUS); } 
-  "-"          { return symbol(sym.MINUS); } 
-  "*"          { return symbol(sym.TIMES); } 
-  "/"          { return symbol(sym.DIVIDE); } 
-  {keywords}         { return symbol(sym.KEYWORD); }  
-  {collections}      { return symbol(sym.COLLECTION); } 
-  {booleanoperators} { return symbol(sym.BOOLEANOPERATOR); }
-  {boolean}          { return symbol(sym.BOOLEAN); }
-  {identifier}       { return symbol(sym.IDENTIFIER); } 
-  {real}             { return symbol(sym.REAL); } 
-  {integer}          { return symbol(sym.INTEGER); }
-} 
-<STRING> {
-	'           { yybegin(YYINITIAL); return symbol(sym.STRING, string.toString());}
-	[^\n\r'\\]+  { string.append( yytext() ); }
-	\\t          { string.append("\t"); }
-	\\n          { string.append("\n"); }
-	\\r          { string.append("\r"); }
-	\\'          { string.append("\'"); }
-	\\           { string.append("\\"); }
-}
-.|\n {System.out.println("Erro!"); throw new Error("Illegal character <"+ yytext()+">");} 
+	
+<YYINITIAL>  {whitespace} {  }    
+<YYINITIAL>  {comments}   {  }	
+<YYINITIAL>  ".."         { return symbol(sym.DOT_DOT); }
+<YYINITIAL>  "::"         { return symbol(sym.PATHNAME); } 
+<YYINITIAL>  "."          { return symbol(sym.DOT); }
+<YYINITIAL>  "->"         { return symbol(sym.MINUS_GT); }   
+<YYINITIAL>  ":"          { return symbol(sym.COLON); }  
+<YYINITIAL>  "("          { return symbol(sym.LEFT_PAR); } 
+<YYINITIAL>  "["          { return symbol(sym.LEFT_BRK); } 
+<YYINITIAL>  "{"          { return symbol(sym.LEFT_BRA); } 
+<YYINITIAL>  ")"          { return symbol(sym.RIGHT_PAR); } 
+<YYINITIAL>  "]"          { return symbol(sym.RIGHT_BRK); } 
+<YYINITIAL>  "}"          { return symbol(sym.RIGHT_BRA); }   	
+<YYINITIAL>  ","          { return symbol(sym.COMMA); } 
+<YYINITIAL>  "|"          { return symbol(sym.BAR); }
+<YYINITIAL>  "="          { return symbol(sym.EQ); } 
+<YYINITIAL>  "<>"         { return symbol(sym.NE); } 
+<YYINITIAL>  "<="         { return symbol(sym.LE); } 
+<YYINITIAL>  ">="         { return symbol(sym.GE); } 
+<YYINITIAL>  "<"          { return symbol(sym.LT); } 
+<YYINITIAL>  ">"          { return symbol(sym.GT); } 
+<YYINITIAL>  "+"          { return symbol(sym.PLUS); } 
+<YYINITIAL>  "-"          { return symbol(sym.MINUS); } 
+<YYINITIAL>  "*"          { return symbol(sym.TIMES); } 
+<YYINITIAL>  "/"          { return symbol(sym.DIVIDE); } 
+<YYINITIAL>  {keywords}         { return symbol(sym.KEYWORD); }  
+<YYINITIAL>  {collections}      { return symbol(sym.COLLECTION); } 
+<YYINITIAL>  {booleanoperators} { return symbol(sym.BOOLEANOPERATOR); }
+<YYINITIAL>  {boolean}          { return symbol(sym.BOOLEAN); }
+<YYINITIAL>  {identifier}       { return symbol(sym.IDENTIFIER); } 
+<YYINITIAL>  {real}             { return symbol(sym.REAL); } 
+<YYINITIAL>  {integer}          { return symbol(sym.INTEGER); }
+<YYINITIAL>  {string}           { return symbol(sym.STRING); }
+{numberid}|.|\n {erros.append("Padrão não reconhecido pela linguagem OCL: <"+ yytext()+">" + " Linha: "+ yyline + " Coluna: "+ yycolumn+"\r");}
+
+<<EOF>>  {System.err.println(erros.toString());System.exit(1);}
