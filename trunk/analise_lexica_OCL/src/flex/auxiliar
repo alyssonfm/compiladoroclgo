@@ -143,3 +143,11 @@ Identifier = {Letter}{Alpha}*
 } 
  
 .|\n { throw new Error("Illegal character <"+ yytext()+">");} 
+
+
+'             { yybegin(YYINITIAL); return symbol(sym.STRING_LITERAL, string.toString());}
+	[^\n\r']+     { string.append( yytext() ); }
+	\\t           { string.append("\t"); }
+	\\n           { string.append("\n"); }
+	\\r           { string.append("\r"); }
+	'             { string.append("'"); }

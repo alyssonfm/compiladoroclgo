@@ -51,15 +51,13 @@ DecIntegerLiteral = 0 | [1-9][0-9]*
 /* whitespace */
 {WhiteSpace} { /* ignore */ }
 }<STRING> {
-\" { yybegin(YYINITIAL);
+' { yybegin(YYINITIAL);
 return symbol(sym.STRING_LITERAL,
 string.toString()); }
-[^\n\r\"\\]+ { string.append( yytext() ); }
+[^\n\r]+ { string.append( yytext() ); }
 \\t { string.append("\t"); }
 \\n { string.append("\n"); }
 \\r { string.append("\r"); }
-\\\" { string.append("/'"); }
-\\ { string.append("\\"); }
 }/* error fallback */
 .|\n { throw new Error("Illegal character <"+
 yytext()+">"); }
