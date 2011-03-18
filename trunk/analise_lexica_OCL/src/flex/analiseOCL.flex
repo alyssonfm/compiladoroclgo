@@ -1,13 +1,11 @@
 package ClassesJava;
 
-import java_cup.runtime.*; 
 import java_cup.runtime.Symbol;
 import java_cup.sym; 
 
 %%
-%standalone
-
 %class AnaliseLexicaOCL
+%standalone
 %unicode
 %cup
 %line
@@ -15,138 +13,83 @@ import java_cup.sym;
 
 %{
 	StringBuffer string = new StringBuffer();
-
-	private Symbol symbol(int type) {
-		Symbol symbol =  new Symbol(type, yyline, yycolumn); 
+	
+	private Symbol symbol(int tokenname) {
+		Symbol symbol = new Symbol(tokenname, yytext(), yyline, yycolumn);
+		System.out.println("Token:" + symbol.getName() + " Valor: " + symbol.getValue() + " Linha: "+ symbol.getLine() + " Coluna: "+ symbol.getColumn());
 		return symbol;
 	}
-	private Symbol symbol(int type, Object value) {
-		Symbol symbol = new Symbol(type, yyline, yycolumn, value, yytext());
-		System.out.println("Token: " + symbol + " Value: " + symbol.getValue() + " RealSymbol: '" + symbol.getText() + "' Linha: "+symbol.getLine() + " Coluna: "+ symbol.getColumn());
+	private Symbol symbol(int tokenname, String value) {
+		Symbol symbol = new Symbol(tokenname, value, yyline, yycolumn);
+		System.out.println("Token:" + symbol.getName() + " Valor: " + symbol.getValue() + " Linha: "+ symbol.getLine() + " Coluna: "+ symbol.getColumn());
 		return symbol;
 	}
 %}
 
-/* Delimitadores segundo UNICODE */
+lineterminator = \n|\r|\n\r|\r\n
+inputcharacter = [^\r\n]
+whitespace     = {lineterminator}|[ \f\t]
+paragraphcomment  = "/*" [^*] ~"*/" | "/*" "*"+ "/"
+linecomment       = "--" {inputcharacter}* {lineterminator}
+comments          = {linecomment} | {paragraphcomment} /*Pg. 127*/
 
-LineTerminator = \n|\r|\n\r|\r\n
-WhiteSpace     = {LineTerminator}|[ \f\t]
-
-/* Comentários */
-
-ParagraphComment  = "/*" ~"*/"
-LineComment       = "--" ~{LineTerminator}
-Comments          = {LineComment} | {ParagraphComment}
-
-/* Letras e dígitos */
- 
-Digit  = [0-9] 
-Letter = [A-Za-z] | [_] 
-Alpha  = {Letter} | {Digit} 
-
-/*Tipos basicos*/
-
-Integer    = {Digit}+ 
-Real       = {Integer}"\."{Integer}[eE][+-]?{Integer} | 
-             {Integer}[eE][+-]?{Integer} | {Integer}"\."{Integer}       
-String     = "'" ~"'"    
-Identifier = {Letter}{Alpha}*     
+digit  = [0-9] 
+letter = [A-Za-z] | [_] 
+alpha  = {letter} | {digit} 
+identifier = {letter}{alpha}*    
+/*Pg. 74 Types*/
+integer    = {digit}+ 
+real       = {integer}"\."{integer}[eE][+-]?{integer} | 
+             {integer}[eE][+-]?{integer} | {integer}"\."{integer}
+boolean = "true"|"false"    
+collections = "Set"|"Bag"|"Sequence"|"OrderedSet"|"Collection" /*Pg. 137*/
+booleanoperators = "if"|"then"|"else"|"endif"|"implies"|"and"|"or"|"xor"|"not" /*Pg. 123*/
+keywords = "self"|"package"|"endpackage"|"context"|"body"  /*Pg. 13 e 14 Especificação OCL*/
+%state STRING
 
 %%
 
-<YYINITIAL> {  
-
-  {WhiteSpace} { /* Ignorar. */ }    
-  {Comments}   { /* Ignorar. */ }
-  ".."         { return symbol(sym.DOT_DOT); } 
-  "::"         { return symbol(sym.COLON_COLON); } 
-  "^^"         { return symbol(sym.UP_UP); } 
-  "."          { return symbol(sym.DOT); } 
-  ":"          { return symbol(sym.COLON); } 
-  "^"          { return symbol(sym.UP); }
-  
-  /* Parênteses, colchetes e chaves */
-  
+<YYINITIAL> {  	
+  {whitespace} {  }    
+  {comments}   {  }	
+  ".."         { return symbol(sym.DOT_DOT); }
+  "::"         { return symbol(sym.PATHNAME); } 
+  "."          { return symbol(sym.DOT); }
+  "->"         { return symbol(sym.MINUS_GT); }   
+  ":"          { return symbol(sym.COLON); }  
   "("          { return symbol(sym.LEFT_PAR); } 
   "["          { return symbol(sym.LEFT_BRK); } 
   "{"          { return symbol(sym.LEFT_BRA); } 
   ")"          { return symbol(sym.RIGHT_PAR); } 
   "]"          { return symbol(sym.RIGHT_BRK); } 
-  "}"          { return symbol(sym.RIGHT_BRA); } 
-  
-  /* Pontuações */
-    	
+  "}"          { return symbol(sym.RIGHT_BRA); }   	
   ","          { return symbol(sym.COMMA); } 
-  ";"          { return symbol(sym.SEMICOLON); } 
-  "|"          { return symbol(sym.BAR); } 
-  "@"          { return symbol(sym.AT); } 
-  "?"          { return symbol(sym.QUESTION); } 
-  
-  /* Operadores */
-  
+  "|"          { return symbol(sym.BAR); }
   "="          { return symbol(sym.EQ); } 
-  "<>"         { return symbol(sym.OPERATOR, sym.NE); } 
- 
-  "<="         { return symbol(sym.OPERATOR, sym.LE); } 
-  ">="         { return symbol(sym.OPERATOR, sym.GE); } 
-  "<"          { return symbol(sym.OPERATOR, sym.LT); } 
-  ">"          { return symbol(sym.OPERATOR, sym.GT); } 
- 
-  "+"          { return symbol(sym.OPERATOR, sym.PLUS); } 
-  "->"         { return symbol(sym.MINUS_GT); } 
-  "-"          { return symbol(sym.OPERATOR, sym.MINUS); } 
- 
-  "*"          { return symbol(sym.OPERATOR, sym.TIMES); } 
-  "/"          { return symbol(sym.OPERATOR, sym.DIVIDE); }
-  
-  /* Palavras Reservadas */
-  
-  "package"       { return symbol(sym.KEYWORD, sym.PACKAGE); } 
-  "endpackage"    { return symbol(sym.KEYWORD, sym.ENDPACKAGE); } 
-  "context"       { return symbol(sym.KEYWORD, sym.CONTEXT); }    
-  "body"          { return symbol(sym.KEYWORD, sym.BODY); } 
-  
-  /* Tipos Compostos */
-  
-  "Set"           { return symbol(sym.COLLECTION, sym.SET); } 
-  "Bag"           { return symbol(sym.COLLECTION, sym.BAG); } 
-  "Sequence"      { return symbol(sym.COLLECTION, sym.SEQUENCE); } 
-  "Collection"    { return symbol(sym.COLLECTION, sym.COLLECTION); } 
-  "OrderedSet"    { return symbol(sym.COLLECTION, sym.ORDEREDSET); } 
-  "TupleType"     { return symbol(sym.TUPLE, sym.TUPLE); } 
-  "Tuple"         { return symbol(sym.TUPLE, sym.TUPLE); }
-  
-  /* Operadores Booleanos */
-  
-  "if"            { return symbol(sym.OPERATOR, sym.IF); } 
-  "then"          { return symbol(sym.OPERATOR, sym.THEN); } 
-  "else"          { return symbol(sym.OPERATOR, sym.ELSE); } 
-  "endif"         { return symbol(sym.OPERATOR, sym.ENDIF); } 
-  
-  "implies"      { return symbol(sym.OPERATOR, sym.IMPLIES); } 
-  "and"          { return symbol(sym.OPERATOR, sym.AND); } 
-  "or"           { return symbol(sym.OPERATOR, sym.OR); } 
-  "xor"          { return symbol(sym.OPERATOR, sym.XOR); } 
-  "not"          { return symbol(sym.OPERATOR, sym.NOT); }
-  
-  /* BOOLEAN */
-   
-  "true"         { return symbol(sym.BOOLEAN, sym.TRUE); } 
-  "false"        { return symbol(sym.BOOLEAN, sym.FALSE); }
-  
-  /* Dúvida aqui! São identificadores ou keywords? */
-  
-  "div"          { return symbol(sym.INT_DIVIDE); }
-  "mod"          { return symbol(sym.INT_MOD); } 
-  
-  /* Tipos Básicos e Identifier*/
-  
-  {Real}         { return symbol(sym.TYPE, sym.REAL); } 
-  {Integer}      { return symbol(sym.TYPE, sym.INTEGER); } 
-   
-  {Identifier}   { return symbol(sym.IDENTIFIER, sym.IDENTIFIER); } 
-  {String}       { return symbol(sym.TYPE, sym.STRING); } 
-
+  "<>"         { return symbol(sym.NE); } 
+  "<="         { return symbol(sym.LE); } 
+  ">="         { return symbol(sym.GE); } 
+  "<"          { return symbol(sym.LT); } 
+  ">"          { return symbol(sym.GT); } 
+  "+"          { return symbol(sym.PLUS); } 
+  "-"          { return symbol(sym.MINUS); } 
+  "*"          { return symbol(sym.TIMES); } 
+  "/"          { return symbol(sym.DIVIDE); } 
+  {keywords}         { return symbol(sym.KEYWORD); }  
+  {collections}      { return symbol(sym.COLLECTION); } 
+  {booleanoperators} { return symbol(sym.BOOLEANOPERATOR); }
+  {boolean}          { return symbol(sym.BOOLEAN); }
+  {identifier}       { return symbol(sym.IDENTIFIER); } 
+  {real}             { return symbol(sym.REAL); } 
+  {integer}          { return symbol(sym.INTEGER); }
 } 
- 
-.|\n { throw new Error("Illegal character <"+ yytext()+">");} 
+<STRING> {
+	'           { yybegin(YYINITIAL); return symbol(sym.STRING, string.toString());}
+	[^\n\r'\\]+  { string.append( yytext() ); }
+	\\t          { string.append("\t"); }
+	\\n          { string.append("\n"); }
+	\\r          { string.append("\r"); }
+	\\'          { string.append("\'"); }
+	\\           { string.append("\\"); }
+}
+.|\n {System.out.println("Erro!"); throw new Error("Illegal character <"+ yytext()+">");} 

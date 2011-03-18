@@ -1,5 +1,7 @@
 package java_cup.runtime;
 
+import java_cup.sym;
+
 /**
  * Defines the Symbol class, which is used to represent all terminals and
  * nonterminals while parsing. The lexer should pass CUP Symbols and CUP returns
@@ -23,14 +25,14 @@ public class Symbol {
 	 * Constructor for l,r values
 	 *******************************/
 
-	public Symbol(int id, int l, int r, Object o, String text) {
+	public Symbol(int id, String value, int l, int r) {
 		this(id);
 		left = l;
 		right = r;
-		value = o;
-		this.text = text;
+		this.value = value;
+		this.text = getTokenName(id);
 	}
-	
+
 	public Symbol(int id, int l, int r, Object o) {
 		this(id);
 		left = l;
@@ -38,21 +40,56 @@ public class Symbol {
 		value = o;
 	}
 
+	public Symbol(int id, int l, int r) {
+		this(id);
+		left = l;
+		right = r;
+	}
+
+	public Symbol(int id, Object value) {
+		this(id);
+		this.value = value;
+	}
+
+	public static String getTokenName(int tokenName) {
+		String out = "SPECIALCHAR";
+		if (java_cup.sym.KEYWORD == tokenName) {
+			out = "KEYWORD";
+		} else if (java_cup.sym.OPERATOR == tokenName
+				|| java_cup.sym.NE == tokenName || java_cup.sym.EQ == tokenName
+				|| java_cup.sym.LE == tokenName || java_cup.sym.GE == tokenName
+				|| java_cup.sym.LT == tokenName || java_cup.sym.GT == tokenName
+				|| java_cup.sym.PLUS == tokenName
+				|| java_cup.sym.TIMES == tokenName
+				|| java_cup.sym.MINUS == tokenName
+				|| java_cup.sym.DIVIDE == tokenName) {
+			out = "OPERATOR";
+		} else if (java_cup.sym.COLLECTION == tokenName) {
+			out = "COLLECTION";
+		} else if (java_cup.sym.BOOLEAN == tokenName) {
+			out = "BOOLEAN";
+		} else if (java_cup.sym.REAL == tokenName) {
+			out = "REAL";
+		} else if (java_cup.sym.INTEGER == tokenName) {
+			out = "INTEGER";
+		} else if (java_cup.sym.STRING == tokenName) {
+			out = "STRING";
+		} else if (java_cup.sym.IDENTIFIER == tokenName) {
+			out = "IDENTIFIER";
+		} else if (java_cup.sym.PATHNAME == tokenName) {
+			out = "sym.PATHNAME";
+		}
+		return out;
+
+	}
+
 	/*******************************
 	 * Constructor for no l,r values
 	 ********************************/
 
-	public Symbol(int id, Object o) {
-		this(id, -1, -1, o, null);
-	}
-
 	/*****************************
 	 * Constructor for no value
 	 ***************************/
-
-	public Symbol(int id, int l, int r) {
-		this(id, l, r, null, null);
-	}
 
 	/***********************************
 	 * Constructor for no value or l,r
@@ -119,7 +156,7 @@ public class Symbol {
 		return this.right;
 	}
 
-	public String getText() {
-		return this.text;
+	public String getName() {
+		return this.text.toString();
 	}
 }

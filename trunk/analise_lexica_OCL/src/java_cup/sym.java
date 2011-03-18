@@ -78,7 +78,7 @@ public class sym {
   public static final int GE = 33;
   public static final int STRING = 28;
   public static final int DIVIDE = 3;
-  public static final int COLON_COLON = 29;
+  public static final int PATHNAME = 29;
   public static final int COMMA = 18;
   public static final int LEFT_BRK = 13;
   public static final int REAL = 36;
@@ -99,6 +99,12 @@ public class sym {
   public static final int TYPE = 9873;
   public static final int BOOLEAN = 9874;
   public static final int IDENTIFIER = 9875;
+  public static final int BOOLEANOPERATOR = 25;
+public static final int EQEQ = 0;
+public static final int BREAK = 0;
+public static final int INTEGER_LITERAL = 0;
+	public static final int ABSTRACT = 0;
+	public static final int STRING_LITERAL = 0;
   
  
 }
