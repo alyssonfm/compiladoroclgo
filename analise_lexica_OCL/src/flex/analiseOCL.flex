@@ -40,23 +40,22 @@ identifier = {letter}{alpha}*
 numberid = ({integer}|{real})+{letter}+({integer}|{real})*
 /*Pg. 74 Types*/
 string = "'" ~"'" 
-integer    = {digit}+  
-real       = {integer}"\."{integer}[eE][+-]?{integer} | 
-             {integer}[eE][+-]?{integer} | {integer}"\."{integer}
+integer    = -?{digit}+  
+real       = {integer}("\."{digit}+)?([eE][+-]?{digit}+)?
 boolean = "true"|"false"    
-collections = "Set"|"Bag"|"Sequence"|"OrderedSet"|"Collection" /*Pg. 137*/
-booleanoperators = "if"|"then"|"else"|"endif"|"implies"|"and"|"or"|"xor"|"not" /*Pg. 123*/
+collections = "Set"|"Bag"|"Sequence"|"OrderedSet" /*Pg. 137*/
+booleanoperators = "implies"|"and"|"or"|"xor"|"not" /*Pg. 123*/
+conditionalexpression = "if"|"then"|"else"|"endif"
 keywords = "self"|"package"|"endpackage"|"context"|"body"  /*Pg. 13 e 14 Especificação OCL*/
 
 %%
 
-	
 <YYINITIAL>  {whitespace} {  }    
 <YYINITIAL>  {comments}   {  }	
 <YYINITIAL>  ".."         { return symbol(sym.DOT_DOT); }
 <YYINITIAL>  "::"         { return symbol(sym.PATHNAME); } 
 <YYINITIAL>  "."          { return symbol(sym.DOT); }
-<YYINITIAL>  "->"         { return symbol(sym.MINUS_GT); }   
+<YYINITIAL>  "->"         { return symbol(sym.COLLECTIONOPERATION); }   
 <YYINITIAL>  ":"          { return symbol(sym.COLON); }  
 <YYINITIAL>  "("          { return symbol(sym.LEFT_PAR); } 
 <YYINITIAL>  "["          { return symbol(sym.LEFT_BRK); } 
@@ -76,14 +75,15 @@ keywords = "self"|"package"|"endpackage"|"context"|"body"  /*Pg. 13 e 14 Especif
 <YYINITIAL>  "-"          { return symbol(sym.MINUS); } 
 <YYINITIAL>  "*"          { return symbol(sym.TIMES); } 
 <YYINITIAL>  "/"          { return symbol(sym.DIVIDE); } 
-<YYINITIAL>  {keywords}         { return symbol(sym.KEYWORD); }  
-<YYINITIAL>  {collections}      { return symbol(sym.COLLECTION); } 
-<YYINITIAL>  {booleanoperators} { return symbol(sym.BOOLEANOPERATOR); }
-<YYINITIAL>  {boolean}          { return symbol(sym.BOOLEAN); }
-<YYINITIAL>  {identifier}       { return symbol(sym.IDENTIFIER); } 
-<YYINITIAL>  {real}             { return symbol(sym.REAL); } 
-<YYINITIAL>  {integer}          { return symbol(sym.INTEGER); }
-<YYINITIAL>  {string}           { return symbol(sym.STRING); }
-{numberid}|.|\n {erros.append("Padrão não reconhecido pela linguagem OCL: <"+ yytext()+">" + " Linha: "+ yyline + " Coluna: "+ yycolumn+"\r");}
+<YYINITIAL>  {keywords}              { return symbol(sym.KEYWORD); }  
+<YYINITIAL>  {collections}           { return symbol(sym.COLLECTION); } 
+<YYINITIAL>  {booleanoperators}      { return symbol(sym.BOOLEANOPERATOR); }
+<YYINITIAL>  {conditionalexpression} { return symbol(sym.CONDITIONALEXPRESSION); }
+<YYINITIAL>  {boolean}               { return symbol(sym.BOOLEAN); }
+<YYINITIAL>  {identifier}            { return symbol(sym.IDENTIFIER); } 
+<YYINITIAL>  {real}                  { return symbol(sym.REAL); } 
+<YYINITIAL>  {integer}               { return symbol(sym.INTEGER); }
+<YYINITIAL>  {string}                { return symbol(sym.STRING); }
+.|\n {erros.append("Lexema não reconhecido pela linguagem OCL: <"+ yytext()+">" + " Linha: "+ yyline + " Coluna: "+ yycolumn+"\r");}
 
 <<EOF>>  {System.err.println(erros.toString());System.exit(1);}
