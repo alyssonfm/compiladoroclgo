@@ -37,7 +37,7 @@ digit  = [0-9]
 letter = [A-Za-z] | [_] 
 alpha  = {letter} | {digit} 
 identifier = {letter}{alpha}*
-numberid = ({integer}|{real})+{letter}+({integer}|{real})*
+
 /*Pg. 74 Types*/
 string = "'" ~"'" 
 integer    = -?{digit}+  
