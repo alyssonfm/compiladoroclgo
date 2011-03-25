@@ -1,0 +1,112 @@
+// CUP specification for a simple expression evaluator (no actions)
+
+import java_cup.runtime.*;
+
+/* Preliminaries to set up and use the scanner.  */
+init with {: scanner.init();              :};
+scan with {: return scanner.next_token(); :};
+
+/* Terminals (tokens returned by the scanner). */
+terminal            
+terminal DOT, COMMA, COLON, PATHNAME, LEFT_PAR, LEFT_BRK, LEFT_BRA, RIGHT_PAR, RIGHT_BRK, RIGHT_BRA
+terminal COLLECTIONOPERATION
+terminal EQ
+terminal Integer INTEGER;
+terminal Double REAL;
+terminal String STRING;
+
+/* Non terminals */
+non terminal oclFile;
+non terminal contextDeclaration;
+non terminal operationContext;
+non terminal bodyDeclaration;
+non terminal operation;
+non terminal oclExpression;
+non terminal parameters;
+non terminal variableExp;
+non terminal simpleName;
+non terminal packageName;
+non terminal literalExp;
+non terminal collectionLiteralExp;
+non terminal collectionTypeIdentifier;
+non terminal collectionLiteralParts;
+non terminal collectionLiteralPart;
+non terminal primitiveLiteralExp;
+non terminal integerLiteral;
+non terminal realLiteral;
+non terminal stringLiteral;
+non terminal booleanLiteral;
+non terminal propertyCallExp;
+non terminal modelPropertyCallExp;
+non terminal operationCallExp;
+non terminal attributeCallExp;
+non terminal navigationCallExp;
+non terminal associationCallExp;
+non terminal arguments;
+non terminal ifExp;
+non terminal collectionType;
+non terminal typeName;
+non terminal variableDeclaration;
+
+
+/* Precedences */
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE, MOD;
+precedence left UMINUS;
+
+/* The grammar */
+oclFile ::=  "package" packageName contextDeclaration* "endpackage"
+oclFile ::=  contextDeclaration*
+contextDeclaration ::= operationContext
+operationContext ::= "context" operation bodyDeclaration
+bodyDeclaration ::= "body" (simpleName)? COLON oclExpression bodyDeclaration?
+operation ::= (packageName PATHNAME)? simpleName LEFT_PAR parameters? RIGHT_PAR COLON typeName?
+oclExpression ::= propertyCallExp
+oclExpression ::= variableExp
+oclExpression ::= literalExp
+oclExpression ::= ifExp
+parameters ::= variableDeclaration (COMMA parameters)?
+variableExp ::= simpleName
+simpleName ::= STRING
+packageName ::= simpleName (PATHNAME packageName)?
+literalExp ::= collectionLiteralExp
+literalExp ::= primitiveLiteralExp
+collectionLiteralExp ::= collectionTypeIdentifier LEFT_BRA (collectionLiteralParts)? RIGHT_BRA
+collectionTypeIdentifier ::= "Set"
+collectionTypeIdentifier ::= "Bag"
+collectionTypeIdentifier ::= "Sequence"
+collectionTypeIdentifier ::= "OrderedSet"
+collectionTypeIdentifier ::= "Collection"
+collectionLiteralParts ::= collectionLiteralPart (COMMA collectionLiteralParts)?
+collectionLiteralPart ::= oclExpression
+primitiveLiteralExp ::= integerLiteral
+primitiveLiteralExp ::= realLiteral
+primitiveLiteralExp ::= stringLiteral
+primitiveLiteralExp ::= booleanLiteral
+integerLiteral ::= INTEGER
+realLiteral ::= REAL
+stringLiteral ::= """ STRING """
+booleanLiteral ::= "true"
+booleanLiteral ::= "false"
+propertyCallExp ::= modelPropertyCallExp
+modelPropertyCallExp ::= operationCallExp
+modelPropertyCallExp ::= attributeCallExp
+modelPropertyCallExp ::= navigationCallExp
+operationCallExp ::= (oclExpression)? simpleName oclExpression  
+operationCallExp ::= oclExpression (COLLECTIONOPERATION | DOT) simpleName LEFT_PAR arguments? RIGHT_PAR
+operationCallExp ::= simpleName LEFT_PAR arguments? RIGHT_PAR
+operationCallExp ::= packageName LEFT_PAR arguments? RIGHT_PAR
+attributeCallExp ::= oclExpression DOT simpleName
+attributeCallExp ::= simpleName
+attributeCallExp ::= packageName
+navigationCallExp ::= associationEndCallExp
+navigationCallExp ::= associationClassCallExp
+associationCallExp ::= (oclExpression DOT)? simpleName (LEFT_BRK arguments RIGHT_BRK)?
+arguments ::= oclExpression ( COMMA arguments )?
+ifExp ::= "if" oclExpression "then" oclExpression "else" oclExpression "endif"
+collectionType ::= collectionTypeIdentifier LEFT_PAR typeName RIGHT_PAR 
+typeName ::= packageName
+typeName ::= collectionType
+variableDeclaration ::= simpleName (COLON typeName)? ( EQ OclExpression)?
+	    ;
+	    
