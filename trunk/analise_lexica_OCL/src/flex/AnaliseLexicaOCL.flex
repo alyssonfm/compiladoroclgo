@@ -11,7 +11,7 @@ import java_cup.sym;
 %column
 
 %{
-	StringBuilder erros = new StringBuilder();
+	StringBuilder string = new StringBuilder();
 	
 	private Symbol symbol(int tokenname) {
 		Symbol symbol = new Symbol(tokenname, yytext(), yyline, yycolumn);
@@ -26,24 +26,21 @@ import java_cup.sym;
 lineterminator = \n|\r|\n\r|\r\n
 inputcharacter = [^\r\n]
 whitespace     = {lineterminator}|[ \f\t]
-paragraphcomment  = "/*" ~"*/"
+paragraphcomment  = ("/*"~"*/")(~"*/")*
 linecomment       = "--" {inputcharacter}* {lineterminator}
-comments          = {linecomment} | {paragraphcomment} /*Pg. 127*/
+comments          = {linecomment} | {paragraphcomment} 
 
 digit  = [0-9] 
 letter = [A-Za-z] | [_] 
 alpha  = {letter} | {digit} 
 identifier = {letter}{alpha}*
 
-/*Pg. 74 Types*/
-string = "'" ~"'" 
+%state STRING
+stringdelimiter = \'
 integer    = -?{digit}+  
 real       = {integer}("\."{digit}+)?([eE][+-]?{digit}+)?
 boolean = "true"|"false"    
-collections = "Set"|"Bag"|"Sequence"|"OrderedSet" /*Pg. 137*/
-booleanoperators = "implies"|"and"|"or"|"xor"|"not" /*Pg. 123*/
-conditionalexpression = "if"|"then"|"else"|"endif"
-keywords = "self"|"package"|"endpackage"|"context"|"body"  /*Pg. 13 e 14 Especificação OCL*/
+collections = "Set"|"Bag"|"Sequence"|"OrderedSet"
 
 %%
 
@@ -71,15 +68,32 @@ keywords = "self"|"package"|"endpackage"|"context"|"body"  /*Pg. 13 e 14 Especif
 <YYINITIAL>  "-"          { return symbol(sym.MINUS); } 
 <YYINITIAL>  "*"          { return symbol(sym.TIMES); } 
 <YYINITIAL>  "/"          { return symbol(sym.DIVIDE); } 
-<YYINITIAL>  {keywords}              { return symbol(sym.KEYWORD); }  
-<YYINITIAL>  {collections}           { return symbol(sym.COLLECTION); } 
-<YYINITIAL>  {booleanoperators}      { return symbol(sym.BOOLEANOPERATOR); }
-<YYINITIAL>  {conditionalexpression} { return symbol(sym.CONDITIONALEXPRESSION); }
+<YYINITIAL>  "self"             { return symbol(sym.SELF); }
+<YYINITIAL>  "package"          { return symbol(sym.PACKAGE); }
+<YYINITIAL>  "endpackage"       { return symbol(sym.ENDPACKAGE); }
+<YYINITIAL>  "context"          { return symbol(sym.CONTEXT); }
+<YYINITIAL>  "body"             { return symbol(sym.BODY); }
+<YYINITIAL>  "if"               { return symbol(sym.IF); }
+<YYINITIAL>  "then"             { return symbol(sym.THEN); }
+<YYINITIAL>  "else"             { return symbol(sym.ELSE); }
+<YYINITIAL>  "endif"            { return symbol(sym.ENDIF); }
+<YYINITIAL>  "implies"          { return symbol(sym.IMPLIES); }
+<YYINITIAL>  "and"              { return symbol(sym.AND); }
+<YYINITIAL>  "or"               { return symbol(sym.OR); }
+<YYINITIAL>  "xor"              { return symbol(sym.XOR); }
+<YYINITIAL>  "not"              { return symbol(sym.NOT); }
 <YYINITIAL>  {boolean}               { return symbol(sym.BOOLEAN); }
 <YYINITIAL>  {identifier}            { return symbol(sym.IDENTIFIER); } 
 <YYINITIAL>  {real}                  { return symbol(sym.REAL); } 
 <YYINITIAL>  {integer}               { return symbol(sym.INTEGER); }
 <YYINITIAL>  {string}                { return symbol(sym.STRING); }
-.|\n {erros.append("Lexema não reconhecido pela linguagem OCL: <"+ yytext()+">" + " Linha: "+ yyline + " Coluna: "+ yycolumn+"\r");}
+<YYINITIAL>  {stringdelimiter}  { string.setLength(0); yybegin(STRING); }
+<STRING>  [^\n\r\'\\]+          { string.append( yytext()); }
+<STRING>  \\t                   { string.append('\t'); }
+<STRING>  \\n                   { string.append('\n'); }
+<STRING>  \\r                   { string.append('\r'); }
+<STRING>  \\\'                  { string.append('\''); }
+<STRING>  \\                    { string.append('\\'); }
+<STRING> {stringdelimiter} 		{ yybegin(YYINITIAL); return symbol(sym.STRING, string.toString());}
 
-<<EOF>>  {System.err.println(erros.toString());System.exit(1);}
+.|\n {throw new Error("Lexema não reconhecido pela linguagem OCL: <"+ yytext()+">" + " Linha: "+ yyline + " Coluna: "+ yycolumn+"\r");}
