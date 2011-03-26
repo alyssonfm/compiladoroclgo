@@ -33,7 +33,7 @@ public class sym {
 	public static final int RIGHT = 22;
 	public static final int ACTION = 5;
 	public static final int CODE_STRING = 29;
-	public static final int RIGHT_BRK = 16;
+	public static final int RIGHT_BRK = 17;
 	public static final int LEFT_BRA = 14;
 	public static final int UP_UP = 30;
 	public static final int CONTEXT = 51;
@@ -75,7 +75,7 @@ public class sym {
 	public static final int MINUS = 5;
 	public static final int DOT_DOT = 27;
 	public static final int GE = 33;
-	public static final int STRING = 28;
+	public static final int STRING = 24;
 	public static final int DIVIDE = 3;
 	public static final int PATHNAME = 29;
 	public static final int COMMA = 18;
@@ -89,9 +89,6 @@ public class sym {
 	public static final int SEQUENCE = 54;
 	public static final int SET = 41;
 	public static final int ORDEREDSET = 47;
-
-	// Definições dos tokens- segue o padrão 987 (numero qualquer)
-
 	public static final int OPERATOR = 9871;
 	public static final int KEYWORD = 9872;
 	public static final int TYPE = 9873;
@@ -104,5 +101,6 @@ public class sym {
 	public static final int INTEGER_LITERAL = 0;
 	public static final int ABSTRACT = 0;
 	public static final int STRING_LITERAL = 0;
+	public static final int SELF = 12;
 
 }
