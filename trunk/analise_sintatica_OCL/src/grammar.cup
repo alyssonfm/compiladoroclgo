@@ -7,13 +7,17 @@ init with {: scanner.init();              :};
 scan with {: return scanner.next_token(); :};
 
 /* Terminals (tokens returned by the scanner). */
-terminal            
-terminal DOT, COMMA, COLON, PATHNAME, LEFT_PAR, LEFT_BRK, LEFT_BRA, RIGHT_PAR, RIGHT_BRK, RIGHT_BRA
-terminal COLLECTIONOPERATION
-terminal EQ
+terminal PACKAGE, ENDPACKAGE, CONTEXT, BODY;
+terminal DOT, COMMA, COLON, PATHNAME, LEFT_PAR, LEFT_BRK, LEFT_BRA, RIGHT_PAR, RIGHT_BRK, RIGHT_BRA;
+terminal COLLECTIONOPERATION;
+terminal EQ, NE, LE, GE, GT, LT;
+terminal AND, OR, NOT, XOR, IMPLIES;
+terminal IF, ELSE, THEN ENDIF;
+terminal PLUS, MINUS, TIMES, DIVIDE;
 terminal Integer INTEGER;
 terminal Double REAL;
 terminal String STRING;
+terminal IDENTIFIER, BOOLEAN;
 
 /* Non terminals */
 non terminal oclFile;
@@ -21,7 +25,7 @@ non terminal contextDeclaration;
 non terminal operationContext;
 non terminal bodyDeclaration;
 non terminal operation;
-non terminal oclExpression;
+non terminal oclExpression, oclExpressions, expression;
 non terminal parameters;
 non terminal variableExp;
 non terminal simpleName;
@@ -47,48 +51,60 @@ non terminal ifExp;
 non terminal collectionType;
 non terminal typeName;
 non terminal variableDeclaration;
+non terminal relationalExpression;
+non terminal additiveExpression;
+non terminal multiplicativeExpression;
+non terminal unaryExpression;
+non terminal oclExpressionAux;
+non terminal unaryOperator;
+non terminal multiplyOperator; 
+non terminal addOperator;
+non terminal relationalOperator;
+non terminal logicalOperator;
 
 
 /* Precedences */
+ 
+precedence left COMMMA;
+precedence left IMPLIES;
+precedence left AND, OR, XOR;
+precedence left EQ, NE;
+precedence left LE, GE, GT, LT; 
+precedence left IF, THEN, ELSE, ENDIF;
 precedence left PLUS, MINUS;
-precedence left TIMES, DIVIDE, MOD;
-precedence left UMINUS;
+precedence left TIMES, DIVIDE;
+precedence left NOT;
+precedence left LEFT_PAR, RIGHT_PAR;
+precedence left COLLECTIONOPERATION, DOT; 
 
 /* The grammar */
-oclFile ::=  "package" packageName contextDeclaration* "endpackage"
+oclFile ::=  PACKAGE packageName contextDeclaration* ENDPACKAGE
 oclFile ::=  contextDeclaration*
 contextDeclaration ::= operationContext
-operationContext ::= "context" operation bodyDeclaration
-bodyDeclaration ::= "body" (simpleName)? COLON oclExpression bodyDeclaration?
+operationContext ::= CONTEXT operation bodyDeclaration
+bodyDeclaration ::= BODY (simpleName)? COLON oclExpression bodyDeclaration?
 operation ::= (packageName PATHNAME)? simpleName LEFT_PAR parameters? RIGHT_PAR COLON typeName?
-oclExpression ::= propertyCallExp
-oclExpression ::= variableExp
-oclExpression ::= literalExp
-oclExpression ::= ifExp
+oclExpressions ::= expression
 parameters ::= variableDeclaration (COMMA parameters)?
 variableExp ::= simpleName
-simpleName ::= STRING
+simpleName ::= IDENTIFIER
 packageName ::= simpleName (PATHNAME packageName)?
 literalExp ::= collectionLiteralExp
 literalExp ::= primitiveLiteralExp
 collectionLiteralExp ::= collectionTypeIdentifier LEFT_BRA (collectionLiteralParts)? RIGHT_BRA
-collectionTypeIdentifier ::= "Set"
-collectionTypeIdentifier ::= "Bag"
-collectionTypeIdentifier ::= "Sequence"
-collectionTypeIdentifier ::= "OrderedSet"
-collectionTypeIdentifier ::= "Collection"
+collectionTypeIdentifier ::= COLLECTION
 collectionLiteralParts ::= collectionLiteralPart (COMMA collectionLiteralParts)?
 collectionLiteralPart ::= oclExpression
-primitiveLiteralExp ::= integerLiteral
-primitiveLiteralExp ::= realLiteral
-primitiveLiteralExp ::= stringLiteral
-primitiveLiteralExp ::= booleanLiteral
-integerLiteral ::= INTEGER
-realLiteral ::= REAL
-stringLiteral ::= """ STRING """
-booleanLiteral ::= "true"
-booleanLiteral ::= "false"
+primitiveLiteralExp ::= INTEGER
+primitiveLiteralExp ::= REAL
+primitiveLiteralExp ::= STRING
+primitiveLiteralExp ::= BOOLEAN
 propertyCallExp ::= modelPropertyCallExp
+propertyCallExp ::= loopExp
+loopExp ::= oclExpression COLLECTIONOPERATION simpleName LEFT_PAR (variableDeclaration (COMMA variableDeclaration)? BAR )? oclExpression RIGHT_PAR
+loopExp ::= oclExpression DOT simpleName LEFT_PAR arguments? RIGHT_PAR
+loopExp ::= oclExpression DOT simpleName
+loopExp ::= oclExpression DOT simpleName (LEFT_BRK arguments? RIGHT_BRK)?
 modelPropertyCallExp ::= operationCallExp
 modelPropertyCallExp ::= attributeCallExp
 modelPropertyCallExp ::= navigationCallExp
@@ -103,10 +119,37 @@ navigationCallExp ::= associationEndCallExp
 navigationCallExp ::= associationClassCallExp
 associationCallExp ::= (oclExpression DOT)? simpleName (LEFT_BRK arguments RIGHT_BRK)?
 arguments ::= oclExpression ( COMMA arguments )?
-ifExp ::= "if" oclExpression "then" oclExpression "else" oclExpression "endif"
+ifExp ::= IF oclExpression THEN oclExpression ELSE oclExpression ENDIF
 collectionType ::= collectionTypeIdentifier LEFT_PAR typeName RIGHT_PAR 
 typeName ::= packageName
 typeName ::= collectionType
 variableDeclaration ::= simpleName (COLON typeName)? ( EQ OclExpression)?
+expression ::= relationalExpression (logicalOperator relationalExpression)*
+relationalExpression ::= additiveExpression (relationalOperator additiveExpression)*
+additiveExpression ::= multiplicativeExpression (addOperator multiplicativeExpression)*
+multiplicativeExpression ::= unaryExpression (multiplyOperator unaryExpression)*
+unaryExpression ::= ( unaryOperator oclExpression )
+unaryExpression ::= oclExpressionAux
+oclExpressionAux ::= propertyCallExp
+oclExpressionAux ::= variableExp
+oclExpressionAux ::= literalExp
+oclExpressionAux ::= ifExp
+oclExpressionAux ::= LEFT_PAR expression RIGHT_PAR
+unaryOperator ::= MINUS
+unaryOperator ::= NOT
+multiplyOperator ::= TIMES
+multiplyOperator ::= DIVIDE 
+addOperator ::= PLUS
+addOperator ::= MINUS
+relationalOperator ::= EQ
+relationalOperator ::= NE
+relationalOperator ::= LE
+relationalOperator ::= GE
+relationalOperator ::= LT
+relationalOperator ::= GT
+logicalOperator ::= AND
+logicalOperator ::= OR
+logicalOperator ::= IMPLIES
+logicalOperator ::= XOR
 	    ;
 	    
