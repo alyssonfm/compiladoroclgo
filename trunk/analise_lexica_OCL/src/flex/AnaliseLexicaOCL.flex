@@ -86,7 +86,6 @@ collections = "Set"|"Bag"|"Sequence"|"OrderedSet"
 <YYINITIAL>  {identifier}            { return symbol(sym.IDENTIFIER); } 
 <YYINITIAL>  {real}                  { return symbol(sym.REAL); } 
 <YYINITIAL>  {integer}               { return symbol(sym.INTEGER); }
-<YYINITIAL>  {string}                { return symbol(sym.STRING); }
 <YYINITIAL>  {stringdelimiter}  { string.setLength(0); yybegin(STRING); }
 <STRING>  [^\n\r\'\\]+          { string.append( yytext()); }
 <STRING>  \\t                   { string.append('\t'); }
