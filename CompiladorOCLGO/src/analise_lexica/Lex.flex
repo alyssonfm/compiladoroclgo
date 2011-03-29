@@ -4,7 +4,7 @@ import java_cup.runtime.*;
 import analise_sintatica.sym; 
 
 %%
-%class AnaliseLexicaOCL
+%class Lex
 %unicode
 %cup
 %line
