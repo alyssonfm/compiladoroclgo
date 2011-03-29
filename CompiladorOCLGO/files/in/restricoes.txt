@@ -1,0 +1,99 @@
+package Behavioral_Elements::Activity_Graphs
+
+context Person::getSon(): Set(Person)
+body: Person.allInstances->select(s | s.father = self or s.mother = self)
+				
+context TestSession::numberOfScoresOverTarget(target : Integer) : Integer
+body: results->select(compositeScore > target)->size()
+
+context ObjectFlowState::getTrue(): Boolean
+body: self.allPreviousLeafStates->size > 0
+
+context Quarto::obterQuartosLivres(entrada: Date, saída : Date, numPessoas : Integer): Set(Quarto)
+body: Quarto.allInstances->select( q | q.capacidade>numPessoas and q.estadia_Quarto
+						 ->exists( e | DateInterval.disjoint(e.data_de_entrada, e.data_de_saída, entrada, saída, true))
+
+					 
+context TestSession::testResultsForTeam(testTeam : Team) : Set(TestResult)
+body: results->select(team = testTeam)	
+		
+context TestSession::averageScoreForTeam(testTeam : Team) : Real
+body: testResultsForTeam(testTeam).compositeScore->sum() / testResultsForTeam(testTeam)->size()	
+
+context TestSession::bestResults() : Set(TestResult)
+body: results->select(compositeScore = results->sortedBy(compositeScore)->last().compositeScore)
+
+context MyType::a(): Set(Set(Integer))
+body: Set {Set{1, 2, 3}, Set{3, 4, 5}, Set{4, 5, 6}}
+
+context ItemAnalyzer::averagePrice() : Money
+body: items.basePrice()->sum() / items.basePrice()->size()
+
+context ItemAnalyzer::uniqueModDescriptions() : Set(String)
+body: items.modDescriptions()->flatten()->asSet()
+
+context Sale::total() : Money
+body: subtotal() + tax()
+
+context Sale::tax() : Money
+body: subtotal() * Tax::localRate
+
+context Sale::subtotal() : Money
+body: items.price()->sum()
+
+context LoyaltyAccount::getCustomerName() : String 
+body: Membership.card.owner.name 
+
+
+
+context LineItem::price() : Money
+body: basePrice() + modsPrice()
+
+context LineItem::modsPrice() : Money
+body: modifiers.price()->sum()
+
+context LineItem::basePrice() : Money
+body:
+if size = DrinkSize::Small then
+	if flavor = Flavor::Regular then
+		Money::newInstance(1.23, Currency::USDollars)
+	else
+		Money::newInstance(1.73, Currency::USDollars)
+    endif
+else
+	if flavor = Flavor::Regular then
+		Money::newInstance(2.43, Currency::USDollars)
+	else
+		Money::newInstance(3.13, Currency::USDollars)
+	endif
+endif
+
+context LargeRegularLemonade::basePrice() : Money
+body: Money::newInstance(2.43, Currency::USDollars)
+
+context SmallFlavoredLemonade::basePrice() : Money
+body: Money::newInstance(1.72, Currency::USDollars)
+
+context TestSession::numberOfScoresOverTarget(target : Integer) : Integer
+body: results->select(compositeScore > target)->size()
+
+context LoyaltyProgram::getServices(pp: ProgramPartner): Set(Service)
+body: if partners->includes(pp)
+		then pp.deliveredServices
+      else Set
+      endif
+	  
+context LoyaltyProgram: getServicesByLevel(levelName: String): Set(Service)
+body: levels->select( name = levelName ).availableServices->asSet()
+
+context Person::getChildren(): Set(Person)
+body: Person.allInstances->select(s | s.father = self or s.mother = self)
+
+context ObjectFlowState::getTrue(): Boolean
+body: source->exists(it|body)
+
+context TeamMember : disjoint (m1 : Meeting, m2 : Meeting) : Boolean
+body: (m1.start + m1.duration <= m2.start) or (m2.start + m2.duration <= m1.start)
+						 
+endpackage
+
