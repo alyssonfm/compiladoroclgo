@@ -1,0 +1,155 @@
+// CUP specification for a simple expression evaluator (no actions)
+package analise_sintatica;
+
+
+/* Terminals (tokens returned by the scanner). */
+terminal PACKAGE, ENDPACKAGE, CONTEXT, BODY, COLLECTION;
+terminal DOT, COMMA, COLON, PATHNAME, LEFT_PAR, LEFT_BRK, LEFT_BRA, RIGHT_PAR, RIGHT_BRK, RIGHT_BRA;
+terminal COLLECTIONOPERATION;
+terminal EQ, NE, LE, GE, GT, LT;
+terminal AND, OR, NOT, XOR, IMPLIES;
+terminal IF, ELSE, THEN, ENDIF;
+terminal PLUS, MINUS, TIMES, DIVIDE;
+terminal Integer INTEGER;
+terminal Double REAL;
+terminal String STRING;
+terminal IDENTIFIER, BOOLEAN;
+terminal BAR;
+
+/* Non terminals */
+non terminal oclFile;
+non terminal contextDeclaration;
+non terminal operationContext;
+non terminal bodyDeclaration;
+non terminal operation;
+non terminal oclExpression, oclExpressions, expression;
+non terminal parameters;
+non terminal variableExp;
+non terminal simpleName;
+non terminal packageName;
+non terminal literalExp;
+non terminal collectionLiteralExp;
+non terminal collectionTypeIdentifier;
+non terminal collectionLiteralParts;
+non terminal collectionLiteralPart;
+non terminal primitiveLiteralExp;
+non terminal integerLiteral;
+non terminal realLiteral;
+non terminal stringLiteral;
+non terminal booleanLiteral;
+non terminal propertyCallExp;
+non terminal modelPropertyCallExp;
+non terminal operationCallExp;
+non terminal attributeCallExp;
+non terminal navigationCallExp;
+non terminal associationCallExp;
+non terminal arguments;
+non terminal ifExp;
+non terminal collectionType;
+non terminal typeName;
+non terminal variableDeclaration;
+non terminal relationalExpression;
+non terminal additiveExpression;
+non terminal multiplicativeExpression;
+non terminal unaryExpression;
+non terminal oclExpressionAux;
+non terminal unaryOperator;
+non terminal multiplyOperator; 
+non terminal addOperator;
+non terminal relationalOperator;
+non terminal logicalOperator;
+non terminal loopExp;
+
+
+/* Precedences */
+ 
+precedence left COMMA;
+precedence left IMPLIES;
+precedence left AND, OR, XOR;
+precedence left EQ, NE;
+precedence left LE, GE, GT, LT; 
+precedence left IF, THEN, ELSE, ENDIF;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence left NOT;
+precedence left LEFT_PAR, RIGHT_PAR;
+precedence left COLLECTIONOPERATION, DOT; 
+
+/*----------------------------------------------------------------*/
+start with oclFile;
+/*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
+
+
+/* The grammar */
+oclFile ::=  PACKAGE packageName (contextDeclaration+ |) ENDPACKAGE;
+oclFile ::=  (contextDeclaration+ | );
+contextDeclaration ::= operationContext;
+operationContext ::= CONTEXT operation bodyDeclaration;
+bodyDeclaration ::= BODY (simpleName  | ) COLON oclExpression ( bodyDeclaration  | ) ;
+operation ::= (packageName PATHNAME | ) simpleName LEFT_PAR parameters | ) RIGHT_PAR COLON (typeName | );
+oclExpressions ::= expression;
+parameters ::= variableDeclaration (COMMA parameters | );
+variableExp ::= simpleName;
+simpleName ::= IDENTIFIER;
+packageName ::= simpleName (PATHNAME packageName | );
+literalExp ::= collectionLiteralExp;
+literalExp ::= primitiveLiteralExp;
+collectionLiteralExp ::= collectionTypeIdentifier LEFT_BRA (collectionLiteralParts | ) RIGHT_BRA;
+collectionTypeIdentifier ::= COLLECTION;
+collectionLiteralParts ::= collectionLiteralPart (COMMA collectionLiteralParts | );
+collectionLiteralPart ::= oclExpression;
+primitiveLiteralExp ::= INTEGER;
+primitiveLiteralExp ::= REAL;
+primitiveLiteralExp ::= STRING;
+primitiveLiteralExp ::= BOOLEAN;
+propertyCallExp ::= modelPropertyCallExp;
+propertyCallExp ::= loopExp;
+loopExp ::= oclExpression COLLECTIONOPERATION simpleName LEFT_PAR (variableDeclaration (COMMA variableDeclaration | ) BAR | ) oclExpression RIGHT_PAR;
+loopExp ::= oclExpression DOT simpleName LEFT_PAR (arguments | ) RIGHT_PAR;
+loopExp ::= oclExpression DOT simpleName;
+loopExp ::= oclExpression DOT simpleName (LEFT_BRK (arguments | ) RIGHT_BRK | );
+modelPropertyCallExp ::= operationCallExp;
+modelPropertyCallExp ::= attributeCallExp;
+modelPropertyCallExp ::= navigationCallExp;
+operationCallExp ::= (oclExpression | ) simpleName oclExpression;  
+operationCallExp ::= oclExpression (COLLECTIONOPERATION  | ) DOT) simpleName LEFT_PAR (arguments  | ) RIGHT_PAR;
+operationCallExp ::= simpleName LEFT_PAR arguments | ) RIGHT_PAR;
+operationCallExp ::= packageName LEFT_PAR (arguments  | ) RIGHT_PAR;
+attributeCallExp ::= oclExpression DOT simpleName;
+attributeCallExp ::= simpleName;
+attributeCallExp ::= packageName;
+navigationCallExp ::= associationCallExp;
+associationCallExp ::= (oclExpression DOT  | ) simpleName (LEFT_BRK arguments RIGHT_BRK  | ));
+arguments ::= oclExpression ( COMMA arguments  | );
+ifExp ::= IF oclExpression THEN oclExpression ELSE oclExpression ENDIF;
+collectionType ::= collectionTypeIdentifier LEFT_PAR typeName RIGHT_PAR;
+typeName ::= packageName;
+typeName ::= collectionType;
+variableDeclaration ::= simpleName (COLON typeName  | ) ( EQ oclExpression  | );
+expression ::= relationalExpression ((logicalOperator relationalExpression)+ | );
+relationalExpression ::= additiveExpression ((relationalOperator additiveExpression)+ | );
+additiveExpression ::= multiplicativeExpression ((addOperator multiplicativeExpression)+ | );
+multiplicativeExpression ::= unaryExpression ((multiplyOperator unaryExpression)+ | );
+unaryExpression ::= ( unaryOperator oclExpression );
+unaryExpression ::= oclExpressionAux;
+oclExpressionAux ::= propertyCallExp;
+oclExpressionAux ::= variableExp;
+oclExpressionAux ::= literalExp;
+oclExpressionAux ::= ifExp;
+oclExpressionAux ::= LEFT_PAR expression RIGHT_PAR;
+unaryOperator ::= MINUS;
+unaryOperator ::= NOT;
+multiplyOperator ::= TIMES;
+multiplyOperator ::= DIVIDE;
+addOperator ::= PLUS;
+addOperator ::= MINUS;
+relationalOperator ::= EQ;
+relationalOperator ::= NE;
+relationalOperator ::= LE;
+relationalOperator ::= GE;
+relationalOperator ::= LT;
+relationalOperator ::= GT;
+logicalOperator ::= AND;
+logicalOperator ::= OR;
+logicalOperator ::= IMPLIES;
+logicalOperator ::= XOR;
