@@ -12,7 +12,7 @@ import analise_sintatica.sym;
  * on 29/03/11 18:00 from the specification file
  * <tt>Lex.flex</tt>
  */
-public class Lex implements java_cup.runtime.Scanner {
+public class AnaliseLexica implements java_cup.runtime.Scanner {
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
@@ -339,7 +339,7 @@ public class Lex implements java_cup.runtime.Scanner {
    *
    * @param   in  the java.io.Reader to read input from.
    */
-  public Lex(java.io.Reader in) {
+  public AnaliseLexica(java.io.Reader in) {
     this.zzReader = in;
   }
 
@@ -349,7 +349,7 @@ public class Lex implements java_cup.runtime.Scanner {
    *
    * @param   in  the java.io.Inputstream to read input from.
    */
-  Lex(java.io.InputStream in) {
+  AnaliseLexica(java.io.InputStream in) {
     this(new java.io.InputStreamReader(in));
   }
 

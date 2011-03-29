@@ -10,16 +10,16 @@ package analise_sintatica;
 /** CUP v0.11a beta 20060608 generated parser.
   * @version Tue Mar 29 17:56:57 GMT-03:00 2011
   */
-public class parser extends java_cup.runtime.lr_parser {
+public class AnaliseSintatica extends java_cup.runtime.lr_parser {
 
   /** Default constructor. */
-  public parser() {super();}
+  public AnaliseSintatica() {super();}
 
   /** Constructor which sets the default scanner. */
-  public parser(java_cup.runtime.Scanner s) {super(s);}
+  public AnaliseSintatica(java_cup.runtime.Scanner s) {super(s);}
 
   /** Constructor which sets the default scanner. */
-  public parser(java_cup.runtime.Scanner s, java_cup.runtime.SymbolFactory sf) {super(s,sf);}
+  public AnaliseSintatica(java_cup.runtime.Scanner s, java_cup.runtime.SymbolFactory sf) {super(s,sf);}
 
   /** Production table. */
   protected static final short _production_table[][] = 
@@ -161,10 +161,10 @@ public class parser extends java_cup.runtime.lr_parser {
 
 /** Cup generated class to encapsulate user supplied action code.*/
 class CUP$parser$actions {
-  private final parser parser;
+  private final AnaliseSintatica parser;
 
   /** Constructor */
-  CUP$parser$actions(parser parser) {
+  CUP$parser$actions(AnaliseSintatica parser) {
     this.parser = parser;
   }
 
