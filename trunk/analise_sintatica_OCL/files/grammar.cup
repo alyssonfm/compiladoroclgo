@@ -1,5 +1,3 @@
-// CUP specification for a simple expression evaluator (no actions)
-
 import java_cup.runtime.*;
 
 /* Preliminaries to set up and use the scanner.  */
