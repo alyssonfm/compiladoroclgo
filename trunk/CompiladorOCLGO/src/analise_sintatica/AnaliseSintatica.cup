@@ -59,6 +59,7 @@ non terminal addOperator;
 non terminal relationalOperator;
 non terminal logicalOperator;
 non terminal loopExp;
+non terminal unaryAux, expressionAux, additiveExpressionAux, multiplicativeAux;
 
 
 /* Precedences */
@@ -81,9 +82,9 @@ start with oclFile;
 
 
 /* The grammar */
-oclFile ::=  PACKAGE packageName (contextDeclaration+ |) ENDPACKAGE;
-oclFile ::=  (contextDeclaration+ | );
-contextDeclaration ::= operationContext;
+oclFile ::=  PACKAGE packageName contextDeclaration ENDPACKAGE;
+oclFile ::=  contextDeclaration;
+contextDeclaration ::= operationContext contextDeclaration | ;
 operationContext ::= CONTEXT operation bodyDeclaration;
 bodyDeclaration ::= BODY (simpleName  | ) COLON oclExpression ( bodyDeclaration  | ) ;
 operation ::= (packageName PATHNAME | ) simpleName LEFT_PAR parameters | ) RIGHT_PAR COLON (typeName | );
@@ -126,10 +127,14 @@ collectionType ::= collectionTypeIdentifier LEFT_PAR typeName RIGHT_PAR;
 typeName ::= packageName;
 typeName ::= collectionType;
 variableDeclaration ::= simpleName (COLON typeName  | ) ( EQ oclExpression  | );
-expression ::= relationalExpression ((logicalOperator relationalExpression)+ | );
-relationalExpression ::= additiveExpression ((relationalOperator additiveExpression)+ | );
-additiveExpression ::= multiplicativeExpression ((addOperator multiplicativeExpression)+ | );
-multiplicativeExpression ::= unaryExpression ((multiplyOperator unaryExpression)+ | );
+expression ::= relationalExpression expressionAux;
+expressionAux ::= logicalOperator relationalExpression expressionAux |;
+relationalExpression ::= additiveExpression additiveExpressionAux;
+additiveExpressionAux ::= relationalOperator additiveExpression additiveExpressionAux |;
+additiveExpression ::= multiplicativeExpression multiplicativeAux;
+multiplicativeAux ::= addOperator multiplicativeExpression multiplicativeAux |;
+multiplicativeExpression ::= unaryExpression unaryAux;
+unaryAux ::= multiplyOperator unaryExpression unaryAux |;
 unaryExpression ::= ( unaryOperator oclExpression );
 unaryExpression ::= oclExpressionAux;
 oclExpressionAux ::= propertyCallExp;
