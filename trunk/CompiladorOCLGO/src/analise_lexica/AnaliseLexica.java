@@ -349,7 +349,7 @@ public class AnaliseLexica implements java_cup.runtime.Scanner {
    *
    * @param   in  the java.io.Inputstream to read input from.
    */
-  AnaliseLexica(java.io.InputStream in) {
+  public AnaliseLexica(java.io.InputStream in) {
     this(new java.io.InputStreamReader(in));
   }
 
