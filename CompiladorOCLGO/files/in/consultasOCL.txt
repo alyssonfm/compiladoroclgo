@@ -1,8 +1,2 @@
-context ProgramaDeFidelidade
--- Teste de comentario-- de linha
-def: getServicosPorNivel(nomeNivel : String) : Set (Servico)
-= nivelServico->select(nome = nomeNivel).servicosDisponiveis->asSet()
-/*
-Teste de comentario por paragrafo.
-*/
->=
+context TestSession::numberOfScoresOverTarget(target : Integer) : Integer
+body: results->select(compositeScore > target)->size()
