@@ -1,5 +1,29 @@
 // CUP specification for a simple expression evaluator (no actions)
 package analise_sintatica;
+import java_cup.runtime.Symbol;
+
+parser code {:
+	
+	public void report_error(String message, Object info) {
+		Util.report_error(message, info);
+	}
+
+	public void syntax_error(Symbol cur_token) {
+		Util.syntax_error(cur_token);
+	}
+
+	public void debug_message(String mess) {
+		Util.debug_message(mess);
+	}
+
+	public void debug_shift(Symbol shift_tkn) {
+		Util.debug_shift(shift_tkn);
+	}
+
+	public void debug_reduce(int prod_num, int nt_num, int rhs_size) {
+		Util.debug_reduce(prod_num, nt_num, rhs_size);
+	}
+:};
 
 
 /* Terminals (tokens returned by the scanner). */
@@ -17,16 +41,20 @@ terminal IDENTIFIER, BOOLEAN;
 terminal BAR;
 
 /* Non terminals */
-non terminal oclFile;
+non terminal packageDeclaration;
+non terminal packageDeclarationAux;
 non terminal contextDeclaration;
 non terminal operationContext;
+non terminal operationContextAux;
 non terminal bodyDeclaration;
 non terminal operation;
+non terminal operationParAux;
+non terminal operationTypeAux;
 non terminal oclExpression, oclExpressions, expression;
 non terminal parameters;
 non terminal variableExp;
-non terminal simpleName;
-non terminal packageName;
+non terminal pathName;
+non terminal pathNameAux;
 non terminal literalExp;
 non terminal collectionLiteralExp;
 non terminal collectionTypeIdentifier;
@@ -48,6 +76,7 @@ non terminal ifExp;
 non terminal collectionType;
 non terminal typeName;
 non terminal variableDeclaration;
+non terminal variableDeclarationTypeAux;
 non terminal relationalExpression;
 non terminal additiveExpression;
 non terminal multiplicativeExpression;
@@ -59,7 +88,6 @@ non terminal addOperator;
 non terminal relationalOperator;
 non terminal logicalOperator;
 non terminal loopExp;
-non terminal unaryAux, expressionAux, additiveExpressionAux, multiplicativeAux;
 
 
 /* Precedences */
@@ -77,84 +105,30 @@ precedence left LEFT_PAR, RIGHT_PAR;
 precedence left COLLECTIONOPERATION, DOT; 
 
 /*----------------------------------------------------------------*/
-start with oclFile;
+start with packageDeclaration;
 /*. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */ 
 
 
 /* The grammar */
-oclFile ::=  PACKAGE packageName contextDeclaration ENDPACKAGE;
-oclFile ::=  contextDeclaration;
-contextDeclaration ::= operationContext contextDeclaration | ;
-operationContext ::= CONTEXT operation bodyDeclaration;
-bodyDeclaration ::= BODY (simpleName  | ) COLON oclExpression ( bodyDeclaration  | ) ;
-operation ::= (packageName PATHNAME | ) simpleName LEFT_PAR parameters | ) RIGHT_PAR COLON (typeName | );
-oclExpressions ::= expression;
-parameters ::= variableDeclaration (COMMA parameters | );
-variableExp ::= simpleName;
-simpleName ::= IDENTIFIER;
-packageName ::= simpleName (PATHNAME packageName | );
-literalExp ::= collectionLiteralExp;
-literalExp ::= primitiveLiteralExp;
-collectionLiteralExp ::= collectionTypeIdentifier LEFT_BRA (collectionLiteralParts | ) RIGHT_BRA;
-collectionTypeIdentifier ::= COLLECTION;
-collectionLiteralParts ::= collectionLiteralPart (COMMA collectionLiteralParts | );
-collectionLiteralPart ::= oclExpression;
-primitiveLiteralExp ::= INTEGER;
-primitiveLiteralExp ::= REAL;
-primitiveLiteralExp ::= STRING;
-primitiveLiteralExp ::= BOOLEAN;
-propertyCallExp ::= modelPropertyCallExp;
-propertyCallExp ::= loopExp;
-loopExp ::= oclExpression COLLECTIONOPERATION simpleName LEFT_PAR (variableDeclaration (COMMA variableDeclaration | ) BAR | ) oclExpression RIGHT_PAR;
-loopExp ::= oclExpression DOT simpleName LEFT_PAR (arguments | ) RIGHT_PAR;
-loopExp ::= oclExpression DOT simpleName;
-loopExp ::= oclExpression DOT simpleName (LEFT_BRK (arguments | ) RIGHT_BRK | );
-modelPropertyCallExp ::= operationCallExp;
-modelPropertyCallExp ::= attributeCallExp;
-modelPropertyCallExp ::= navigationCallExp;
-operationCallExp ::= (oclExpression | ) simpleName oclExpression;  
-operationCallExp ::= oclExpression (COLLECTIONOPERATION  | ) DOT) simpleName LEFT_PAR (arguments  | ) RIGHT_PAR;
-operationCallExp ::= simpleName LEFT_PAR arguments | ) RIGHT_PAR;
-operationCallExp ::= packageName LEFT_PAR (arguments  | ) RIGHT_PAR;
-attributeCallExp ::= oclExpression DOT simpleName;
-attributeCallExp ::= simpleName;
-attributeCallExp ::= packageName;
-navigationCallExp ::= associationCallExp;
-associationCallExp ::= (oclExpression DOT  | ) simpleName (LEFT_BRK arguments RIGHT_BRK  | ));
-arguments ::= oclExpression ( COMMA arguments  | );
-ifExp ::= IF oclExpression THEN oclExpression ELSE oclExpression ENDIF;
+
+packageDeclaration ::=  PACKAGE pathName packageDeclarationAux ENDPACKAGE
+						| packageDeclarationAux;
+packageDeclarationAux ::= contextDeclaration packageDeclarationAux |;
+pathName ::= IDENTIFIER pathNameAux;
+pathNameAux ::= PATHNAME pathName |;
+contextDeclaration ::= CONTEXT operation;
+operation ::= IDENTIFIER pathNameAux LEFT_PAR operationParAux RIGHT_PAR COLON operationTypeAux
+			|IDENTIFIER LEFT_PAR operationParAux RIGHT_PAR COLON operationTypeAux;
+operationParAux ::= parameters |;
+operationTypeAux ::= typeName |;
+parameters ::= variableDeclaration
+			| variableDeclaration COMMA parameters; 
+typeName ::= pathName
+			| collectionType;
+variableDeclaration ::= IDENTIFIER variableDeclarationTypeAux EQ oclExpression
+						|IDENTIFIER variableDeclarationTypeAux;
+variableDeclarationTypeAux ::= COLON typeName |;
+oclExpression ::= IDENTIFIER; 
 collectionType ::= collectionTypeIdentifier LEFT_PAR typeName RIGHT_PAR;
-typeName ::= packageName;
-typeName ::= collectionType;
-variableDeclaration ::= simpleName (COLON typeName  | ) ( EQ oclExpression  | );
-expression ::= relationalExpression expressionAux;
-expressionAux ::= logicalOperator relationalExpression expressionAux |;
-relationalExpression ::= additiveExpression additiveExpressionAux;
-additiveExpressionAux ::= relationalOperator additiveExpression additiveExpressionAux |;
-additiveExpression ::= multiplicativeExpression multiplicativeAux;
-multiplicativeAux ::= addOperator multiplicativeExpression multiplicativeAux |;
-multiplicativeExpression ::= unaryExpression unaryAux;
-unaryAux ::= multiplyOperator unaryExpression unaryAux |;
-unaryExpression ::= ( unaryOperator oclExpression );
-unaryExpression ::= oclExpressionAux;
-oclExpressionAux ::= propertyCallExp;
-oclExpressionAux ::= variableExp;
-oclExpressionAux ::= literalExp;
-oclExpressionAux ::= ifExp;
-oclExpressionAux ::= LEFT_PAR expression RIGHT_PAR;
-unaryOperator ::= MINUS;
-unaryOperator ::= NOT;
-multiplyOperator ::= TIMES;
-multiplyOperator ::= DIVIDE;
-addOperator ::= PLUS;
-addOperator ::= MINUS;
-relationalOperator ::= EQ;
-relationalOperator ::= NE;
-relationalOperator ::= LE;
-relationalOperator ::= GE;
-relationalOperator ::= LT;
-relationalOperator ::= GT;
-logicalOperator ::= AND;
-logicalOperator ::= OR;
-logicalOperator ::= IMPLIES;
-logicalOperator ::= XOR;
+collectionTypeIdentifier ::= COLLECTION;
+
