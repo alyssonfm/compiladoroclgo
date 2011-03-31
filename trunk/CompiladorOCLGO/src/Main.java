@@ -5,8 +5,9 @@ import java.util.Scanner;
 
 import java_cup.sym;
 import java_cup.runtime.Symbol;
-import analise_lexica.AnaliseLexica;
-import analise_sintatica.AnaliseSintatica;
+import analise_lexica.*;
+import analise_sintatica.Util;
+import analise_sintatica.parser;
 
 public class Main {
 
@@ -40,7 +41,7 @@ public class Main {
 					break;
 				}
 				
-				logger.addMessage("Token: " + s.sym + " - " + "\"" + s.value + "\"");
+				logger.addMessage("Token: " + Util.changeTokenNames(s.toString()) + " - " + "\"" + s.value + "\"");
 			
 			
 			}
@@ -55,14 +56,20 @@ public class Main {
 		System.out.println("########  Finalizada Analise Lexica ########");
 	}
 
-	private static void analiseSintatica(String fileName) {
+	private static void analiseSintatica(String fileName, boolean debug) {
 		try {
 			AnaliseLexica l = createScanner(fileName);
-			AnaliseSintatica g = new AnaliseSintatica(l);
-			g.debug_parse();
+			parser g = new parser(l);
+			if(debug){
+				g.debug_parse();
+			}else{
+				g.parse();
+			}
+			System.out.println("Sem erros.");
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado!");
 		} catch (Exception e) {
+			System.out.println("TOROU");
 			e.printStackTrace();
 		}
 
@@ -76,9 +83,22 @@ public class Main {
 			System.out.println("2 - Analise Sintatica");
 			System.out.print("Arquivo? ");
 			Scanner in = new Scanner(System.in);
-			analiseSintatica(in.next());
+			analiseSintatica(in.next(), false);
 		}else{
-			analiseSintatica(args[0]);
+			System.out.println("OCL -> GO");
+			System.out.println("1 - Analise Lexica");
+			System.out.println("2 - Analise Sintatica");
+			System.out.println("3 - Analise Sintatica Avançado");
+			Scanner in = new Scanner(System.in);
+			int choice = in.nextInt();
+			if(choice == 1){
+				analiseLexica(args[0]);
+			}else if(choice == 2){
+				analiseSintatica(args[0], false);
+			}else if(choice == 3){
+				analiseSintatica(args[0], true);
+			}
+			System.out.println("FIM");
 		}
 	}
 
