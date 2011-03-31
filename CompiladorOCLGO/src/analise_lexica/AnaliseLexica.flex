@@ -40,7 +40,7 @@ stringdelimiter = \'
 integer    = -?{digit}+  
 real       = {integer}("\."{digit}+)?([eE][+-]?{digit}+)?
 boolean = "true"|"false"    
-collections = "Set"|"Bag"|"Sequence"|"OrderedSet"
+collections = "Set"|"Bag"|"Sequence"|"OrderedSet"|"Collection"
 
 %%
 
@@ -81,10 +81,11 @@ collections = "Set"|"Bag"|"Sequence"|"OrderedSet"
 <YYINITIAL>  "or"               { return symbol(sym.OR); }
 <YYINITIAL>  "xor"              { return symbol(sym.XOR); }
 <YYINITIAL>  "not"              { return symbol(sym.NOT); }
-<YYINITIAL>  {boolean}               { return symbol(sym.BOOLEAN); }
-<YYINITIAL>  {identifier}            { return symbol(sym.IDENTIFIER); } 
-<YYINITIAL>  {real}                  { return symbol(sym.REAL); } 
-<YYINITIAL>  {integer}               { return symbol(sym.INTEGER); }
+<YYINITIAL>  {boolean}          { return symbol(sym.BOOLEAN); }
+<YYINITIAL>  {collections}      { return symbol(sym.COLLECTION); }
+<YYINITIAL>  {identifier}       { return symbol(sym.IDENTIFIER); } 
+<YYINITIAL>  {real}             { return symbol(sym.REAL); } 
+<YYINITIAL>  {integer}          { return symbol(sym.INTEGER); }
 <YYINITIAL>  {stringdelimiter}  { string.setLength(0); yybegin(STRING); }
 <STRING>  [^\n\r\'\\]+          { string.append( yytext()); }
 <STRING>  \\t                   { string.append('\t'); }
