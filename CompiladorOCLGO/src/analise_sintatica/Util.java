@@ -55,7 +55,7 @@ public class Util {
 		// + " [Índice: "+ nt_num + ", " + "Tamanho: " + rhs_size + "]"
 	}
 
-	private static String changeTokenNames(String string) {
+	public static String changeTokenNames(String string) {
 		String out = string;
 		if (string.contains("#" + sym.BAR)) {
 			out = out.replace("#" + sym.BAR, Constants.BAR);
