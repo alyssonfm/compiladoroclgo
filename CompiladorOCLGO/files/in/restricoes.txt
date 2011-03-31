@@ -83,7 +83,7 @@ body: if partners->includes(pp)
       else Set
       endif
 	  
-context LoyaltyProgram: getServicesByLevel(levelName: String): Set(Service)
+context LoyaltyProgram::getServicesByLevel(levelName: String): Set(Service)
 body: levels->select( name = levelName ).availableServices->asSet()
 
 context Person::getChildren(): Set(Person)
@@ -92,7 +92,7 @@ body: Person.allInstances->select(s | s.father = self or s.mother = self)
 context ObjectFlowState::getTrue(): Boolean
 body: source->exists(it|body)
 
-context TeamMember : disjoint (m1 : Meeting, m2 : Meeting) : Boolean
+context TeamMember :: disjoint (m1 : Meeting, m2 : Meeting) : Boolean
 body: (m1.start + m1.duration <= m2.start) or (m2.start + m2.duration <= m1.start)
 						 
 endpackage

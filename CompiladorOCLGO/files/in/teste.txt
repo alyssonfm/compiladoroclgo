@@ -1,0 +1,5 @@
+package asd context endpackage
+package asd endpackage
+package asd context context context endpackage
+context context context
+package asd::asd endpackage
