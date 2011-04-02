@@ -1,6 +1,7 @@
 // CUP specification for a simple expression evaluator (no actions)
 package analise_sintatica;
 import java_cup.runtime.Symbol;
+import util.Util;
 
 parser code {:
 	

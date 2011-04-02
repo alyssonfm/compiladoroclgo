@@ -134,6 +134,9 @@ body: source->exists(it|asd)
 
 context TeamMember :: disjoint (m1 : Meeting, m2 : Meeting) : Boolean
 body: (m1.start + m1.duration <= m2.start) or (m2.start + m2.duration <= m1.start)
+
+context TeamMember :: disjoint (m1 : Meeting, m2 : Meeting) : Boolean
+body: (m1.start + m1.duration <= m2.start) or (m2.start + m2.duration <= m1.start)
 						 
 endpackage
 

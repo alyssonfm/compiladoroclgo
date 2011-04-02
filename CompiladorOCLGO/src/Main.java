@@ -72,7 +72,10 @@ public class Main {
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado!");
 		} catch (Exception e) {
-			System.out.println("TOROU");
+			System.out.println("Ocorreu algum erro sintatico");
+		}catch (Error e) {
+			System.out.print(e.getMessage());
+			System.out.println("Ocorreu algum erro lexico");
 		}
 		System.out.println("########  Finalizada Analise Sintatica ########");
 	}
