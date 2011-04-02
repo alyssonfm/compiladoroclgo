@@ -3,10 +3,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
-import java_cup.sym;
+
+
 import java_cup.runtime.Symbol;
 import util.Logger;
 import util.Util;
+import util.sym;
 import analise_lexica.AnaliseLexica;
 import analise_sintatica.AnaliseSintatica;
 
@@ -43,7 +45,11 @@ public class Main {
 					break;
 				}
 				
-				logger.addMessage("Token: " + Util.changeTokenNames(s.toString()) + " - " + "\"" + s.value + "\"");
+				if(s.sym == sym.STRING){
+					logger.addMessage("Token: " + Util.changeTokenNames(s.toString()) + " - " + "\"" + "'" + s.value + "'" + "\"");
+				}else{
+					logger.addMessage("Token: " + Util.changeTokenNames(s.toString()) + " - " + "\"" + s.value + "\"");
+				}
 			
 			
 			}

@@ -55,9 +55,6 @@ public class Util {
 
 	public static String changeTokenNames(String string) {
 		String out = string;
-		if (string.contains("#" + sym.BAR)) {
-			out = out.replace("#" + sym.BAR, Constants.BAR);
-		}
 		if (string.contains("#" + sym.BOOLEAN)) {
 			out = out.replace("#" + sym.BOOLEAN, Constants.BOOLEAN);
 		}
@@ -72,6 +69,18 @@ public class Util {
 		}
 		if (string.contains("#" + sym.INTEGER)) {
 			out = out.replace("#" + sym.INTEGER, Constants.INTEGER);
+		}
+		if (string.contains("#" + sym.STRINGTYPE)) {
+			out = out.replace("#" + sym.STRINGTYPE, Constants.STRINGTYPE);
+		}
+		if (string.contains("#" + sym.BOOLEANTYPE)) {
+			out = out.replace("#" + sym.BOOLEANTYPE, Constants.BOOLEANTYPE);
+		}
+		if (string.contains("#" + sym.REALTYPE)) {
+			out = out.replace("#" + sym.REALTYPE, Constants.REALTYPE);
+		}
+		if (string.contains("#" + sym.INTEGERTYPE)) {
+			out = out.replace("#" + sym.INTEGERTYPE, Constants.INTEGERTYPE);
 		}
 		if (string.contains("#" + sym.DIVIDE)) {
 			out = out.replace("#" + sym.DIVIDE, Constants.DIVIDE);
@@ -122,7 +131,7 @@ public class Util {
 			out = out.replace("#" + sym.GE, Constants.GE);
 		}
 		if (string.contains("#" + sym.LE)) {
-			out = out.replace("#" + "#" + sym.LE, Constants.LE);
+			out = out.replace("#" + sym.LE, Constants.LE);
 		}
 		if (string.contains("#" + sym.NE)) {
 			out = out.replace("#" + sym.NE, Constants.NE);
@@ -133,6 +142,9 @@ public class Util {
 		if (string.contains("#" + sym.COLLECTIONOPERATION)) {
 			out = out.replace("#" + sym.COLLECTIONOPERATION,
 					Constants.COLLECTIONOPERATION);
+		}
+		if (string.contains("#" + sym.BAR)) {
+			out = out.replace("#" + sym.BAR, Constants.BAR);
 		}
 		if (string.contains("#" + sym.RIGHT_BRA)) {
 			out = out.replace("#" + sym.RIGHT_BRA, Constants.RIGHT_BRA);
@@ -163,6 +175,9 @@ public class Util {
 		}
 		if (string.contains("#" + sym.DOT)) {
 			out = out.replace("#" + sym.DOT, Constants.DOT);
+		}
+		if (string.contains("#" + sym.SELF)) {
+			out = out.replace("#" + sym.SELF, Constants.SELF);
 		}
 		if (string.contains("#" + sym.COLLECTION)) {
 			out = out.replace("#" + sym.COLLECTION, Constants.COLLECTION);
