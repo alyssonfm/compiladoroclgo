@@ -27,7 +27,7 @@ public class Constants {
 	public static final String EOF = "EOF";
 	public static final String error = "ERROR";
 	public static final String EQ = "IGUAL";
-	public static final String RIGHT_PAR = "PARÊNTESE_ESQUERDO";
+	public static final String RIGHT_PAR = "PARÊNTESE_DIREITO";
 	public static final String REAL = "REAL";
 	public static final String ENDPACKAGE = "ENDPACKAGE";
 	public static final String TIMES = "MULTIPLICACAO";
@@ -42,7 +42,7 @@ public class Constants {
 	public static final String NE = "DIFERENTE";
 	public static final String STRING = "STRING";
 	public static final String RIGHT_BRA = "CHAVE_DIREITA";
-	public static final String LEFT_PAR = "PARENTESE_DIREITO";
+	public static final String LEFT_PAR = "PARENTESE_ESQUERDO";
 	public static final String GT = "MAIOR";
 	public static final String IDENTIFIER = "IDENTIFICADOR";
 

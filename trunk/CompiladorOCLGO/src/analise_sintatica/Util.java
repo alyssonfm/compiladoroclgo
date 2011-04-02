@@ -1,5 +1,7 @@
 package analise_sintatica;
 
+import util.Constants;
+import util.sym;
 import java_cup.runtime.Symbol;
 
 public class Util {
