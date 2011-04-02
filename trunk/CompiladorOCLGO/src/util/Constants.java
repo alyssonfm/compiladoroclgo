@@ -45,5 +45,9 @@ public class Constants {
 	public static final String LEFT_PAR = "PARENTESE_ESQUERDO";
 	public static final String GT = "MAIOR";
 	public static final String IDENTIFIER = "IDENTIFICADOR";
-
+	public static final String SELF = "SELF";
+	public static final String INTEGERTYPE = "INTEGER_TYPE";
+	public static final String REALTYPE = "REAL_TYPE";
+	public static final String BOOLEANTYPE = "BOOLEAN_TYPE";
+	public static final String STRINGTYPE = "STRING_TYPE";
 }
