@@ -85,7 +85,7 @@ non terminal relationalOperator;
 non terminal logicalOperator;
 non terminal literal;
 non terminal primaryTypes;
-
+non terminal colonPathName;
 
 /* Precedences */
  
@@ -134,7 +134,7 @@ primaryTypes ::= STRINGTYPE
 			| BOOLEANTYPE
 			| INTEGERTYPE;
 			
-literal ::= REAL | INTEGER | BOOLEAN | STRING | pathName;
+literal ::= REAL | INTEGER | BOOLEAN | STRING;
 			
 variableDeclaration ::= IDENTIFIER COLON typeName;
 oclExpression ::= relationalExpression oclExpressionAux;
@@ -161,28 +161,28 @@ primaryExpression ::= literalCollection
 					| literal
 					| propertyCall
 					| LEFT_PAR oclExpression RIGHT_PAR
+					| SELF
 					| ifExp;
 
 literalCollection ::= collectionTypeIdentifier LEFT_BRA expressionParameter RIGHT_BRA;
-  
-expressionParameter ::= oclExpression expressionParameterAux |;
-expressionParameterAux ::= COMMA oclExpression expressionParameterAux |;
-
+ 
 ifExp ::= IF oclExpression THEN oclExpression ELSE oclExpression ENDIF;
 
 propertyCall ::= pathName qualifiers propertyCallParameters;
 
-qualifiers ::= LEFT_BRK actualParameterList RIGHT_BRK;
+qualifiers ::= LEFT_BRK actualParameterList RIGHT_BRK|;
 
-actualParameterList::= oclExpression expressionParameterAux;
+propertyCallParameters ::= LEFT_PAR expressionParameter RIGHT_PAR
+						   |LEFT_PAR IDENTIFIER expressionParameterAux RIGHT_PAR
+						   |LEFT_PAR declarator expressionParameter RIGHT_PAR
+						   |;
+						   
+declarator ::= IDENTIFIER declaratorAux colonPathName  BAR oclExpression;
+declaratorAux ::= COMMA IDENTIFIER declaratorAux|;
+colonPathName ::= COLON pathName |;
 
-propertyCallParameters ::= LEFT_PAR declarator actualParameterList RIGHT_PAR
-						| LEFT_PAR actualParameterList RIGHT_PAR
-						| LEFT_PAR declarator RIGHT_PAR
-						| LEFT_PAR RIGHT_PAR;
-declarator ::= IDENTIFIER declaratorAux COLON pathName BAR
-			| IDENTIFIER declaratorAux BAR;
-declaratorAux ::= COMMA IDENTIFIER declaratorAux |;
+expressionParameter ::= oclExpression expressionParameterAux |;
+expressionParameterAux ::= COMMA oclExpression expressionParameterAux |;
 
 logicalOperator ::= AND | OR | XOR | IMPLIES;
 relationalOperator ::= EQ | NE | LE | GE | GT | LT;
