@@ -5,8 +5,9 @@ import java.util.Scanner;
 
 import java_cup.sym;
 import java_cup.runtime.Symbol;
-import analise_lexica.*;
-import analise_sintatica.Util;
+import util.Logger;
+import util.Util;
+import analise_lexica.AnaliseLexica;
 import analise_sintatica.parser;
 
 public class Main {

@@ -1,4 +1,4 @@
-package analise_sintatica;
+package util;
 
 public class Constants {
 
