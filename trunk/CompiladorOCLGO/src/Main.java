@@ -5,10 +5,12 @@ import java.util.Scanner;
 
 import java_cup.sym;
 import java_cup.runtime.Symbol;
+import analise_lexica.*;import analise_sintatica.Util;
 import util.Logger;
 import util.Util;
 import analise_lexica.AnaliseLexica;
 import analise_sintatica.parser;
+
 
 public class Main {
 
@@ -58,6 +60,7 @@ public class Main {
 	}
 
 	private static void analiseSintatica(String fileName, boolean debug) {
+		System.out.println("########  Iniciando Analise Sintatica  ########");
 		try {
 			AnaliseLexica l = createScanner(fileName);
 			parser g = new parser(l);
@@ -71,9 +74,8 @@ public class Main {
 			System.err.println("Arquivo nao encontrado!");
 		} catch (Exception e) {
 			System.out.println("TOROU");
-			e.printStackTrace();
 		}
-
+		System.out.println("########  Finalizada Analise Sintatica ########");
 	}
 
 	public static void main(String[] args) {

@@ -1,17 +1,17 @@
 package Behavioral_Elements::Activity_Graphs
 
 context Person::getSon(): Set(Person)
-body: Person.allInstances->select(s | s.father = self or s.mother = self)
+body: Person.allInstances->select(s | s.father = asd or s.mother = asd)
 				
 context TestSession::numberOfScoresOverTarget(target : Integer) : Integer
 body: results->select(compositeScore > target)->size()
 
 context ObjectFlowState::getTrue(): Boolean
-body: self.allPreviousLeafStates->size() > 0
+body: asd.allPreviousLeafStates->size > 0
 
-context Quarto::obterQuartosLivres(entrada: Date, saída : Date, numPessoas : Integer): Set(Quarto)
+context Quarto::obterQuartosLivres(entrada: Date, saida : Date, numPessoas : Integer): Set(Quarto)
 body: Quarto.allInstances->select( q | q.capacidade>numPessoas and q.estadia_Quarto
-						 ->exists( e | DateInterval.disjoint(e.data_de_entrada, e.data_de_saída, entrada, saída, true))
+						 ->exists( e | DateInterval.disjoint(e.data_de_entrada, e.data_de_saida, entrada, saida, true)))
 
 					 
 context TestSession::testResultsForTeam(testTeam : Team) : Set(TestResult)
@@ -80,63 +80,60 @@ body: results->select(compositeScore > target)->size()
 context LoyaltyProgram::getServices(pp: ProgramPartner): Set(Service)
 body: if partners->includes(pp)
 		then pp.deliveredServices
-      else Set
+      else Set{}
       endif
 	  
-context LoyaltyProgram: getServicesByLevel(levelName: String): Set(Service)
+context LoyaltyProgram::getServicesByLevel(levelName: String): Set(Service)
 body: levels->select( name = levelName ).availableServices->asSet()
 
 context Person::getChildren(): Set(Person)
+body: Person.allInstances->select(s | s.father = asd or s.mother = asd)
+
+context Person::getSon(): Set(Person)
 body: Person.allInstances->select(s | s.father = self or s.mother = self)
 
 context ObjectFlowState::getTrue(): Boolean
-body: source->exists(it|body)
+body: self.allPreviousLeafStates->size > 0
 
-context TeamMember : disjoint (m1 : Meeting, m2 : Meeting) : Boolean
-body: (m1.start + m1.duration <= m2.start) or (m2.start + m2.duration <= m1.start)
+context Person::getChildren(): Set(Person)
+body: Person.allInstances->select(s | s.father = self->forAll() or s.mother = self)
 
-context Person::getCurrentSpouse() : Person
-body:  self.mariages->select( m | m.ended = false ).spouse
-
-context Trem::comprimentoTotal() : Integer 
-body: vagoes.comprimentoTotal()->sum() +  locomotivas.comprimentoTotal()->sum()
-
+context Person::getChildren(): Set(Person)
+body: partners.deliveredservices->
+       forAll(pointsEarned = 0 and pointsBurned = 0)
+                 implies Membership.account->isEmpty()
+                 
+context DVD::taxaAluguel(data : Date) : Real 
+ body: 
+    if data.dowIsBetween(DayOfWeek::Monday, DayOfWeek::Thursday)  
+       then asd.filme.categoria.taxaNormal 
+      else asd.filme.categoria.taxaFimSemana 
+    endif
+    
 context CDJogo::taxaAluguel(data : Date) : Real 
-body:  
-if data.month = 1 
-      then 0 
-      else self.jogo.taxa 
-endif
+ body:  (
+    if data.month = 1 
+       then /* asd 
+       asd */0
+       --asjdjdjd 
+       else asd.jogo.taxa 
+    endif
+    )
+    
+context ObjectFlowState::getTrue(): Boolean    
+body asd: meetings->forAll (m1 : ASD | meetings->forAll (m2 | m1<>m2 implies disjoint (m1)))
 
-context DVD::taxaAluguel(data : Date) : Real 
-body: 
-   if data.dowIsBetween(DayOfWeek::Monday, DayOfWeek::Thursday)  
-      then self.filme.categoria.taxaNormal 
-      else self.filme.categoria.taxaFimSemana 
-	endif
-	
-context DVD::taxaAluguel(data : Date) : Real
-body: self.vertices->forAll(p1, p2 | (p1.x = p2.x and p1.y = p2.y) implies p1 = p2)
+context ObjectFlowState::getTrue(): Boolean    
+body asd: teste(asd, asd )
 
-context DVD::taxaAluguel(data : Date) : Real 
-body: Polygon.allInstances->select(p : Polygon | p.vertices->size = 3
+context ObjectFlowState::getTrue(): Boolean    
+body asd: meetings->forAll (m1 | meetings->forAll (m2 | m1<>m2 implies disjoint (m1, m2)))
 
-context DVD::taxaAluguel(data : Date) : Real 
-body: self.employeeRanking[employees]->sum() > 0
+context ObjectFlowState::getTrue(): Boolean
+body: source->exists(it|asd)
 
-context DVD::taxaAluguel(data : Date) : Real 
-body: employeeRanking[employees]->exists(score = 10)
-
-context DVD::taxaAluguel(data : Date) : Real 
-body: partners.deliveredservices->	forAll(pointsEarned = 0 and pointsBurned = 0)
-		  implies Membership.account->isEmpty()
-
-context DVD::taxaAluguel(data : Date) : Real 
-body: self.employee->forAll (e1 | self.employee->forAll (e2 |
-                e1 <> e2 implies e1.forename <> e2.forename))
-				
-context DVD::taxaAluguel(data : Date) : Real 
-body: select(code.substring(1,2) = ‘CS’).credit?sum( ) >= 90
+context TeamMember :: disjoint (m1 : Meeting, m2 : Meeting) : Boolean
+body: (m1.start + m1.duration <= m2.start) or (m2.start + m2.duration <= m1.start)
 						 
 endpackage
- 
+
