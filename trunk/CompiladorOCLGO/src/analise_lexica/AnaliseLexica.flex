@@ -81,6 +81,11 @@ collections = "Set"|"Bag"|"Sequence"|"OrderedSet"|"Collection"
 <YYINITIAL>  "or"               { return symbol(sym.OR); }
 <YYINITIAL>  "xor"              { return symbol(sym.XOR); }
 <YYINITIAL>  "not"              { return symbol(sym.NOT); }
+<YYINITIAL>  "self"              { return symbol(sym.SELF); }
+<YYINITIAL>  "String"              { return symbol(sym.STRINGTYPE); }
+<YYINITIAL>  "Real"              { return symbol(sym.REALTYPE); }
+<YYINITIAL>  "Boolean"              { return symbol(sym.BOOLEANTYPE); }
+<YYINITIAL>  "Integer"              { return symbol(sym.INTEGERTYPE); }
 <YYINITIAL>  {boolean}          { return symbol(sym.BOOLEAN); }
 <YYINITIAL>  {collections}      { return symbol(sym.COLLECTION); }
 <YYINITIAL>  {identifier}       { return symbol(sym.IDENTIFIER); } 
