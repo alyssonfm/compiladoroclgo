@@ -69,7 +69,6 @@ non terminal postfixExpressionAux;
 non terminal operationCall;
 non terminal propertyCall;
 non terminal propertyCallParameters;
-non terminal actualParameterList;
 non terminal declarator;
 non terminal declaratorAux;
 non terminal literalCollection;
@@ -171,7 +170,7 @@ ifExp ::= IF oclExpression THEN oclExpression ELSE oclExpression ENDIF;
 
 propertyCall ::= pathName qualifiers propertyCallParameters;
 
-qualifiers ::= LEFT_BRK actualParameterList RIGHT_BRK|;
+qualifiers ::= LEFT_BRK expressionParameter RIGHT_BRK|;
 
 propertyCallParameters ::= LEFT_PAR expressionParameter RIGHT_PAR
 						   |LEFT_PAR IDENTIFIER expressionParameterAux RIGHT_PAR
