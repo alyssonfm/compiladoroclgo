@@ -1,20 +1,22 @@
 package util;
 
-import analise_sintatica.sym;
 import java_cup.runtime.Symbol;
 
 public class Util {
 
 	public static void report_error(String message, Object info) {
-		System.err.print(message);
-		if (info instanceof Symbol)
-			if (((Symbol) info).left != -1)
-				System.err.println(" no caractere " + ((Symbol) info).left
-						+ " da entrada");
-			else
-				System.err.println("");
-		else
-			System.err.println("");
+		if (info instanceof Symbol){
+			Symbol sym = (Symbol) info;
+			if (sym.left != -1){
+				System.out.println("Erro Sintatico na linha " + (sym.left + 1) + " e coluna " + (sym.right + 1));
+				System.out.println("Palavra " + sym.value + " reconhecida como " + changeTokenNames(sym.toString()));
+			}else{
+				System.out.println("sym.left = -1");
+			}
+		}else{
+			System.out.println("Nao eh instancia de Symbol");
+		}
+		
 	}
 
 	public static void syntax_error(Symbol cur_token) {

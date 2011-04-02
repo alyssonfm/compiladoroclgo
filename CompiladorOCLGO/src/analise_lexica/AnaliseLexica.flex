@@ -1,7 +1,7 @@
 package analise_lexica;
 
 import java_cup.runtime.*;
-import analise_sintatica.sym; 
+import util.sym; 
 
 %%
 %class AnaliseLexica

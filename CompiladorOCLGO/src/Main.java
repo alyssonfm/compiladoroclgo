@@ -5,11 +5,10 @@ import java.util.Scanner;
 
 import java_cup.sym;
 import java_cup.runtime.Symbol;
-import analise_lexica.*;import analise_sintatica.Util;
 import util.Logger;
 import util.Util;
 import analise_lexica.AnaliseLexica;
-import analise_sintatica.parser;
+import analise_sintatica.AnaliseSintatica;
 
 
 public class Main {
@@ -63,7 +62,7 @@ public class Main {
 		System.out.println("########  Iniciando Analise Sintatica  ########");
 		try {
 			AnaliseLexica l = createScanner(fileName);
-			parser g = new parser(l);
+			AnaliseSintatica g = new AnaliseSintatica(l);
 			if(debug){
 				g.debug_parse();
 			}else{
