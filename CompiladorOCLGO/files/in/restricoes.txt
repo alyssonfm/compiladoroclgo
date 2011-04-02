@@ -7,7 +7,7 @@ context TestSession::numberOfScoresOverTarget(target : Integer) : Integer
 body: results->select(compositeScore > target)->size()
 
 context ObjectFlowState::getTrue(): Boolean
-body: self.allPreviousLeafStates->size > 0
+body: self.allPreviousLeafStates->size() > 0
 
 context Quarto::obterQuartosLivres(entrada: Date, saída : Date, numPessoas : Integer): Set(Quarto)
 body: Quarto.allInstances->select( q | q.capacidade>numPessoas and q.estadia_Quarto
@@ -83,7 +83,7 @@ body: if partners->includes(pp)
       else Set
       endif
 	  
-context LoyaltyProgram::getServicesByLevel(levelName: String): Set(Service)
+context LoyaltyProgram: getServicesByLevel(levelName: String): Set(Service)
 body: levels->select( name = levelName ).availableServices->asSet()
 
 context Person::getChildren(): Set(Person)
@@ -92,8 +92,51 @@ body: Person.allInstances->select(s | s.father = self or s.mother = self)
 context ObjectFlowState::getTrue(): Boolean
 body: source->exists(it|body)
 
-context TeamMember :: disjoint (m1 : Meeting, m2 : Meeting) : Boolean
+context TeamMember : disjoint (m1 : Meeting, m2 : Meeting) : Boolean
 body: (m1.start + m1.duration <= m2.start) or (m2.start + m2.duration <= m1.start)
+
+context Person::getCurrentSpouse() : Person
+body:  self.mariages->select( m | m.ended = false ).spouse
+
+context Trem::comprimentoTotal() : Integer 
+body: vagoes.comprimentoTotal()->sum() +  locomotivas.comprimentoTotal()->sum()
+
+context CDJogo::taxaAluguel(data : Date) : Real 
+body:  
+if data.month = 1 
+      then 0 
+      else self.jogo.taxa 
+endif
+
+context DVD::taxaAluguel(data : Date) : Real 
+body: 
+   if data.dowIsBetween(DayOfWeek::Monday, DayOfWeek::Thursday)  
+      then self.filme.categoria.taxaNormal 
+      else self.filme.categoria.taxaFimSemana 
+	endif
+	
+context DVD::taxaAluguel(data : Date) : Real
+body: self.vertices->forAll(p1, p2 | (p1.x = p2.x and p1.y = p2.y) implies p1 = p2)
+
+context DVD::taxaAluguel(data : Date) : Real 
+body: Polygon.allInstances->select(p : Polygon | p.vertices->size = 3
+
+context DVD::taxaAluguel(data : Date) : Real 
+body: self.employeeRanking[employees]->sum() > 0
+
+context DVD::taxaAluguel(data : Date) : Real 
+body: employeeRanking[employees]->exists(score = 10)
+
+context DVD::taxaAluguel(data : Date) : Real 
+body: partners.deliveredservices->	forAll(pointsEarned = 0 and pointsBurned = 0)
+		  implies Membership.account->isEmpty()
+
+context DVD::taxaAluguel(data : Date) : Real 
+body: self.employee->forAll (e1 | self.employee->forAll (e2 |
+                e1 <> e2 implies e1.forename <> e2.forename))
+				
+context DVD::taxaAluguel(data : Date) : Real 
+body: select(code.substring(1,2) = ‘CS’).credit?sum( ) >= 90
 						 
 endpackage
-
+ 
