@@ -82,29 +82,51 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		if(args.length < 1){
-			System.out.println("OCL -> GO");
-			System.out.println("1 - Analise Lexica");
-			System.out.println("2 - Analise Sintatica");
-			System.out.print("Arquivo? ");
-			Scanner in = new Scanner(System.in);
-			analiseSintatica(in.next(), false);
-		}else{
-			System.out.println("OCL -> GO");
-			System.out.println("1 - Analise Lexica");
-			System.out.println("2 - Analise Sintatica");
-			System.out.println("3 - Analise Sintatica Avançado");
-			Scanner in = new Scanner(System.in);
-			int choice = in.nextInt();
-			if(choice == 1){
-				analiseLexica(args[0]);
-			}else if(choice == 2){
-				analiseSintatica(args[0], false);
-			}else if(choice == 3){
-				analiseSintatica(args[0], true);
+		String filePath = "";
+		int tipo = 0;
+		
+		System.out.println("COMPILADOR OCL -> GO");
+		System.out.println("Autores: Alysson, Delano e Nata");
+		
+		if(args.length < 2){
+			Scanner in;
+			
+			if(args.length < 1){
+				System.out.print("Arquivo com consultas OCL: ");
+				in = new Scanner(System.in);
+				filePath = in.nextLine();
+				
+				System.out.println("1 - Analise Lexica");
+				System.out.println("2 - Analise Sintatica");
+				in = new Scanner(System.in);
+				tipo = in.nextInt();
+			}else{
+				System.out.println("1 - Analise Lexica");
+				System.out.println("2 - Analise Sintatica");
+				in = new Scanner(System.in);
+				tipo = in.nextInt();
+				filePath = args[0];
 			}
-			System.out.println("FIM");
+		}else{
+			filePath = args[0];
+			try{
+				tipo = Integer.parseInt(args[1]);
+			}catch (Exception e){
+				System.out.println("Entrada deve ser: <string> <integer>");
+				System.exit(0);
+			}
 		}
+		
+		if(tipo == 1){
+			analiseLexica(filePath);
+		}else if(tipo == 2){
+			analiseSintatica(filePath, false);
+		}else{
+			System.out.println("Deve escolher entre 1 ou 2.");
+		}
+		
+		System.out.println("Obrigado por usar nosso compilador!");
+		
 	}
 
 }

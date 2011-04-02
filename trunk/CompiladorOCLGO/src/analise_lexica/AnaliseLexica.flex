@@ -100,4 +100,4 @@ collections = "Set"|"Bag"|"Sequence"|"OrderedSet"|"Collection"
 <STRING>  \\                    { string.append('\\'); }
 <STRING> {stringdelimiter} 		{ yybegin(YYINITIAL); return symbol(sym.STRING, string.toString());}
 
-.|\n {throw new Error("Lexema não reconhecido pela linguagem OCL: <"+ yytext()+">" + " Linha: "+ yyline + " Coluna: "+ yycolumn+"\r");}
+.|\n {throw new Error("Lexema não reconhecido pela linguagem OCL: <"+ yytext()+">" + " Linha: "+ (yyline + 1) + " Coluna: "+ (yycolumn + 1)+"\r");}

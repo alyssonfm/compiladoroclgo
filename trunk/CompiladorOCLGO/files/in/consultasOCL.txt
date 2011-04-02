@@ -126,6 +126,7 @@ body asd: meetings->forAll (m1, asd : ASD | meetings->forAll (m2 | m1<>m2 implie
 context ObjectFlowState::getTrue(): Boolean    
 body asd: teste(asd, asd )
 
+
 context ObjectFlowState::getTrue(): Boolean    
 body asd: meetings->forAll (m1, asd | meetings->forAll (m2 | m1<>m2 implies disjoint (m1, m2)))
 
