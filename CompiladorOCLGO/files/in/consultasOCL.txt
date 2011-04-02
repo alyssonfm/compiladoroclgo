@@ -1,2 +1,6 @@
-context package LoyaltyProgram::getServicesByLevel(levelName: String): Set(Service)
-context MyType::a(): Set(Set(Integer::ghhghg))
+package Behavioral_Elements::Activity_Graphs
+
+context ObjectFlowState::getTrue(): Boolean
+body torada: not asd
+						 
+endpackage

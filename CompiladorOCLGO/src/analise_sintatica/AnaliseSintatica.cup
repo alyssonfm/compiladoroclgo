@@ -27,59 +27,55 @@ parser code {:
 
 
 /* Terminals (tokens returned by the scanner). */
-terminal PACKAGE, ENDPACKAGE, CONTEXT, BODY, COLLECTION;
-terminal DOT, COMMA, COLON, PATHNAME, LEFT_PAR, LEFT_BRK, LEFT_BRA, RIGHT_PAR, RIGHT_BRK, RIGHT_BRA;
+terminal PACKAGE, ENDPACKAGE, CONTEXT, BODY, COLLECTION, SELF;
+terminal DOT, COMMA, COLON, PATHNAME, LEFT_PAR, LEFT_BRK, LEFT_BRA, RIGHT_PAR, RIGHT_BRK, RIGHT_BRA, BAR;
 terminal COLLECTIONOPERATION;
 terminal EQ, NE, LE, GE, GT, LT;
 terminal AND, OR, NOT, XOR, IMPLIES;
 terminal IF, ELSE, THEN, ENDIF;
 terminal PLUS, MINUS, TIMES, DIVIDE;
+terminal INTEGERTYPE, REALTYPE, BOOLEANTYPE, STRINGTYPE;
 terminal Integer INTEGER;
 terminal Double REAL;
 terminal String STRING;
 terminal IDENTIFIER, BOOLEAN;
-terminal BAR;
 
 /* Non terminals */
 non terminal packageDeclaration;
 non terminal packageDeclarationAux;
 non terminal contextDeclaration;
-non terminal operationContext;
-non terminal operationContextAux;
 non terminal bodyDeclaration;
 non terminal operation;
 non terminal operationParAux;
-non terminal operationTypeAux;
-non terminal oclExpression, oclExpressions, expression;
+non terminal oclExpression;
 non terminal parameters;
-non terminal variableExp;
 non terminal pathName;
 non terminal pathNameAux;
-non terminal literalExp;
-non terminal collectionLiteralExp;
+non terminal pathNameOperation;
 non terminal collectionTypeIdentifier;
-non terminal collectionLiteralParts;
-non terminal collectionLiteralPart;
-non terminal primitiveLiteralExp;
-non terminal integerLiteral;
-non terminal realLiteral;
-non terminal stringLiteral;
-non terminal booleanLiteral;
-non terminal propertyCallExp;
-non terminal modelPropertyCallExp;
-non terminal operationCallExp;
-non terminal attributeCallExp;
-non terminal navigationCallExp;
-non terminal associationCallExp;
-non terminal arguments;
 non terminal ifExp;
 non terminal collectionType;
 non terminal typeName;
 non terminal variableDeclaration;
-non terminal variableDeclarationTypeAux;
 non terminal relationalExpression;
+non terminal relationalExpressionAux;
 non terminal additiveExpression;
+non terminal additiveExpressionAux;
 non terminal multiplicativeExpression;
+non terminal multiplicativeExpressionAux;
+non terminal postfixExpression;
+non terminal postfixExpressionAux;
+non terminal operationCall;
+non terminal propertyCall;
+non terminal propertyCallParameters;
+non terminal actualParameterList;
+non terminal declarator;
+non terminal declaratorAux;
+non terminal literalCollection;
+non terminal expressionParameter;
+non terminal expressionParameterAux;
+non terminal qualifiers;
+non terminal primaryExpression;
 non terminal unaryExpression;
 non terminal oclExpressionAux;
 non terminal unaryOperator;
@@ -87,7 +83,8 @@ non terminal multiplyOperator;
 non terminal addOperator;
 non terminal relationalOperator;
 non terminal logicalOperator;
-non terminal loopExp;
+non terminal literal;
+non terminal primaryTypes;
 
 
 /* Precedences */
@@ -116,19 +113,79 @@ packageDeclaration ::=  PACKAGE pathName packageDeclarationAux ENDPACKAGE
 packageDeclarationAux ::= contextDeclaration packageDeclarationAux |;
 pathName ::= IDENTIFIER pathNameAux;
 pathNameAux ::= PATHNAME pathName |;
-contextDeclaration ::= CONTEXT operation;
-operation ::= IDENTIFIER pathNameAux LEFT_PAR operationParAux RIGHT_PAR COLON operationTypeAux
-			|IDENTIFIER LEFT_PAR operationParAux RIGHT_PAR COLON operationTypeAux;
+pathNameOperation ::= PATHNAME pathName;
+contextDeclaration ::= CONTEXT operation bodyDeclaration;
+bodyDeclaration ::= BODY IDENTIFIER COLON oclExpression
+					| BODY COLON oclExpression;
+operation ::= IDENTIFIER pathNameOperation LEFT_PAR operationParAux RIGHT_PAR COLON typeName;
 operationParAux ::= parameters |;
-operationTypeAux ::= typeName |;
 parameters ::= variableDeclaration
-			| variableDeclaration COMMA parameters; 
-typeName ::= pathName
-			| collectionType;
-variableDeclaration ::= IDENTIFIER variableDeclarationTypeAux EQ oclExpression
-						|IDENTIFIER variableDeclarationTypeAux;
-variableDeclarationTypeAux ::= COLON typeName |;
-oclExpression ::= IDENTIFIER; 
+			| variableDeclaration COMMA parameters;
+
 collectionType ::= collectionTypeIdentifier LEFT_PAR typeName RIGHT_PAR;
 collectionTypeIdentifier ::= COLLECTION;
+			 
+typeName ::= primaryTypes 
+			| pathName
+			| collectionType;
 
+primaryTypes ::= STRINGTYPE
+			| REALTYPE
+			| BOOLEANTYPE
+			| INTEGERTYPE;
+			
+literal ::= REAL | INTEGER | BOOLEAN | STRING | pathName;
+			
+variableDeclaration ::= IDENTIFIER COLON typeName;
+oclExpression ::= relationalExpression oclExpressionAux;
+oclExpressionAux ::= logicalOperator relationalExpression oclExpressionAux |;
+
+relationalExpression ::= additiveExpression relationalExpressionAux;
+relationalExpressionAux ::= relationalOperator additiveExpression relationalExpressionAux |;
+
+additiveExpression ::= multiplicativeExpression additiveExpressionAux;
+additiveExpressionAux ::= addOperator multiplicativeExpression additiveExpressionAux |;
+
+multiplicativeExpression ::= unaryExpression multiplicativeExpressionAux;
+multiplicativeExpressionAux ::= multiplyOperator unaryExpression multiplicativeExpressionAux |;
+
+unaryExpression ::= unaryOperator postfixExpression
+					| postfixExpression;
+
+postfixExpression ::= primaryExpression postfixExpressionAux;
+postfixExpressionAux ::= operationCall propertyCall postfixExpressionAux |;
+operationCall ::= COLLECTIONOPERATION 
+				  | DOT;
+				  
+primaryExpression ::= literalCollection
+					| literal
+					| propertyCall
+					| LEFT_PAR oclExpression RIGHT_PAR
+					| ifExp;
+
+literalCollection ::= collectionTypeIdentifier LEFT_BRA expressionParameter RIGHT_BRA;
+  
+expressionParameter ::= oclExpression expressionParameterAux |;
+expressionParameterAux ::= COMMA oclExpression expressionParameterAux |;
+
+ifExp ::= IF oclExpression THEN oclExpression ELSE oclExpression ENDIF;
+
+propertyCall ::= pathName qualifiers propertyCallParameters;
+
+qualifiers ::= LEFT_BRK actualParameterList RIGHT_BRK;
+
+actualParameterList::= oclExpression expressionParameterAux;
+
+propertyCallParameters ::= LEFT_PAR declarator actualParameterList RIGHT_PAR
+						| LEFT_PAR actualParameterList RIGHT_PAR
+						| LEFT_PAR declarator RIGHT_PAR
+						| LEFT_PAR RIGHT_PAR;
+declarator ::= IDENTIFIER declaratorAux COLON pathName BAR
+			| IDENTIFIER declaratorAux BAR;
+declaratorAux ::= COMMA IDENTIFIER declaratorAux |;
+
+logicalOperator ::= AND | OR | XOR | IMPLIES;
+relationalOperator ::= EQ | NE | LE | GE | GT | LT;
+addOperator ::= PLUS | MINUS;
+multiplyOperator ::= TIMES | DIVIDE;
+unaryOperator ::= MINUS | NOT;
