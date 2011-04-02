@@ -9,14 +9,9 @@ public class Util {
 			Symbol sym = (Symbol) info;
 			if (sym.left != -1){
 				System.out.println("Erro Sintatico na linha " + (sym.left + 1) + " e coluna " + (sym.right + 1));
-				System.out.println("Palavra " + sym.value + " reconhecida como " + changeTokenNames(sym.toString()));
-			}else{
-				System.out.println("sym.left = -1");
+				System.out.println("Palavra " + sym.value + " nao esperada.");
 			}
-		}else{
-			System.out.println("Nao eh instancia de Symbol");
 		}
-		
 	}
 
 	public static void syntax_error(Symbol cur_token) {
