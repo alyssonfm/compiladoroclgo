@@ -1,0 +1,265 @@
+\section{Análise Léxica}
+
+Na análise léxica ocorre \ldots
+
+\subsection{Ferramenta JFlex}
+
+A ferramenta \textbf{JFlex} gera analisadores léxicos em \textbf{Java} a partir
+da especificação de expressões regulares e trechos de código associados a cada
+expressão. A especificação referida é escrita utilizando a linguaguem JFlex (um
+clone da linguagem \textbf{lex}), que tem como extensão \textbf{.flex}.
+
+\begin{figure}[h] 
+\begin{center}
+\includegraphics[width=6.0cm,height=4.0cm]{imagens/analiseLexica}
+\caption{(Esquema - ferramenta JFlex.)}
+\end{center}
+\end{figure}
+
+O esquema acima, ilustra a ferramenta JFlex recebendo como entrada o arquivo
+\textbf{AnaliseLexicaOCL.flex} e gerando a classe
+\textbf{AnaliseLexicaOCL.java}. Em linhas gerais, o código gerado lê um arquivo de entrada, extrai cadeias que estão de acordo com as expressões regulares definidas e executa o código associados as expressões.
+
+\subsection{Linguagem JLex}
+	
+O arquivo \textbf{AnaliseLexicaOCL.flex} é divido em três seções separadas por
+'\%\%'. A primeira seção serve para incluir código do usuário, ou seja, declarações de imports, classes e métodos auxiliares, que serão copiados diretamente para o topo do arquivo gerado.  A segunda seção é o espaço reservado para especificar diretivas, ou seja, declarações de macros (que definem as expressões regulares) e nomes de estados. Na última seção são definidas as ações para cada regra especificada anteriormente.
+
+\subsection{Explicitando o arquivo AnaliseLexicaOCL.flex}
+A seguir será explicado o código do arquivo AnaliseLexicaOCL.flex.
+
+\subsubsection{Primeira Seção}
+
+\textbf{Declaração de pacotes e \textit{imports}}
+
+Na primeira seção são descritos trechos de código java. Na linha 1 é definido o
+pacote ClassesJava, que a classe gerada (em java) ficará, nesse caso, a classe
+gerada será AnaliseLexicaOCL.java. Nas linhas 3 e 4 são especificados os
+\textit{imports} para as classes \textit{Symbol.java} e \textit{sym.java}.
+Utilizou-se o pacote ClassesJava visando organizar e tornar fácil a manutenção das classes java construídas durante o desenvolvimento do projeto. As classes importadas são necessárias para a manipulação dos tokens no código gerado.
+
+\subsubsection{Segunda Seção}
+
+\textbf{Definição das opções a serem usadas}
+
+Nas linhas 7 a 11 são descritas as diretivas (opcionais). Na linha 7, define-se
+o nome da classe que será gerada por meio da diretiva \%class, nesse caso, o
+nome da classe é AnaliseLexicaOCL. Na linha 8, usa-se a diretiva \%unicode, que
+define o conjunto de caracteres (UNICODE) que o analisador reconhecerá ao ler um
+arquivo textual. Na linha 9, a diretiva \%cup indica compatibilidade com um
+analisador sintático CUP. Nas linhas 10 e 11, as diretivas \%line e \%column
+permitem utilizar as variáveis \textbf{yyline} e \textbf{yycolumn}, que
+armazenam o número da linha e da coluna, respectivamente, do arquivo que está
+lido pelo analisador léxico.
+
+\textbf{Declaração de variáveis e métodos}
+
+Na linha 14, declara-se a variável erros, do tipo StringBuilder, que será usada
+para armazenar todos os erros léxicos encontrados durante a etapa de Análise
+Léxica. Das linhas 16 a 19 é especificada a função \textit{symbol}, que será
+usada para tratar tokens que não possuem 'valor-atributo' (e.g. palavras
+reservadas da linguagem). Nessa função é criado um objeto Symbol, que armazena
+informações (nome, linha e coluna onde está localizado no arquivo) sobre o token
+e, em seguida, retornado.
+
+Entre as linhas 20 e 22, a função \textbf{symbol} sofre uma sobrecarga para lidar com os tokens que possuem o par: (nome-token, valor-atributo). Seu funcionamento é similar a função symbol (definida anteriormente). Esta funções serão utilizadas pelo analisador sintático.
+
+\subsubsection{Expressões Regulares}
+
+A seguir são descritas as expressões regulares utilizadas para definir um subconjunto da linguagem OCL. Este subconjunto se preocupa com os símbolos da linguagem que cobre a parte de Operações de Consulta e os conceitos que estão ligados a esta parte, como por exemplo, Coleções, Operadores, dentre outros.
+
+A especificação segue com as declarações de macros. Macros são definições de
+expressões regulares usadas para tornar o código mais fácil de entender. Uma
+declaração de macro consiste no identificador da macro, seguido do símbolo =,
+seguido pela expressão regular que a representa: \verb!<nome = definição>!. Em
+flex, para referenciar uma macro já criada, basta colocá-la entre \verb!{ }!.
+
+\textbf{Delimitadores de linha}
+
+Nas linhas 26 a 28 são declaradas as macros para tratar delimitação de linha e
+espaço em branco. \textbf{inputcharacter}, definida pela expressão regular:
+\verb![^\r\n]!, reconhece qualquer caractere, exceto os caracteres especiais
+\verb!\r! e/ou \verb!\n!. \textbf{whitespace}, definida pela expressão
+\verb!{lineterminator}|[ \f\t]!, reconhece os espaços em branco, tabulações e quebras de linha contidas no arquivo fonte do programa que está sendo analisado.
+
+\textbf{Comentários}
+
+Os comentários em OCL podem ser de dois tipos, conforme a Especificação de OCL,
+pg. 127. Comentários de linha, representados por \verb!--! seguidos por qualquer
+sequência de caracteres que se encontrem na mesma linha, e comentários de
+parágrafo - representados por \verb!/*! seguido por qualquer cadeia de
+caracteres e \verb!*/!, qualquer cadeia delimitada por \verb!/*! e \verb!*/!
+será desconsiderada pelo analisador léxico.
+
+Na linha 29 é definida a macro para comentário de parágrafo
+\textbf{paragraphcomment}, que possui a expressão regular
+\verb!("/*"~"*/")(~"*/")*!, indicando que pode existir qualquer cadeia entre
+\verb!/*! e \verb!*/!, inclusive eles próprios. \verb!("/*"~"*/")! permite que
+exista qualquer cadeia entre \verb!/*! e \verb!*/!, exceto \verb!*/!. A
+concatenação com \verb!(~"*/")*! permite incluir a cadeia \verb!*/! dentre as
+cadeias que fazem parte do comentário.
+
+Na linha 30 é definida a macro para comentário de linha \textbf{linecomment},
+que consiste em: \verb!"--" {inputcharacter}* {lineterminator}!, um \verb!--!
+seguido por qualquer sequência de caracteres, exceto quebra de linhas.
+
+Na linha 31 é definida a macro para ambos os tipos de comentários e possui a
+expressão regular: \verb!{linecomment} | {paragraphcomment}!, indicando que um
+comentário pode ser de linha ou de coluna.
+
+\textbf{Alfa numéricos}
+
+Na linha 33 é definida a macro \textbf{digit} cuja expressão é \verb![0-9]!, que
+indica que um dígito pode ser qualquer valor no intervalo de 0 a 9 (e.g.
+\textbf{5} é um \textbf{digit}). 
+Na linha 34 é definida a macro para letras ou
+sublinhado \textbf{letter}, que possui como expressão regular: \verb![A-Za-z] |[_]!, podendo um \textbf{letter} ser qualquer letra maiúscula, minúscula ou
+sublinhado. 
+Na linha 35 é definida a macro \textbf{alpha} que consiste numa letra ou
+sublinhado ou um digito, e possui expressão: \verb!{letter} | {digit}!.
+
+\textbf{Identificadores}
+
+Os identificadores são usados para o casamento dos padrões com os nomes de
+funções, procedimentos, variáveis, ou outras expressões que representem
+identificadores para as linguagens de programação. Em OCL, um identificador deve
+ser iniciado com uma letra ou sublinhado e pode ser seguido por qualquer
+sequência de letras, sublinhados ou dígitos. Desta forma, na linha 36, a macro
+\textbf{identifier} é definida com a seguinte expressão:
+\verb!{letter}{alpha}*!, garantindo que todos os identificadores reconhecidos na Análise Léxica iniciarão com uma letra ou sublinhado e terá qualquer sequência de letras, sublinhados ou dígitos.
+
+\textbf{Tipos Básicos}
+
+A seguir serão explicadas as expressões regulares usadas para definir os tipos básicos de OCL (pg. 74 [KLEPPE]). 
+
+\textbf{Tipo String}
+
+Na linha 38 é declarado o estado \verb!STRING!, que será usado na parte das
+regras léxicas para auxiliar no reconhecimento de strings. Na linha 39 é
+definida a macro \textbf{stringdelimiter}, que é representada pela expressão
+\verb!\'!. Serve para reconhecer o delimitador de string, no início e fim, que é
+representado por \verb!'!.
+
+\textbf{Tipo Integer}
+
+Na linha 40 é definida a  expressão para o tipo Integer. Baseado na macro
+\textbf{digit}, definida anteriormente, a expressão faz referência a \textbf{digit} da
+forma \verb!{digit}!. Em seguida aparece o símbol \textbf{+}, indicando que a
+sequência anterior não pode ser vazia e representando o conjunto de qualquer
+sequência de dígitos. \textbf{12} é um exemplo do tipo Integer.
+
+\textbf{Tipo Real}
+
+Na linha 41 é definida a expressão para o tipo Real. Baseado na macro
+\textbf{integer}, definida anteriormente, ela pode ser subdividida em três
+subexpressões para facilitar a explicação. A expressão inicia com
+\verb!{integer}!, indicando que a cadeia começa com qualquer elemento do
+conjunto dos inteiros, seguida por  \verb!("\."{digit}+)?!, indicando que a
+cadeia pode ser vazia ou então formada pelo símbolo \textbf{.} concatenada por
+qualquer elemento do conjunto dos inteiros positivos. Para finalizar, a
+subexpressão \verb!([eE][+-]?{digit}+)?!, indica que o número, representado pela
+cadeia \verb!{integer}("\."{digit}+)?!, pode ser ainda ''elevado'' a qualquer
+elemento do conjunto dos inteiros positivos \verb!({digit}+)!. O termo
+''elevado'' é representado pela cadeia \verb![eE]!, que por sua vez, é
+concatenada com a cadeia \verb![+-]?!, indicando se o número ''elevado'' será
+positivo ou negativo, ou uma cadeia vazia. \textbf{1.23e3} é um exemplo do tipo
+Real.
+
+\textbf{Tipo Boolean}
+
+Na linha 42 é definida a expressão \verb!"true"|"false"!, indicando que o tipo
+Boolean é formado pelas palavras reservadas \textbf{true} e \textbf{false}.
+
+\textbf{Tipos Compostos - Coleções}
+
+Na linha 43 é definida a expressão \verb!"Set"|"Bag"|"Sequence"|"OrderedSet"!,
+que representa os tipos de coleções de OCL, ou seja, as palavras reservadas que
+representam cada um dos tipos de coleções: \textbf{Set, Bag, Sequence e
+OrderedSet} \verb!(pg. 137 [KEPLLE])!.
+
+\subsubsection{Terceira Seção}
+
+Na terceira seção são descritas as regras das expressões regulares. Todas as
+regras seguem o seguinte padrão: \verb!<estado> expressão { ação }!. O
+analisador léxico vai lendo a entrada e procurando a sequência mais longa de caracteres. Caso mais de uma regra case com a sequência mais longa, escolhe-se aquela que foi definida primeiro. No arquivo AnaliseLexicaOCL.flex, na terceira seção, são manipulados dois estados. O estado inicial (YYINITIAL) e o estado que serve para auxiliar no reconhecimento de String (STRING).
+
+Todas as ações das regras, que aparecem nas linhas 49 a 88, utilizam a função
+\textit{symbol} (definada na seção 2) para retornar o objeto Symbol (que contém
+as informações sobre o token que está associado a expressão daquela regra). É
+passado como argumento para a função \textit{symbol} o nome do token.
+
+\textbf{Espaço e comentário}
+
+Nas linhas 47 e 48 são tratadas as expressões que reconhecem espaço em branco e comentários, respectivamente. Não é executada nenhuma ação para estas duas expressões, ou seja, o analisador está removendo estas cadeias, que são desnecessárias para realizar o agrupamento dos tokens.
+
+\textbf{Nomes de pacotes, operação de coleção, ponto e dois pontos} 
+
+A regra da linha 49 trata o terminal \verb!::!, que no escopo do projeto,
+servirá para referenciar tipos em outros pacotes, ou seja, permite navegar nos
+pacotes (de UML) até chegar numa classe desejada. Exemplo: \verb!context
+NomePacote1::NomePacote2::NomeTipo!.  Na linha 50, a regra trata o símbolo
+\verb!.!, que no escopo do projeto, é usado para acessar atributos em classes e
+permitir executar uma operação a partir de um objeto (que não seja coleção).
+Exemplo: \verb!Classe1.atributo1.operacao1()!. Na linha 51, a regra trata o
+terminal \verb!->!, utilizado para executar operações sobre objetos do tipo
+Collections. Exemplo: \verb!Bag1->select (...)!. O terminal \verb!:!, associado
+a regra da linha 52, é utilizado de diversas formas no escopo deste projeto. As
+mais comuns são: determinar o início da especificação do corpo de uma função
+\verb!(body:)!, permitir associar o tipo de Objeto a uma variável no iterador
+\textit{forAll}, especificar o tipo de retorno de uma função. Exemplos:
+\verb!body: self.atributo, forAll(a : TipoObjeto | expressão)}!.
+
+\textbf{Parênteses, Colchetes, Chaves, Vírgula e Barra}
+
+Os parênteses, tratados nas regras das linhas 53 e 56, são usados em operações,
+para especificar os argumentos e para determinar a precedência de expressões, em
+geral, por exemplo: a expressão \verb!5 - 2 * 10 + 5! resultaria em \verb!-10!,
+entretanto, se escrevêssemos \verb!(5 - 2) * (10 + 5)!, o resultado seria
+\verb!45!. Com isso, percebe-se que os parênteses mudaram a ordem em que foram
+realizadas as operações. Os colchetes, tratados nas regras das linhas 54 e 56 no
+escopo deste projeto, são utilizados mais comumente para acessar elementos de
+classes compostas por conjunto de outros elementos. Por exemplo, a expressão:
+\verb!classeA.conjuntoB[1]! terá como resultado o primeiro elemento do
+\verb!conjuntoB!. 
+As chaves, tratadas nas regras das linhas 55 e 58, são usadas
+para definir coleções. Por exemplo: \verb!body: Set{1, 2, 3, 4}!. A vírgula,
+tratada na regra da linha 58, é utilizada, no escopo deste projeto, para:
+separar os argumentos das operações e separar elementos de uma coleção. A barra,
+tratada na regra da linha 60, é utilizada em operações, como por exemplo:
+\verb!self.employee->exists( p | p.forename = 'Jack' )!.
+
+\textbf{Operadores}
+
+Os operadores \verb!=, <>, <=, >=,  <, >, +, -, *, /,! tratados nas regras das
+linhas 61 a 70, são utilizados para realizar operações em valores do tipo
+Integer e Real. Os operadores \verb!= e <>! também são utilizados em operações
+que envolvem valores do tipo String e do tipo Boolean.
+
+\textbf{Keywords}
+
+As palavras chaves da linguagem OCL necessárias para o escopo do projeto são:
+\textbf{self} (denotar a instância do contexto), \textbf{package} (especificar
+explicitamente a que pacote as expressões pertencem), \textbf{endpackage}
+(delimita o ''fim do package''), \textbf{context} (especificar o contexto para
+as expressões) e \textbf{body} (definir o corpo da operação) e são tratadas nas
+regras das linhas \verb!71 a 75. (pg. 13 e 14 [Especificação OCL])!
+
+
+\textbf{Expressão Condicional if-then-else}
+
+As regras das linhas 76 a 79 tratam os elementos que formam a expressão
+condicional \verb!''if-then-else''!, são eles:  \textbf{if, then, else, endif}. 
+\verb!(pg. 10 [Especificação OCL])!. Um exemplo de uma expressão condicional
+\textbf{if-then-else}:  \verb!if balance > 5000 then 2 else 3 endif!.
+
+\textbf{Operadores ''Booleanos''}
+
+As regras das linhas 80 a 84 tratam os operadores ''booleanos'' (além dos já
+comentados acima), são eles: \textbf{implies, and, or, xor e not} \verb!(pg. 123 [KEPLLE])!. Exemplo: \verb!forAll(elem | self->includes(elem) xor
+s->includes(elem))!.
+
+ \textbf{Tipos básicos e identificador}
+ 
+As regas das linhas 85, 87 e 88 tratam os tipos Boolean, Real e Integer, respectivamente, baseados nas macros definidas anteriormente, na seção 2. Na linha 86, a regra trata a macro que define os Identificadores (também explicada na seção 2).
+Para auxiliar no reconhecimento dos valores do tipo String, foi necessário criar o estado STRING. Quando o analisador léxico encontra um delimitador de String (tratado na linha 89), um possível valor do tipo String poderá ser encontrado.  
+

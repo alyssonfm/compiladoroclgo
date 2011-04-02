@@ -1,0 +1,57 @@
+\documentclass[a4paper,12pt,dvipdfm]{article}
+
+\usepackage{sbc-template}
+
+\usepackage{graphicx,url}
+
+\usepackage[pdftex,raiselinks=false,colorlinks=true,linkcolor=blue,anchorcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue,linktocpage=true,bookmarksopen=true%,pagebackref=true
+    ]{hyperref}
+    
+\usepackage[latin1]{inputenc}  
+
+\usepackage{listings}
+
+\usepackage{multirow}
+
+\lstset{numbers=left,
+stepnumber=1,
+firstnumber=1,
+numberstyle=\tiny,
+extendedchars=true,
+breaklines=true,
+frame=tb,
+basicstyle=\footnotesize,
+stringstyle=\ttfamily,
+showstringspaces=false
+}
+
+\title{Relatório sobre Análise Léxica e Sintática de Operações de Consulta OCL
+- Go}
+
+\author{Alysson Milanez\inst{1}\\ Delano Oliveira\inst{1}\\ Natã Melo\inst{1}}
+
+\address{
+  Departamento de Sistemas e Computação\\
+  Universidade Federal de Campina Grande (UFCG) -- Campina Grande, PB -- Brasil
+  \email{\{alyssonfilgueira, delanohelio, nata.venancio.melo\}@gmail.com}
+}
+
+\sloppy
+
+\pagenumbering{arabic}
+\begin{document}
+
+\maketitle
+
+\tableofcontents{}
+\newpage
+\input{textos/introducao}
+\newpage
+\input{textos/analiselexica}
+\newpage
+\input{textos/analisesintatica}
+\newpage
+\input{textos/conclusao}
+\newpage
+\input{textos/bibliografia}
+\end{document}
