@@ -1,4 +1,37 @@
 \section{Introdução}
 
-Neste trabalho iremos apresentar os analisadores léxico e sintático
-para Operações de Consulta OCL\ldots
+Este projeto tem como objetivo construir um compilador de um subconjunto de OCL
+(Object Constraint Language) para a linguagem Go. O subconjunto referido se
+preocupa em tratar as restrições que definem o corpo de operações de consulta,
+utilizando a \textit{keyword} \textbf{body}. Para reduzir o escopo de OCL foram
+utilizadas as gramáticas:  \verb![Kleppe]!,
+(\href{http://www.yancy.org/school/lehigh/phd/links/ocl-grammar-01b.pdf}{\texttt{http://www.yancy.org/school/lehigh/phd/links/ocl-grammar-01b.pdf}})
+e a \verb![Especificação OCL]!.
+
+Na primeira etapa do projeto foram construídas as fases de Análise Léxica e Análise Sintática. Para construir o Analisador Léxico e o Analisador Sintático foram utilizadas as ferramentas JFlex e JCup respectivamente. 
+
+Um esboço da arquitetura do ''Compilador de OCL para Go'' é apresentando na
+imagem abaixo. Construído em Java, o compilador possui três pacotes:
+\verb!analise_lexica!, \verb!analise_sintatica! e \verb!util!.
+
+\begin{figure}[h]
+	\includegraphics{imagens/compilador.png}
+	\caption {Compilador OCL para Go.}
+\end{figure}
+
+O pacote util é formado pelas classes:
+\begin{itemize}
+  \item Util.java - possui operações auxiliares para tratar como os tokens serão
+  apresentados para o usuário;
+  \item Logger.java - possui operações que tratam as mensagens de erros;
+  \item Constants.java - possui constantes que auxiliam na apresentação dos
+  tokens para o usuário;
+  \item Sym.java - possui as constantes que representam os tokens.
+\end{itemize}
+
+O analisador léxico (representado pela classe \textbf{AnaliseLexica.java})
+utiliza o pacote util para auxiliar no reconhecimento dos tokens. O analisador sintático
+(representado pela classe \textbf{AnaliseSintatica.java}) utiliza as classes do
+pacote Util e do pacote \verb!analise_lexica!, mais especificamente a classe
+AnaliseLexica.java, para realizar a análise sintática.
+ 
