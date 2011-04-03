@@ -7,19 +7,15 @@ parser code {:
 	public void report_error(String message, Object info) {
 		Util.report_error(message, info);
 	}
-
 	public void syntax_error(Symbol cur_token) {
 		Util.syntax_error(cur_token);
 	}
-
 	public void debug_message(String mess) {
 		Util.debug_message(mess);
 	}
-
 	public void debug_shift(Symbol shift_tkn) {
 		Util.debug_shift(shift_tkn);
 	}
-
 	public void debug_reduce(int prod_num, int nt_num, int rhs_size) {
 		Util.debug_reduce(prod_num, nt_num, rhs_size);
 	}
@@ -94,6 +90,8 @@ precedence left TIMES, DIVIDE;
 precedence left NOT;
 precedence left LEFT_PAR, RIGHT_PAR;
 precedence left COLLECTIONOPERATION, DOT; 
+
+start with packageDeclaration;
 
 packageDeclaration ::=  PACKAGE pathName packageDeclarationAux ENDPACKAGE
 						| packageDeclarationAux;
