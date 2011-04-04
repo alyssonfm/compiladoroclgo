@@ -1,0 +1,181 @@
+\section{Anexo B - Arquivo AnaliseSintatica.cup}
+\scriptsize
+\begin{lstlisting}[frame=single, caption={AnaliseLexica.flex}]
+package analise_sintatica;
+import java_cup.runtime.Symbol;
+import util.Util;
+
+parser code {:
+	
+	public void report_error(String message, Object info) {
+		Util.report_error(message, info);
+	}
+	public void syntax_error(Symbol cur_token) {
+		Util.syntax_error(cur_token);
+	}
+	public void debug_message(String mess) {
+		Util.debug_message(mess);
+	}
+	public void debug_shift(Symbol shift_tkn) {
+		Util.debug_shift(shift_tkn);
+	}
+	public void debug_reduce(int prod_num, int nt_num, int rhs_size) {
+		Util.debug_reduce(prod_num, nt_num, rhs_size);
+	}
+:};
+
+terminal PACKAGE, ENDPACKAGE, CONTEXT, BODY, COLLECTION, SELF;
+terminal DOT, COMMA, COLON, PATHNAME, LEFT_PAR, LEFT_BRK, LEFT_BRA, RIGHT_PAR, RIGHT_BRK, RIGHT_BRA, BAR;
+terminal COLLECTIONOPERATION;
+terminal EQ, NE, LE, GE, GT, LT;
+terminal AND, OR, NOT, XOR, IMPLIES;
+terminal IF, ELSE, THEN, ENDIF;
+terminal PLUS, MINUS, TIMES, DIVIDE;
+terminal INTEGERTYPE, REALTYPE, BOOLEANTYPE, STRINGTYPE;
+terminal Integer INTEGER;
+terminal Double REAL;
+terminal String STRING;
+terminal IDENTIFIER, BOOLEAN;
+
+non terminal packageDeclaration;
+non terminal packageDeclarationAux;
+non terminal contextDeclaration;
+non terminal bodyDeclaration;
+non terminal operation;
+non terminal operationParAux;
+non terminal oclExpression;
+non terminal parameters;
+non terminal pathName;
+non terminal pathNameAux;
+non terminal pathNameOperation;
+non terminal collectionTypeIdentifier;
+non terminal ifExp;
+non terminal collectionType;
+non terminal typeName;
+non terminal variableDeclaration;
+non terminal relationalExpression;
+non terminal relationalExpressionAux;
+non terminal additiveExpression;
+non terminal additiveExpressionAux;
+non terminal multiplicativeExpression;
+non terminal multiplicativeExpressionAux;
+non terminal postfixExpression;
+non terminal postfixExpressionAux;
+non terminal operationCall;
+non terminal propertyCall;
+non terminal propertyCallParameters;
+non terminal declarator;
+non terminal declaratorAux;
+non terminal literalCollection;
+non terminal expressionParameter;
+non terminal expressionParameterAux;
+non terminal qualifiers;
+non terminal primaryExpression;
+non terminal unaryExpression;
+non terminal oclExpressionAux;
+non terminal unaryOperator;
+non terminal multiplyOperator; 
+non terminal addOperator;
+non terminal relationalOperator;
+non terminal logicalOperator;
+non terminal literal;
+non terminal primaryTypes;
+non terminal colonPathName;
+ 
+precedence left COMMA;
+precedence left IMPLIES;
+precedence left AND, OR, XOR;
+precedence left EQ, NE;
+precedence left LE, GE, GT, LT; 
+precedence left IF, THEN, ELSE, ENDIF;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence left NOT;
+precedence left LEFT_PAR, RIGHT_PAR;
+precedence left COLLECTIONOPERATION, DOT; 
+
+start with packageDeclaration;
+
+packageDeclaration ::=  PACKAGE pathName packageDeclarationAux ENDPACKAGE
+		| packageDeclarationAux;
+packageDeclarationAux ::= contextDeclaration packageDeclarationAux |;
+pathName ::= IDENTIFIER pathNameAux;
+pathNameAux ::= PATHNAME pathName |;
+pathNameOperation ::= PATHNAME pathName;
+contextDeclaration ::= CONTEXT operation bodyDeclaration;
+bodyDeclaration ::= BODY IDENTIFIER COLON oclExpression
+		| BODY COLON oclExpression;
+operation ::= IDENTIFIER pathNameOperation LEFT_PAR operationParAux RIGHT_PAR COLON typeName;
+operationParAux ::= parameters |;
+parameters ::= variableDeclaration
+		| variableDeclaration COMMA parameters;
+
+collectionType ::= collectionTypeIdentifier LEFT_PAR typeName RIGHT_PAR;
+collectionTypeIdentifier ::= COLLECTION;
+			 
+typeName ::= primaryTypes 
+		| pathName
+		| collectionType;
+
+primaryTypes ::= STRINGTYPE
+		| REALTYPE
+		| BOOLEANTYPE
+		| INTEGERTYPE;
+			
+literal ::= REAL | INTEGER | BOOLEAN | STRING;
+			
+variableDeclaration ::= IDENTIFIER COLON typeName;
+oclExpression ::= relationalExpression oclExpressionAux;
+oclExpressionAux ::= logicalOperator relationalExpression oclExpressionAux |;
+
+relationalExpression ::= additiveExpression relationalExpressionAux;
+relationalExpressionAux ::= relationalOperator additiveExpression relationalExpressionAux |;
+
+additiveExpression ::= multiplicativeExpression additiveExpressionAux;
+additiveExpressionAux ::= addOperator multiplicativeExpression additiveExpressionAux |;
+
+multiplicativeExpression ::= unaryExpression multiplicativeExpressionAux;
+multiplicativeExpressionAux ::= multiplyOperator unaryExpression multiplicativeExpressionAux |;
+
+unaryExpression ::= unaryOperator postfixExpression
+					| postfixExpression;
+
+postfixExpression ::= primaryExpression postfixExpressionAux;
+postfixExpressionAux ::= operationCall propertyCall postfixExpressionAux |;
+operationCall ::= COLLECTIONOPERATION 
+		| DOT;
+				  
+primaryExpression ::= literalCollection
+		| literal
+		| propertyCall
+		| LEFT_PAR oclExpression RIGHT_PAR
+		| SELF
+		| ifExp;
+
+literalCollection ::= collectionTypeIdentifier LEFT_BRA expressionParameter RIGHT_BRA;
+ 
+ifExp ::= IF oclExpression THEN oclExpression ELSE oclExpression ENDIF;
+
+propertyCall ::= pathName qualifiers propertyCallParameters;
+
+qualifiers ::= LEFT_BRK expressionParameter RIGHT_BRK|;
+
+propertyCallParameters ::= LEFT_PAR expressionParameter RIGHT_PAR
+		|LEFT_PAR IDENTIFIER expressionParameterAux RIGHT_PAR
+		|LEFT_PAR declarator expressionParameter RIGHT_PAR
+		|;
+						   
+declarator ::= IDENTIFIER declaratorAux colonPathName  BAR oclExpression;
+declaratorAux ::= COMMA IDENTIFIER declaratorAux|;
+colonPathName ::= COLON pathName |;
+
+expressionParameter ::= oclExpression expressionParameterAux |;
+expressionParameterAux ::= COMMA oclExpression expressionParameterAux |;
+
+logicalOperator ::= AND | OR | XOR | IMPLIES;
+relationalOperator ::= EQ | NE | LE | GE | GT | LT;
+addOperator ::= PLUS | MINUS;
+multiplyOperator ::= TIMES | DIVIDE;
+unaryOperator ::= MINUS | NOT;
+\end{lstlisting}
+\normalsize

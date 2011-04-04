@@ -14,8 +14,8 @@ Um esboço da arquitetura do ''Compilador de OCL para Go'' é apresentando na
 imagem abaixo. Construído em Java, o compilador possui três pacotes:
 \verb!analise_lexica!, \verb!analise_sintatica! e \verb!util!.
 
-\begin{figure}[h]
-	\includegraphics{imagens/compilador.png}
+\begin{figure}[h!]
+	\includegraphics[scale=0.5]{imagens/compilador.png}
 	\caption {Compilador OCL para Go.}
 \end{figure}
 
@@ -23,7 +23,8 @@ O pacote util é formado pelas classes:
 \begin{itemize}
   \item Util.java - possui operações auxiliares para tratar como os tokens serão
   apresentados para o usuário;
-  \item Logger.java - possui operações que tratam as mensagens de erros;
+  \item Logger.java - possui operações que tratam as mensagens de erros da
+  analise léxica;
   \item Constants.java - possui constantes que auxiliam na apresentação dos
   tokens para o usuário;
   \item Sym.java - possui as constantes que representam os tokens.
