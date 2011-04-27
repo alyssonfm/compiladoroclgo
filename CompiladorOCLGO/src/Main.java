@@ -33,35 +33,38 @@ public class Main {
 		AnaliseLexica scanner = null;
 		Logger logger = new Logger();
 		scanner = createScanner(fileName);
-		
-		System.out.println("########  Iniciando Analise Lexica  ########");
-		
-		Symbol s;
-		while(true){
-			try{
-				s = scanner.next_token();
-				
-				if(s.sym == sym.EOF){
-					break;
-				}
-				
-				if(s.sym == sym.STRING){
-					logger.addMessage("Token: " + Util.changeTokenNames(s.toString()) + " - " + "\"" + "'" + s.value + "'" + "\"");
-				}else{
-					logger.addMessage("Token: " + Util.changeTokenNames(s.toString()) + " - " + "\"" + s.value + "\"");
-				}
+		if(scanner != null){
+			System.out.println("########  Iniciando Analise Lexica  ########");
 			
-			
+			Symbol s;
+			while(true){
+				try{
+					s = scanner.next_token();
+					
+					if(s.sym == sym.EOF){
+						break;
+					}
+					
+					if(s.sym == sym.STRING){
+						logger.addMessage("Token: " + Util.changeTokenNames(s.toString()) + " - " + "\"" + "'" + s.value + "'" + "\"");
+					}else{
+						logger.addMessage("Token: " + Util.changeTokenNames(s.toString()) + " - " + "\"" + s.value + "\"");
+					}
+				
+				
+				}
+				catch (IOException e) {
+					System.out.printf(
+							"Erro nao esperado durante a leitura do arquivo:\n%s\n", e
+									.getMessage());
+				}
+				catch (Error e) {
+					logger.addError(e.getMessage());
+				}
 			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-			catch (Error e) {
-				logger.addError(e.getMessage());
-			}
+			System.out.print(logger);
+			System.out.println("########  Finalizada Analise Lexica ########");
 		}
-		System.out.print(logger);
-		System.out.println("########  Finalizada Analise Lexica ########");
 	}
 
 	private static void analiseSintatica(String fileName, boolean debug) {
@@ -78,6 +81,7 @@ public class Main {
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado!");
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Ocorreu algum erro sintatico");
 		}catch (Error e) {
 			System.out.print(e.getMessage());
@@ -132,6 +136,9 @@ public class Main {
 		}
 		
 		System.out.println("Obrigado por usar nosso compilador!");
+		System.out.println("Pressione ENTER para sair.");
+		Scanner in = new Scanner(System.in);
+		//in.nextLine();
 		
 	}
 

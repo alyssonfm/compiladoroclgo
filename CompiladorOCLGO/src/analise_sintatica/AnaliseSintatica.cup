@@ -100,8 +100,7 @@ pathName ::= IDENTIFIER pathNameAux;
 pathNameAux ::= PATHNAME pathName |;
 pathNameOperation ::= PATHNAME pathName;
 contextDeclaration ::= CONTEXT operation bodyDeclaration;
-bodyDeclaration ::= BODY IDENTIFIER COLON oclExpression
-					| BODY COLON oclExpression;
+bodyDeclaration ::= BODY COLON oclExpression;
 operation ::= IDENTIFIER pathNameOperation LEFT_PAR operationParAux RIGHT_PAR COLON typeName;
 operationParAux ::= parameters |;
 parameters ::= variableDeclaration
@@ -119,7 +118,7 @@ primaryTypes ::= STRINGTYPE
 			| BOOLEANTYPE
 			| INTEGERTYPE;
 			
-literal ::= REAL | INTEGER | BOOLEAN | STRING;
+literal ::= REAL | INTEGER:i {: System.out.println(i.intValue()); :} | BOOLEAN | STRING:s {: System.out.println(s); :};
 			
 variableDeclaration ::= IDENTIFIER COLON typeName;
 oclExpression ::= relationalExpression oclExpressionAux;
@@ -158,7 +157,6 @@ propertyCall ::= pathName qualifiers propertyCallParameters;
 qualifiers ::= LEFT_BRK expressionParameter RIGHT_BRK|;
 
 propertyCallParameters ::= LEFT_PAR expressionParameter RIGHT_PAR
-						   |LEFT_PAR IDENTIFIER expressionParameterAux RIGHT_PAR
 						   |LEFT_PAR declarator expressionParameter RIGHT_PAR
 						   |;
 						   
@@ -166,8 +164,8 @@ declarator ::= IDENTIFIER declaratorAux colonPathName  BAR oclExpression;
 declaratorAux ::= COMMA IDENTIFIER declaratorAux|;
 colonPathName ::= COLON pathName |;
 
-expressionParameter ::= oclExpression expressionParameterAux |;
-expressionParameterAux ::= COMMA oclExpression expressionParameterAux |;
+expressionParameter ::= oclExpression expressionParameterAux | IDENTIFIER expressionParameterAux |;
+expressionParameterAux ::= COMMA oclExpression expressionParameterAux | COMMA IDENTIFIER expressionParameterAux |;
 
 logicalOperator ::= AND | OR | XOR | IMPLIES;
 relationalOperator ::= EQ | NE | LE | GE | GT | LT;
