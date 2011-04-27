@@ -17,7 +17,7 @@ import util.sym;
 		Symbol symbol = new Symbol(tokenname, yyline, yycolumn, yytext());
 		return symbol;
 	}
-	private Symbol symbol(int tokenname, String value) {
+	private Symbol symbol(int tokenname, Object value) {
 		Symbol symbol = new Symbol(tokenname, yyline, yycolumn, value);
 		return symbol;
 	}
@@ -38,7 +38,7 @@ identifier = {letter}{alpha}*
 %state STRING
 stringdelimiter = \'
 integer    = -?{digit}+  
-real       = {integer}("\."{digit}+)?([eE][+-]?{digit}+)?
+real       = {integer}("\."{digit}+)([eE][+-]?{digit}+)?
 boolean = "true"|"false"    
 collections = "Set"|"Bag"|"Sequence"|"OrderedSet"|"Collection"
 
@@ -90,7 +90,7 @@ collections = "Set"|"Bag"|"Sequence"|"OrderedSet"|"Collection"
 <YYINITIAL>  {collections}      { return symbol(sym.COLLECTION); }
 <YYINITIAL>  {identifier}       { return symbol(sym.IDENTIFIER); } 
 <YYINITIAL>  {real}             { return symbol(sym.REAL); } 
-<YYINITIAL>  {integer}          { return symbol(sym.INTEGER); }
+<YYINITIAL>  {integer}          { return symbol(sym.INTEGER, new Integer(yytext())); }
 <YYINITIAL>  {stringdelimiter}  { string.setLength(0); yybegin(STRING); }
 <STRING>  [^\n\r\'\\]+          { string.append( yytext()); }
 <STRING>  \\t                   { string.append('\t'); }

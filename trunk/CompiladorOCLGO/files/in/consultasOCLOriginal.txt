@@ -121,14 +121,22 @@ context CDJogo::taxaAluguel(data : Date) : Real
     )
     
 context ObjectFlowState::getTrue(): Boolean    
-body asd: meetings->forAll (m1, asd : ASD | meetings->forAll (m2 | m1<>m2 implies disjoint (m1)))
+body: teste('asd')
 
 context ObjectFlowState::getTrue(): Boolean    
-body asd: teste(asd, asd, 'a')
-
+body: teste(1)
 
 context ObjectFlowState::getTrue(): Boolean    
-body asd: meetings->forAll (m1, asd | meetings->forAll (m2 | m1<>m2 implies disjoint (m1, m2)))
+body: teste(asd)
+
+context ObjectFlowState::getTrue(): Boolean    
+body: teste(id1, id2, id3, id4, asd, dsd, 1, sdsds, 'a')
+    
+context ObjectFlowState::getTrue(): Boolean    
+body: meetings->forAll (m1, asd : ASD | meetings->forAll (m2 | m1<>m2 implies disjoint (m1)))
+
+context ObjectFlowState::getTrue(): Boolean    
+body: meetings->forAll (m1, asd | meetings->forAll (m2 | m1<>m2 implies disjoint (m1, m2)))
 
 context ObjectFlowState::getTrue(): Boolean
 body: source->exists(it|asd)
