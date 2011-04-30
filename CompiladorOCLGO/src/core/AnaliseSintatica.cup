@@ -1,6 +1,7 @@
-package analise_sintatica;
+package core;
 import java_cup.runtime.Symbol;
-import util.Util;
+import util.sym;
+import util.*;
 
 parser code {:
 	
@@ -30,7 +31,7 @@ terminal IF, ELSE, THEN, ENDIF;
 terminal PLUS, MINUS, TIMES, DIVIDE;
 terminal INTEGERTYPE, REALTYPE, BOOLEANTYPE, STRINGTYPE;
 terminal Integer INTEGER;
-terminal Double REAL;
+terminal REAL;
 terminal String STRING;
 terminal IDENTIFIER, BOOLEAN;
 
@@ -93,56 +94,110 @@ precedence left COLLECTIONOPERATION, DOT;
 
 start with packageDeclaration;
 
-packageDeclaration ::=  PACKAGE pathName packageDeclarationAux ENDPACKAGE
+packageDeclaration ::=  PACKAGE pathName:pn packageDeclarationAux ENDPACKAGE
 						| packageDeclarationAux;
 packageDeclarationAux ::= contextDeclaration packageDeclarationAux |;
-pathName ::= IDENTIFIER pathNameAux;
-pathNameAux ::= PATHNAME pathName |;
-pathNameOperation ::= PATHNAME pathName;
-contextDeclaration ::= CONTEXT operation bodyDeclaration;
+pathName ::= IDENTIFIER:id pathNameAux:aux {: RESULT = id.toString() + aux.toString(); :};
+pathNameAux ::= PATHNAME:pn pathName:path {: RESULT = "::" + path.toString(); :}  
+				| {: RESULT = ""; :};
+pathNameOperation ::= PATHNAME:pn pathName:path {: RESULT = "::"+ path.toString(); :};
+contextDeclaration ::= CONTEXT operation:op bodyDeclaration;
 bodyDeclaration ::= BODY COLON oclExpression;
-operation ::= IDENTIFIER pathNameOperation LEFT_PAR operationParAux RIGHT_PAR COLON typeName;
-operationParAux ::= parameters |;
-parameters ::= variableDeclaration
-			| variableDeclaration COMMA parameters;
+operation ::= IDENTIFIER:id pathNameOperation:pno LEFT_PAR operationParAux:ope RIGHT_PAR COLON typeName:type
+			  {: RESULT = id.toString() + pno.toString() + "(" + ope.toString() + ")" + ":" + type.toString(); :};
+operationParAux ::= parameters:p {: RESULT = p.toString(); :}  
+					| {: RESULT = ""; :};
+parameters ::= variableDeclaration:v {: RESULT = v.toString(); :}
+			| variableDeclaration:v COMMA parameters:p {: RESULT = v.toString() + "," + p.toString(); :};
 
-collectionType ::= collectionTypeIdentifier LEFT_PAR typeName RIGHT_PAR;
-collectionTypeIdentifier ::= COLLECTION;
+collectionType ::= collectionTypeIdentifier:c LEFT_PAR typeName:t RIGHT_PAR 
+				   {: RESULT = c.toString() + "(" + t.toString() + ")"; :};
+collectionTypeIdentifier ::= COLLECTION:c {: RESULT = c.toString(); :};
 			 
-typeName ::= primaryTypes 
-			| pathName
-			| collectionType;
+typeName ::= primaryTypes:p {: RESULT = p.toString(); :} 
+			| pathName:pna {: RESULT = pna.toString(); :}
+			| collectionType:c {: RESULT = c.toString(); :};
 
-primaryTypes ::= STRINGTYPE
-			| REALTYPE
-			| BOOLEANTYPE
-			| INTEGERTYPE;
+primaryTypes ::= STRINGTYPE:s {: RESULT = "String"; :} 
+			| REALTYPE:r {: RESULT = "Real"; :}
+			| BOOLEANTYPE:b {: RESULT = "Boolean"; :}
+			| INTEGERTYPE:i {: RESULT = "Integer"; :};
 			
-literal ::= REAL | INTEGER:i {: System.out.println(i.intValue()); :} | BOOLEAN | STRING:s {: System.out.println(s); :};
+literal ::= REAL:v {:
+	Elemento elem = new Elemento(v.toString(), vleft, vright);
+	elem.setAtributo("tipo", "Real");
+	RESULT = elem;
+:}
+| INTEGER:v {:
+	Elemento elem = new Elemento(v.toString(), vleft, vright);
+	elem.setAtributo("tipo", "Integer");
+	RESULT = elem;
+:} 
+| BOOLEAN:v {:
+	Elemento elem = new Elemento(v.toString(), vleft, vright);
+	elem.setAtributo("tipo", "Boolean");
+	RESULT = elem;
+:} 
+| STRING:v {:
+	Elemento elem = new Elemento(v.toString(), vleft, vright);
+	elem.setAtributo("tipo", "String");
+	RESULT = elem;
+:};
 			
-variableDeclaration ::= IDENTIFIER COLON typeName;
-oclExpression ::= relationalExpression oclExpressionAux;
-oclExpressionAux ::= logicalOperator relationalExpression oclExpressionAux |;
+variableDeclaration ::= IDENTIFIER:id COLON typeName:type {: RESULT = id.toString() + ":" + type.toString(); :};
 
-relationalExpression ::= additiveExpression relationalExpressionAux;
-relationalExpressionAux ::= relationalOperator additiveExpression relationalExpressionAux |;
+oclExpression ::= relationalExpression:r oclExpressionAux:aux {:
+	if(aux != null){
+		Elemento rel = (Elemento) r;
+		if(rel.getAtributo("tipo") != "Boolean"){
+			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(rel.toString(), "Boolean"));
+		}
+	}
+	
+:};
+oclExpressionAux ::= logicalOperator relationalExpression:r oclExpressionAux {:
+	Elemento rel = (Elemento) r;  
+	if(rel.getAtributo("tipo") != "Boolean"){
+		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(rel.toString(), "Boolean"));
+	}
+	RESULT = rel; 
+:} 
+|;
 
-additiveExpression ::= multiplicativeExpression additiveExpressionAux;
+relationalExpression ::= additiveExpression:add relationalExpressionAux:aux {:
+	Elemento val = (Elemento) add;
+	if(aux != null){
+		if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+		}
+	}
+	RESULT = val;
+:}; 
+relationalExpressionAux ::= relationalOperator additiveExpression:add relationalExpressionAux {:
+	Elemento val = (Elemento) add;  
+	if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+	}
+	RESULT = val;
+:} 
+|;
+
+additiveExpression ::= multiplicativeExpression:mult additiveExpressionAux {: RESULT = mult;:};
 additiveExpressionAux ::= addOperator multiplicativeExpression additiveExpressionAux |;
 
-multiplicativeExpression ::= unaryExpression multiplicativeExpressionAux;
+multiplicativeExpression ::= unaryExpression:un multiplicativeExpressionAux {: RESULT = un; :};
 multiplicativeExpressionAux ::= multiplyOperator unaryExpression multiplicativeExpressionAux |;
 
 unaryExpression ::= unaryOperator postfixExpression
-					| postfixExpression;
+					| postfixExpression:post {: RESULT = post; :};
 
-postfixExpression ::= primaryExpression postfixExpressionAux;
+postfixExpression ::= primaryExpression:pri postfixExpressionAux {: RESULT = pri; :};
 postfixExpressionAux ::= operationCall propertyCall postfixExpressionAux |;
 operationCall ::= COLLECTIONOPERATION 
 				  | DOT;
 				  
 primaryExpression ::= literalCollection
-					| literal
+					| literal:li {: RESULT = li; :}
 					| propertyCall
 					| LEFT_PAR oclExpression RIGHT_PAR
 					| SELF
