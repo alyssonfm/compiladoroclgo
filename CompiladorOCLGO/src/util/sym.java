@@ -4,7 +4,7 @@
 // Tue Apr 26 22:38:27 GMT-03:00 2011
 //----------------------------------------------------
 
-package analise_sintatica;
+package util;
 
 /** CUP generated class containing symbol constants. */
 public class sym {
