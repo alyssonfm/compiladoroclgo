@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VersionController>
+<changements>
+<Default id="_16_0_1_42a0207_1303577403802_562644_503">
+<old/>
+<new/>
+<Generalization supertype="com.pavelvlasov.uml.xmi.GeneralizationImpl@161f10f"/>
+</Default>
+<Association id="_16_0_1_42a0207_1303577325784_70972_465">
+<old name="UsuarioLoga"/>
+<new name=""/>
+</Association>
+</changements>
+</VersionController>
