@@ -1,7 +1,5 @@
 \section{Análise Sintática}
 
-A análise sintática \ldots
-
 \subsection{Ferramenta JCup}
 
 A ferramenta \textbf{JCup} gera analisadores sintáticos em Java a partir da
@@ -140,7 +138,8 @@ de derivação a partir desta regra.
 
 \begin{figure}[h!]
 \centering
-	\includegraphics[scale=0.5]{imagens/ex1.png}
+	\includegraphics[scale=0.3]{imagens/ex1.png}
+	\caption{Árvore de Derivação da regra packageDeclaration}
 \end{figure}
 
 A regra \textbf{packageDeclarationAux} (linha 97) permite definir várias
@@ -149,7 +148,8 @@ partindo desta regra.
 
 \begin{figure}[h!]
 \centering
-	\includegraphics[scale=0.5]{imagens/ex2.png}
+	\includegraphics[scale=0.3]{imagens/ex2.png}
+	\caption{Árvore de Derivação da regra packageDeclarationAux}
 \end{figure}
 
 Como se pode perceber, a regra \textbf{packageDeclarationAux} deriva para
@@ -164,7 +164,8 @@ utilizada a regra \textbf{bodyDeclaration} (linha 103), como pode-se ver abaixo:
 
 \begin{figure}[h!]
 \centering
-	\includegraphics[scale=0.5]{imagens/ex3.png}
+	\includegraphics[scale=0.3]{imagens/ex3.png}
+	\caption{Árvore de Derivação da regra bodyDeclaration}
 \end{figure}
 
 A regra \textbf{bodyDeclaration} é composta de um \textbf{BODY}, seguido por um
@@ -180,7 +181,8 @@ anterior, representando os passos para derivar o trecho de código:
 
 \begin{figure}[h!]
 \centering
-	\includegraphics[scale=0.5]{imagens/ex4.png}
+	\includegraphics[scale=0.3]{imagens/ex4.png}
+	\caption{Árvore de Derivação da regra propertyCall}
 \end{figure}
 
 Conforme podemos observar, a regra \textbf{propertyCall} é composta por um
