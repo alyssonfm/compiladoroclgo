@@ -46,7 +46,7 @@
 \contentsline {subsection}{\numberline {3.8}Explica\c c\~ao das regras de produ\c c\~ao da Gram\'atica}{14}{subsection.3.8}
 \contentsline {subsection}{\numberline {3.9}Observa\c c\~oes}{16}{subsection.3.9}
 \contentsline {subsection}{\numberline {3.10}Ambiguidade}{16}{subsection.3.10}
-\contentsline {section}{\numberline {4}Conclus\~ao}{18}{section.4}
-\contentsline {section}{\numberline {5}Bibliografia}{19}{section.5}
-\contentsline {section}{\numberline {6}Anexo A - Arquivo AnaliseLexica.flex}{20}{section.6}
-\contentsline {section}{\numberline {7}Anexo B - Arquivo AnaliseSintatica.cup}{22}{section.7}
+\contentsline {section}{\numberline {4}Conclus\~ao}{17}{section.4}
+\contentsline {section}{\numberline {5}Bibliografia}{18}{section.5}
+\contentsline {section}{\numberline {6}Anexo A - Arquivo AnaliseLexica.flex}{19}{section.6}
+\contentsline {section}{\numberline {7}Anexo B - Arquivo AnaliseSintatica.cup}{21}{section.7}
