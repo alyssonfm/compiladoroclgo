@@ -147,11 +147,13 @@ literal ::= REAL:v {:
 variableDeclaration ::= IDENTIFIER:id COLON typeName:type {: RESULT = id.toString() + ":" + type.toString(); :};
 
 oclExpression ::= relationalExpression:r oclExpressionAux:aux {:
+	RESULT = r;
 	if(aux != null){
 		Elemento rel = (Elemento) r;
 		if(rel.getAtributo("tipo") != "Boolean"){
 			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(rel.toString(), "Boolean"));
 		}
+		
 	}
 	
 :};
@@ -167,45 +169,135 @@ oclExpressionAux ::= logicalOperator relationalExpression:r oclExpressionAux {:
 relationalExpression ::= additiveExpression:add relationalExpressionAux:aux {:
 	Elemento val = (Elemento) add;
 	if(aux != null){
-		if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
-			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+		Elemento auxElem = (Elemento) aux; 
+		if((auxElem.getAtributo("operacao") != "=") && (auxElem.getAtributo("operacao") != "<>")){
+			if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+				LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+			}
+		}else if((auxElem.getAtributo("operacao") == "=") || (auxElem.getAtributo("operacao") == "<>")){
+			if(!Elemento.tiposEquivalentes(val.getAtributo("tipo"), auxElem.getAtributo("tipo"))){
+				LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val.toString(), auxElem.toString()));
+			}else{
+				String tipoMax = Elemento.max(val.getAtributo("tipo"), auxElem.getAtributo("tipo"));
+				val.valor = Elemento.coercao(val.valor, val.getAtributo("tipo"), tipoMax);
+				val.setAtributo("tipo", tipoMax);
+			}
 		}
 	}
 	RESULT = val;
 :}; 
-relationalExpressionAux ::= relationalOperator additiveExpression:add relationalExpressionAux {:
-	Elemento val = (Elemento) add;  
-	if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
-		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+relationalExpressionAux ::= relationalOperator:op additiveExpression:add relationalExpressionAux:aux {:
+	Elemento val = (Elemento) add;
+	val.setAtributo("operacao", op.toString());
+	if((val.getAtributo("operacao") != "=") && (val.getAtributo("operacao") != "<>")){
+		if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+		}
+	}
+	if(aux != null){
+		Elemento auxElem = (Elemento) aux;
+		if((auxElem.getAtributo("operacao") == "=") || (auxElem.getAtributo("operacao") == "<>")){
+			if(!Elemento.tiposEquivalentes(val.getAtributo("tipo"), auxElem.getAtributo("tipo"))){
+				LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val.toString(), auxElem.toString()));
+			}else{
+				String tipoMax = Elemento.max(val.getAtributo("tipo"), auxElem.getAtributo("tipo"));
+				val.valor = Elemento.coercao(val.valor, val.getAtributo("tipo"), tipoMax);
+				val.setAtributo("tipo", tipoMax);
+			}
+		}
 	}
 	RESULT = val;
 :} 
 |;
 
-additiveExpression ::= multiplicativeExpression:mult additiveExpressionAux {: RESULT = mult;:};
-additiveExpressionAux ::= addOperator multiplicativeExpression additiveExpressionAux |;
+additiveExpression ::= multiplicativeExpression:mult additiveExpressionAux:aux {:
+	Elemento val = (Elemento) mult;
+	if(aux != null){ 
+		if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+		}
+	}
+	RESULT = mult;
+:};
 
-multiplicativeExpression ::= unaryExpression:un multiplicativeExpressionAux {: RESULT = un; :};
-multiplicativeExpressionAux ::= multiplyOperator unaryExpression multiplicativeExpressionAux |;
+additiveExpressionAux ::= addOperator multiplicativeExpression:mult additiveExpressionAux {:
+	Elemento val = (Elemento) mult;
+	if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+	}
+	RESULT = mult;
+:} 
+|;
 
-unaryExpression ::= unaryOperator postfixExpression
-					| postfixExpression:post {: RESULT = post; :};
+multiplicativeExpression ::= unaryExpression:un multiplicativeExpressionAux:aux {:
+	Elemento val = (Elemento) un;
+	if(aux != null){ 
+		if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+		}
+	}
+	RESULT = un;
+:};
+multiplicativeExpressionAux ::= multiplyOperator unaryExpression:un multiplicativeExpressionAux{:
+	Elemento val = (Elemento) un;
+	if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+	}
+	RESULT = un;
+:} 
+|;
+
+unaryExpression ::= unaryOperator:op postfixExpression:post {:
+	Elemento val = (Elemento) post;
+	if(op.toString() == "NOT"){
+		if(val.getAtributo("tipo") != "Boolean"){
+			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Boolean"));
+		}
+	}else if(op.toString() == "-"){
+		if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
+		}
+	}
+	val.valor = op.toString() + val.valor;
+	RESULT = post;
+:}
+| postfixExpression:post {: RESULT = post; :};
 
 postfixExpression ::= primaryExpression:pri postfixExpressionAux {: RESULT = pri; :};
 postfixExpressionAux ::= operationCall propertyCall postfixExpressionAux |;
-operationCall ::= COLLECTIONOPERATION 
-				  | DOT;
+
+operationCall ::= COLLECTIONOPERATION {: RESULT = "->"; :} 
+				  | DOT {: RESULT = "."; :};
 				  
 primaryExpression ::= literalCollection
 					| literal:li {: RESULT = li; :}
-					| propertyCall
-					| LEFT_PAR oclExpression RIGHT_PAR
+					| propertyCall:p {: RESULT = p; :}
+					| LEFT_PAR oclExpression:exp RIGHT_PAR {: RESULT = exp; :}
 					| SELF
-					| ifExp;
+					| ifExp:exp {: RESULT = exp; :};
 
 literalCollection ::= collectionTypeIdentifier LEFT_BRA expressionParameter RIGHT_BRA;
  
-ifExp ::= IF oclExpression THEN oclExpression ELSE oclExpression ENDIF;
+ifExp ::= IF:ifToken oclExpression:exp THEN oclExpression:exp1 ELSE oclExpression:exp2 ENDIF {:
+	Elemento val = (Elemento) exp;
+	Elemento val1 = (Elemento) exp1;
+	Elemento val2 = (Elemento) exp2;
+	
+	Elemento res = new Elemento("Expressao Condicional", ifTokenleft, ifTokenright);
+	res.setAtributo("tipo", val1.getAtributo("tipo"));
+	
+	if(val.getAtributo("tipo") != "Boolean"){
+		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Boolean"));
+	}
+	if(!Elemento.tiposEquivalentes(val1.getAtributo("tipo"), val2.getAtributo("tipo"))){
+		LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val1.toString(), val2.toString()));
+	}else{
+		res.setAtributo("tipo", Elemento.max(val1.getAtributo("tipo"), val2.getAtributo("tipo")));
+	}
+	
+	RESULT = res;
+:}
+;
 
 propertyCall ::= pathName qualifiers propertyCallParameters;
 
@@ -223,7 +315,15 @@ expressionParameter ::= oclExpression expressionParameterAux | IDENTIFIER expres
 expressionParameterAux ::= COMMA oclExpression expressionParameterAux | COMMA IDENTIFIER expressionParameterAux |;
 
 logicalOperator ::= AND | OR | XOR | IMPLIES;
-relationalOperator ::= EQ | NE | LE | GE | GT | LT;
+
+relationalOperator ::= EQ {: RESULT = "="; :} 
+|NE {: RESULT = "<>"; :}
+|LE {: RESULT = "<="; :}
+|GE {: RESULT = ">="; :}
+|GT {: RESULT = "<"; :}
+|LT {: RESULT = ">"; :};
+
 addOperator ::= PLUS | MINUS;
 multiplyOperator ::= TIMES | DIVIDE;
-unaryOperator ::= MINUS | NOT;
+unaryOperator ::= MINUS {: RESULT = "-"; :}
+|NOT {: RESULT = "NOT"; :};

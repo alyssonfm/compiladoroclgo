@@ -1,4 +1,5 @@
 package asd::asd::asd
+
 context Person::getSon(asd : String, dd : Integer): Set(Person)
-body: true = 2.2
+body: if true then 1.1 else 1.2 endif = false 
 endpackage
