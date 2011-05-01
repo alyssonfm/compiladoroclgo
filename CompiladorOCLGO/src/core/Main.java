@@ -102,7 +102,6 @@ public class Main {
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado!");
 		} catch (Exception e) {
-			e.printStackTrace();
 			System.out.println("Ocorreu algum erro sintatico");
 		}catch (Error e) {
 			System.out.print(e.getMessage());
