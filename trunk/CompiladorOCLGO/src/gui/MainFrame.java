@@ -9,6 +9,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Label;
 import java.awt.SystemColor;
+import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +18,8 @@ import java.awt.event.TextListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -44,12 +47,12 @@ final public class MainFrame extends Frame implements Handles {
   private TextField spec;
   private TextField dir;
 
-  private TextField messages;
-  private TextField oclSpecification;
+  private TextArea messages;
+  private TextArea oclSpecification;
 
   //private GeneratorThread thread;
 
-  private OptionsDialog dialog;
+  //private OptionsDialog dialog;
 
   
   @SuppressWarnings("deprecation")
@@ -77,8 +80,8 @@ public MainFrame() {
     dir        = new TextField(10);
     specChoose = new Button("Browse");
     spec       = new TextField(10);            
-    messages   = new TextField(10000);
-    oclSpecification = new TextField(10000);
+    messages   = new TextArea(10, 100);
+    oclSpecification = new TextArea(10, 100);
     lexica = new JRadioButton("Léxica ", true);
     sintatica = new JRadioButton("Sintática ", false);
     semantica = new JRadioButton("Semântica ", false);
@@ -91,8 +94,6 @@ public MainFrame() {
       messages.setFont(new Font("Monospaced", font.getStyle(), font.getSize()));
     else
       messages.setFont(new Font("Monospaced", Font.PLAIN, 12));
-
-    //Out.setGUIMode(messages);
     
     oclSpecification.setEditable(true);
     font = oclSpecification.getFont();
@@ -163,12 +164,11 @@ public MainFrame() {
     radioPanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createEtchedBorder(), "Análise: "));
     
-    GridPanel north = new GridPanel(4,10,10,10);
+    GridPanel north = new GridPanel(3,4,10,10);
     north.setInsets( new Insets(5,8,10,10) );
-      
-    north.add( 3,1, quit);
-    north.add( 3,2, generate);
     
+    GridPanel other = new GridPanel(3,4,10,10);
+      
     north.add( 0,0, BOTTOM, new Label("XML Model:"));
     north.add( 0,1, 2,1, spec);
     north.add( 2,1, specChoose);
@@ -177,25 +177,29 @@ public MainFrame() {
     north.add( 0,3, 2,1, dir);
     north.add( 2,3, dirChoose);
     
-    north.add( 0, 4, BOTTOM, new Label("Ocl Specification: "));
-    north.add( 0, 5, 2, 1, oclSpecification);
+    other.add( 0, 0, BOTTOM, new Label("Ocl Specification: "));
+    other.add( 0, 1, 2, 1, oclSpecification);
     
-    north.add(0, 6, BOTTOM, new Label("Analysis Output:"));
-    north.add(0, 7, 2, 1, messages);
+    other.add(0, 2, BOTTOM, new Label("Analysis Output:"));
+    other.add(0, 3, 2, 1, messages);
+    
+    other.add(2, 1, radioPanel);
+    north.add(2,0, quit);
+    north.add(2,2, generate);
  
     add("North", north);
-    add(radioPanel);
+    add(other);
 
     setEnabledAll(false);
   }
 
-  @SuppressWarnings("deprecation")
+ /* @SuppressWarnings("deprecation")
 protected void showOptions() {
     if (dialog == null) {
       dialog = new OptionsDialog(this);
     }
     dialog.show();
-  }
+  }*/
 
 
   public Dimension getPreferredSize() {
@@ -215,13 +219,19 @@ protected void showOptions() {
   }
 
   private void generate() {
-    // workaround for a weird AWT bug
-   /* if (choosing) return;
-   
-    setEnabledAll(true);
-
-    thread = new GeneratorThread(this, fileName, dirName);
-    thread.start();*/
+	  String file = "temp.txt";
+	  FileWriter x;
+	  try {
+		x = new FileWriter(file,false);
+		x.write(oclSpecification.getText());
+		x.close();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	  if(lexica.isSelected()) gui.Main.analiseLexica(file);
+	  else if(sintatica.isSelected()) gui.Main.analiseSintatica(file, false);
+	  else if(semantica.isSelected()) gui.Main.analiseSemantica(file, false);
   } 
 
   public void generationFinished(boolean success) {
