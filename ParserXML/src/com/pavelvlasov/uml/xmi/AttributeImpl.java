@@ -28,6 +28,7 @@ import java.util.Collection;
 import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import util.AuxiliaryFunctionsXML;
 import util.ConstantsXML;
@@ -50,23 +51,42 @@ class AttributeImpl extends ModelElementImpl implements Attribute {
 	 * @param owner
 	 * @param holder
 	 */
+	public boolean isCollection() {
+		NodeList upperValue = holder
+				.getElementsByTagName(ConstantsXML.UPPER_VALUE);
+		if (upperValue != null) {
+			String upper = null;
+			if (upperValue.item(0).getAttributes().getNamedItem(
+					ConstantsXML.VALUE) != null) {
+				upper = upperValue.item(0).getAttributes().getNamedItem(
+						ConstantsXML.VALUE).getNodeValue();
+			}
+			if (upper != null) {
+				if (upper.equals("-1")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public AttributeImpl(ModelElementImpl owner, Element holder) {
 		super(owner, holder);
 		loadClassifierId();
-		
+
 		try {
-			String type = "Property";
-			Element eType = (Element) getModel().getCachedXPathAPI().selectSingleNode(
-					holder, "type");
+			Element eType = (Element) getModel().getCachedXPathAPI()
+					.selectSingleNode(holder, "type");
 			if (eType != null) {
-				setType(AuxiliaryFunctionsXML.filterAttributeType(eType.getAttribute(ConstantsXML.HREF)));
-			}else{
-				setType(holder.getAttribute(ConstantsXML.TYPE_ONLY));
+				this.setType(AuxiliaryFunctionsXML.filterAttributeType(eType
+						.getAttribute(ConstantsXML.HREF)));
+			} else {
+				this.setType(holder.getAttribute(ConstantsXML.TYPE_ONLY));
 			}
 		} catch (TransformerException e1) {
 			e1.printStackTrace();
 		}
-		
+
 		try {
 			Element e = (Element) getModel().getCachedXPathAPI()
 					.selectSingleNode(holder, "defaultValue");
@@ -80,8 +100,11 @@ class AttributeImpl extends ModelElementImpl implements Attribute {
 	}
 
 	public void setType(String type) {
-		super.setType(type);
-
+		if (isCollection()) {
+			super.setType("Collection(" + type + ")");
+		} else {
+			super.setType(type);
+		}
 	}
 
 	/**
