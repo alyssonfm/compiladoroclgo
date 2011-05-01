@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import util.Constants;
 
+import com.pavelvlasov.uml.Attribute;
 import com.pavelvlasov.uml.Classifier;
 import com.pavelvlasov.uml.Element;
 import com.pavelvlasov.uml.Model;
@@ -63,8 +64,20 @@ public class ParserAuxiliar {
 				}
 			}
 		}
-
 		return element.getType().replace("<", "(").replace(">", ")");
+	}
+
+	public static String filterType(String type) {
+		if (type.startsWith("_")) {
+			for (Object ob : classes) {
+				if (((Classifier) ob).getId().equals(type)) {
+
+					return ((Classifier) ob).getName().replace("<", "(")
+							.replace(">", ")");
+				}
+			}
+		}
+		return type.replace("<", "(").replace(">", ")");
 	}
 
 	public static void setClasses(Model model) {
@@ -75,4 +88,25 @@ public class ParserAuxiliar {
 		classes.addAll(model.getClasses());
 	}
 
+	public static String getAttributeType(String name,
+			Collection<Attribute> attributes) {
+		for (Object att : attributes) {
+			if (((Attribute) att).getName().equals(name)) {
+				if (((Attribute) att).getType().startsWith("Collection")) {
+					return "Collection("
+							+ filterType(((Attribute) att).getType()
+									.substring(
+											0,
+											((Attribute) att).getType()
+													.length() - 1).replace(
+											"Collection(", "")) + ")";
+				} else {
+					return ((Attribute) att).getType();
+				}
+
+			}
+		}
+
+		return null;
+	}
 }
