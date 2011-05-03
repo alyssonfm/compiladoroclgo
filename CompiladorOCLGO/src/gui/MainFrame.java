@@ -238,9 +238,11 @@ protected void showOptions() {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-	  if(lexica.isSelected()) gui.Main.analiseLexica(file);
-	  else if(sintatica.isSelected()) gui.Main.analiseSintatica(file, false);
-	  else if(semantica.isSelected()) gui.Main.analiseSemantica(file, false);
+	  if(lexica.isSelected()) {
+		  messages.append(""+gui.Main.analiseLexica(file));
+	  }
+	  else if(sintatica.isSelected()) messages.append("\n"+gui.Main.analiseSintatica(file, false));
+	  else if(semantica.isSelected()) messages.append("\n"+gui.Main.analiseSemantica(file, false));
   } 
 
   public void generationFinished(boolean success) {
