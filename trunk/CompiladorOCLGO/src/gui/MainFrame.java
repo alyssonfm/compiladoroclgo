@@ -49,6 +49,11 @@ final public class MainFrame extends Frame implements Handles {
 
   private TextArea messages;
   private TextArea oclSpecification;
+  
+  private Label labXml;
+  private Label labSpecification;
+  private Label labOutDir;
+  private Label labAnalysis;
 
   //private GeneratorThread thread;
 
@@ -87,6 +92,10 @@ public MainFrame() {
     semantica = new JRadioButton("Semântica ", false);
     btg = new ButtonGroup();
     radioPanel = new JPanel();
+    labAnalysis = new Label("Analysis Output:");
+    labOutDir = new Label("Output directory:");
+    labSpecification = new Label("Ocl Specification: ");
+    labXml = new Label("XML Model:");
 
     messages.setEditable(false);
     Font font = messages.getFont();
@@ -169,18 +178,18 @@ public MainFrame() {
     
     GridPanel other = new GridPanel(3,4,10,10);
       
-    north.add( 0,0, BOTTOM, new Label("XML Model:"));
+    north.add( 0,0, BOTTOM, labXml);
     north.add( 0,1, 2,1, spec);
     north.add( 2,1, specChoose);
 
-    north.add( 0,2, BOTTOM, new Label("Output directory:"));
+    north.add( 0,2, BOTTOM, labOutDir);
     north.add( 0,3, 2,1, dir);
     north.add( 2,3, dirChoose);
     
-    other.add( 0, 0, BOTTOM, new Label("Ocl Specification: "));
+    other.add( 0, 0, BOTTOM, labSpecification);
     other.add( 0, 1, 2, 1, oclSpecification);
     
-    other.add(0, 2, BOTTOM, new Label("Analysis Output:"));
+    other.add(0, 2, BOTTOM, labAnalysis);
     other.add(0, 3, 2, 1, messages);
     
     other.add(2, 1, radioPanel);
