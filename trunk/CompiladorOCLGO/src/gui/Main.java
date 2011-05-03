@@ -32,12 +32,12 @@ public class Main {
                 return scanner;
         }
         
-        public static void analiseLexica(String fileName){
+        public static Logger analiseLexica(String fileName){
                 AnaliseLexica scanner = null;
                 Logger logger = new Logger();
                 scanner = createScanner(fileName);
                 if(scanner != null){
-                        System.out.println("########  Iniciando Analise Lexica  ########");
+                	logger.addMessage("########  Iniciando Analise Lexica  ########");
                         
                         Symbol s;
                         while(true){
@@ -65,35 +65,39 @@ public class Main {
                                         logger.addError(e.getMessage());
                                 }
                         }
-                        System.out.print(logger);
-                        System.out.println("########  Finalizada Analise Lexica ########");
+                        logger.addMessage("########  Finalizada Analise Lexica ########");
                 }
+                return logger;
         }
 
-        public static void analiseSintatica(String fileName, boolean debug) {
-                System.out.println("########  Iniciando Analise Sintatica  ########");
-                try {
-                        AnaliseLexica l = createScanner(fileName);
-                        AnaliseSintatica g = new AnaliseSintatica(l);
-                        if(debug){
-                                g.debug_parse();
-                        }else{
-                                g.parse();
-                        }
-                        System.out.println("Sem erros.");
-                } catch (FileNotFoundException e) {
-                        System.err.println("Arquivo nao encontrado!");
-                } catch (Exception e) {
-                        System.out.println("Ocorreu algum erro sintatico");
-                }catch (Error e) {
-                        System.out.print(e.getMessage());
-                        System.out.println("Ocorreu algum erro lexico");
+        public static Logger analiseSintatica(String fileName, boolean debug) {
+        	Logger log = new Logger();
+        	log.addMessage("########  Iniciando Analise Sintatica  ########");
+            try {
+            	AnaliseLexica l = createScanner(fileName);
+                AnaliseSintatica g = new AnaliseSintatica(l);
+                if(debug){
+                	g.debug_parse();
+                }else{
+                	g.parse();
                 }
-                System.out.println("########  Finalizada Analise Sintatica ########");
+                log.addMessage("Sem erros.");
+                } catch (FileNotFoundException e) {
+                	log.addMessage("Arquivo nao encontrado!");
+                } catch (Exception e) {
+                	log.addMessage("Ocorreu algum erro sintatico");
+                }catch (Error e) {
+                        log.addError(e.getMessage());
+                        log.addMessage("Ocorreu algum erro lexico");
+                }
+                log.addMessage("########  Finalizada Analise Sintatica ########");
+                return log;
         }
         
-        public static void analiseSemantica(String fileName, boolean debug) {
-                System.out.println("########  Iniciando Analise Semantica  ########");
+        public static Logger analiseSemantica(String fileName, boolean debug) {
+        	Logger log = new Logger();
+        	log.addMessage("########  Iniciando Analise Semantica  ########");
+                
                 try {
                         AnaliseLexica l = createScanner(fileName);
                         AnaliseSintatica g = new AnaliseSintatica(l);
@@ -102,16 +106,17 @@ public class Main {
                         }else{
                                 g.parse();
                         }
-                        System.out.print(LoggerSemantico.getInstance());
+                        log.addMessage(LoggerSemantico.getInstance().toString());
                 } catch (FileNotFoundException e) {
-                        System.err.println("Arquivo nao encontrado!");
+                	log.addError("Arquivo nao encontrado!");
                 } catch (Exception e) {
-                        System.out.println("Ocorreu algum erro sintatico");
+                	log.addError("Ocorreu algum erro sintatico");
                 }catch (Error e) {
-                        System.out.print(e.getMessage());
-                        System.out.println("Ocorreu algum erro lexico");
+                        log.addError(e.getMessage());
+                        log.addMessage("Ocorreu algum erro lexico");
                 }
-                System.out.println("########  Finalizada Analise Semantica ########");
+                log.addMessage("########  Finalizada Analise Semantica ########");
+                return log;
         }
         public static void main(String[] args) {
 			MainFrame mf = new MainFrame();
