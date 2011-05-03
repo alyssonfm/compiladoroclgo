@@ -92,6 +92,7 @@ public class AuxiliaryFunctionsXML {
 	public static String filterAttributeType(String type) {
 		return type.replace("href=", "").replace(
 				"http://schema.omg.org/spec/UML/2.0/uml.xml#", "").replace(
-				"\"", "");
+				"\"", "").replace(
+				"http://schema.omg.org/spec/UML/2.2/uml.xml#", "");
 	}
 }

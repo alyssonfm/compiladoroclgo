@@ -86,13 +86,14 @@ class OperationImpl extends ModelElementImpl implements Operation {
 										.filterAttributeType(nodeList.item(0)
 												.getAttributes().item(0)
 												.toString()));
-							}else{
+							} else {
 								setType(pe.getAttribute(ConstantsXML.TYPE_ONLY));
 							}
 						}
 					}
-					if (!pe.hasAttribute("direction")
-							|| pe.hasAttribute("direction")) {
+					if (!pe.hasAttribute("direction")) {
+						parameters.add(new ParameterImpl(this, pe));
+					} else if (pe.hasAttribute("direction")) {
 						if (!pe.getAttribute("direction").equals("return")) {
 							parameters.add(new ParameterImpl(this, pe));
 						}

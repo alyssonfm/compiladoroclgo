@@ -154,13 +154,6 @@ class ClassifierImpl extends ModelElementImpl implements Classifier {
 				Element ae;
 				while ((ae = (Element) nit.nextNode()) != null) {
 					AttributeImpl attribute = new AttributeImpl(this, ae);
-
-					// if (attribute.getClassifier() == null) {
-					/*
-					 * getModel().getLogger().debug( this, "Attribute " +
-					 * attribute.getName() + " classifier is null, skipped.");
-					 */
-					// } else {
 					attributes.add(attribute);
 					// }
 				}

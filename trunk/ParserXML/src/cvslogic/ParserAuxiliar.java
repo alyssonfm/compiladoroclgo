@@ -2,12 +2,14 @@ package cvslogic;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import util.Constants;
 
 import com.pavelvlasov.uml.Attribute;
 import com.pavelvlasov.uml.Classifier;
 import com.pavelvlasov.uml.Element;
+import com.pavelvlasov.uml.Generalization;
 import com.pavelvlasov.uml.Model;
 import com.pavelvlasov.uml.Operation;
 import com.pavelvlasov.uml.Package;
@@ -21,11 +23,20 @@ public class ParserAuxiliar {
 	public static String parameterError = "Não existe o parâmetro especificado: ";
 	public static String returnTypeError = "Não existe o tipo de retorno especificado: ";
 	public static Collection<Classifier> classes = new LinkedList<Classifier>();
+	private static Collection<String> generalizations = new LinkedList<String>();
 
-	public static Classifier getClassByName(Collection<Object> classes,
-			String className) {
+	public static Classifier getClassByName(String className) {
 		for (Object o : classes) {
 			if (((Element) o).getName().equals(className)) {
+				return (Classifier) o;
+			}
+		}
+		return null;
+	}
+
+	public static Classifier getClassById(String id) {
+		for (Object o : classes) {
+			if (((Element) o).getId().equals(id)) {
 				return (Classifier) o;
 			}
 		}
@@ -48,7 +59,8 @@ public class ParserAuxiliar {
 			String type) {
 		for (Object ob : operation.getParameters()) {
 			if (((Parameter) ob).getName().equals(name)
-					&& ((Parameter) ob).getType().equals(type)) {
+					&& filterType(((Element) ob).getType()).equals(
+							filterType(type))) {
 				return (Parameter) ob;
 			}
 		}
@@ -81,6 +93,7 @@ public class ParserAuxiliar {
 	}
 
 	public static void setClasses(Model model) {
+		classes.clear();
 		for (Object p : model.getPackages()) {
 			Package pack = ((Package) p);
 			classes.addAll(pack.getElements(Constants.CLASS));
@@ -88,25 +101,106 @@ public class ParserAuxiliar {
 		classes.addAll(model.getClasses());
 	}
 
-	public static String getAttributeType(String name,
+	public static List<String> getOperationParameters(String name,
+			Collection<Operation> operations) {
+		Operation op = getOperation(name, operations);
+		List<String> out = null;
+		if (op != null) {
+			out = new LinkedList<String>();
+			for (Object param : op.getParameters()) {
+				out.add(formatType(((Element) param)));
+			}
+		}
+		return out;
+	}
+
+	private static Operation getOperation(String name,
+			Collection<Operation> operations) {
+		for (Object op : operations) {
+			if (((Operation) op).getName().equals(name)) {
+				return (Operation) op;
+			}
+		}
+		return null;
+	}
+
+	private static String formatType(Element element) {
+		if (((Element) element).getType().startsWith("Collection")) {
+			return "Collection("
+					+ filterType(((Element) element).getType().substring(0,
+							((Element) element).getType().length() - 1)
+							.replace("Collection(", "")) + ")";
+
+		} else {
+			return ((Element) element).getType();
+		}
+	}
+
+	public static String getOperationType(String name,
+			Collection<Operation> operations) {
+		Operation op = getOperation(name, operations);
+		if (op != null) {
+			return formatType((Element) op);
+		}
+		return null;
+	}
+
+	private static Attribute getAttribute(String name,
 			Collection<Attribute> attributes) {
 		for (Object att : attributes) {
 			if (((Attribute) att).getName().equals(name)) {
-				if (((Attribute) att).getType().startsWith("Collection")) {
-					return "Collection("
-							+ filterType(((Attribute) att).getType()
-									.substring(
-											0,
-											((Attribute) att).getType()
-													.length() - 1).replace(
-											"Collection(", "")) + ")";
-				} else {
-					return ((Attribute) att).getType();
-				}
-
+				return (Attribute) att;
 			}
 		}
-
 		return null;
+	}
+
+	public static String getAttributeType(String name,
+			Collection<Attribute> attributes) {
+		Attribute att = getAttribute(name, attributes);
+		if (att != null) {
+			return formatType((Element) att);
+		} else {
+			return null;
+		}
+	}
+
+	public static String getSuperType(String type, String typeReduz) {
+		Classifier classReduz = getClassByName(typeReduz);
+
+		if (classReduz != null) {
+			if (classReduz.getName().equals(type)) {
+				return classReduz.getName();
+			} else if (getGeneralizations(classReduz).size() > 0) {
+				for (String classAux : getGeneralizations(classReduz)) {
+					if (classAux.equals(type)) {
+						return classAux;
+					}
+				}
+			}
+		}
+		return null;
+
+	}
+
+	public static Collection<String> getGeneralizations(Classifier classAux) {
+		generalizations.clear();
+		addSuperType(classAux);
+		return generalizations;
+
+	}
+
+	private static void addSuperType(Classifier classAux) {
+		if (classAux != null) {
+			for (Object ob : classAux.getGeneralizations()) {
+				if (!generalizations.contains(((Generalization) ob)
+						.getSupertype())) {
+					Classifier aux = getClassById(((Generalization) ob)
+							.getSupertype());
+					generalizations.add(aux.getName());
+					addSuperType(aux);
+				}
+			}
+		}
 	}
 }
