@@ -6,7 +6,6 @@ import java.util.List;
 
 import util.ConstantsXML;
 
-import com.pavelvlasov.uml.Attribute;
 import com.pavelvlasov.uml.Classifier;
 import com.pavelvlasov.uml.CompositeAcceptor;
 import com.pavelvlasov.uml.Element;
@@ -18,11 +17,12 @@ import com.pavelvlasov.uml.xmi.ModelBuilder;
 import com.pavelvlasov.uml.xmi.PrintStreamLogger;
 
 public class XMIParser {
-	private static Model model;
-	private static ConstraintPackage constraintPackage = new ConstraintPackage();
-	private static ConstraintContext constraintContext = new ConstraintContext();
-	private static ConstraintBody constraintBody = new ConstraintBody();
-	private static String errorActual = "";
+	private Model model;
+	private ConstraintPackage constraintPackage = new ConstraintPackage();
+	private ConstraintContext constraintContext = new ConstraintContext();
+	private ConstraintBody constraintBody = new ConstraintBody();
+	private ConstraintContext cc;
+	private String errorActual = "";
 	// private static Package bodyPack = null;
 	private static Classifier bodyClass = null;
 
@@ -37,6 +37,7 @@ public class XMIParser {
 		this.model = ModelBuilder.loadModel(getModelFile(path),
 				new CompositeAcceptor(), new PrintStreamLogger(),
 				new PrefixedCompositeEvaluator());
+		ParserAuxiliar.setClasses(model);
 
 	}
 
@@ -44,42 +45,34 @@ public class XMIParser {
 		return model;
 	}
 
+	public void setContext(String context) {
+		cc = new ConstraintContext();
+		cc.setContext(context);
+	}
+
 	public static void main(String[] args) {
 		XMIParser parser = new XMIParser();
-		parser.loadModel("Modelos/Profe.xml");
-		ParserAuxiliar.setClasses(model);
-		ConstraintContext cc = new ConstraintContext();
-		cc.setContext("ProgramaFidelidade::obtemServicos():Set(Servicos)");
-		parser.exists(cc);
-		if (parser.getType("socio") != null) {
-			System.out.println(ParserAuxiliar.filterType(parser
-					.getType("socio")));
-		}
-		// parser.getModel().getPackages()
-		/*
-		 * for (Object o : parser.getModel().getClasses().toArray()) {
-		 * Classifier classifier = (Classifier) o; System.out.println("Class: "
-		 * + classifier.getName()); if (classifier.getOperations().size() > 0) {
-		 * for (Object ob : classifier.getOperations().toArray()) { Operation
-		 * att = (Operation) ob; String out = att.getName() + " " +
-		 * att.getType(); System.out.println(out); }
-		 * 
-		 * }
-		 * 
-		 * }
-		 */
+		parser.loadModel("Modelos/profe.xml");
+		parser
+				.setContext("Conta::estaVazia(nome:String,lista:Sequence<Cartao>):Boolean");
+		System.out.println(parser.existsContext());
+		System.out.println(parser.getError());
+		parser.getOperationType("estaVazia");
+		parser.getParametersType("estaVazia");
+		parser.getSuperType("Transacao", "Cheque");
+		parser.getAttributeType("pontos");
 
-		// Classifier classifier = ((Classifier) parser.getModel().getClasses()
-		// .toArray()[0]);
-		// classifier.getAbsoluteName();
+	}
 
+	public String getSuperType(String type, String typeReduz) {
+		return ParserAuxiliar.getSuperType(type, typeReduz);
 	}
 
 	public static Classifier getBodyClass() {
 		return bodyClass;
 	}
 
-	public static String getError() {
+	public String getError() {
 		return errorActual;
 	}
 
@@ -87,11 +80,11 @@ public class XMIParser {
 		this.errorActual = error + " !";
 	}
 
-	public boolean exists(ConstraintContext cc) {
+	public boolean existsContext() {
 
 		if (cc.getCaminho().size() == 0) {
-			Classifier classActual = ParserAuxiliar.getClassByName(model
-					.getClasses(), cc.getContextClass());
+			Classifier classActual = ParserAuxiliar.getClassByName(cc
+					.getContextClass());
 			if (classActual == null) {
 				setError(ParserAuxiliar.contexClassError + cc.getContextClass());
 				return false;
@@ -132,15 +125,43 @@ public class XMIParser {
 		this.bodyClass = classActual;
 	}
 
-	public static String getType(String identifier) {
+	public List<String> getParametersType(String operation) {
+		List<String> parameters = null;
+		String[] idPath = operation.split(ConstantsXML.DOUBLE_DOT_DOT);
+		if (idPath.length == 1) {
+			parameters = ParserAuxiliar.getOperationParameters(operation,
+					getBodyClass().getOperations());
+		}
+		return parameters;
+
+	}
+
+	public String getOperationType(String identifier) {
+		String[] idPath = identifier.split(ConstantsXML.DOUBLE_DOT_DOT);
+		if (idPath.length == 1) {
+			return ParserAuxiliar.getOperationType(identifier, getBodyClass()
+					.getOperations());
+		}
+		return null;
+	}
+
+	public String getAttributeType(String identifier) {
 		String[] idPath = identifier.split(ConstantsXML.DOUBLE_DOT_DOT);
 		String idName;
 		String idClass;
 		List<String> caminho = new LinkedList<String>();
+		idName = (idPath[0]).replace("self.", "");
 		if (idPath.length == 1) {
-			idName = (idPath[0]).replace("self.", "");
+			if (idName.equals("self")) {
+				return getBodyClass().getName();
+			}
+			idName = idName.replace("self.", "");
 			return ParserAuxiliar.getAttributeType(idName, getBodyClass()
 					.getAttributes());
+		} else if (idPath.length == 2) {
+
+		} else if (idPath.length > 2) {
+
 		}
 		return null;
 	}

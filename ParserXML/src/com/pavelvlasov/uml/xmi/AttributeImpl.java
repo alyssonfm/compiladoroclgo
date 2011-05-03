@@ -54,7 +54,7 @@ class AttributeImpl extends ModelElementImpl implements Attribute {
 	public boolean isCollection() {
 		NodeList upperValue = holder
 				.getElementsByTagName(ConstantsXML.UPPER_VALUE);
-		if (upperValue != null) {
+		if (upperValue != null && upperValue.getLength() > 0) {
 			String upper = null;
 			if (upperValue.item(0).getAttributes().getNamedItem(
 					ConstantsXML.VALUE) != null) {
@@ -62,7 +62,7 @@ class AttributeImpl extends ModelElementImpl implements Attribute {
 						ConstantsXML.VALUE).getNodeValue();
 			}
 			if (upper != null) {
-				if (upper.equals("-1")) {
+				if (upper.equals("-1") || upper.equals("*")) {
 					return true;
 				}
 			}

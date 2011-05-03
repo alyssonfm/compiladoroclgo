@@ -29,6 +29,7 @@ import java.util.Iterator;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import util.AuxiliaryFunctionsXML;
 import util.ConstantsXML;
@@ -45,10 +46,12 @@ class ElementImpl implements com.pavelvlasov.uml.Element {
 		this.owner = owner;
 		this.holder = holder;
 		this.model = owner.getModel();
-		if (holder.hasAttribute(ConstantsXML.xmiType)) {
-			type = AuxiliaryFunctionsXML.getNodeType(holder);
+		NodeList nodeList = holder.getElementsByTagName("type");
+		if (nodeList.getLength() > 0) {
+			setType(AuxiliaryFunctionsXML.filterAttributeType(nodeList.item(0)
+					.getAttributes().item(0).toString()));
 		} else {
-			type = holder.getNodeName();
+			setType(holder.getAttribute(ConstantsXML.TYPE_ONLY));
 		}
 	}
 
@@ -56,10 +59,12 @@ class ElementImpl implements com.pavelvlasov.uml.Element {
 	ElementImpl(ModelImpl model, Element holder) {
 		this.model = model;
 		this.holder = holder;
-		if (holder.hasAttribute(ConstantsXML.xmiType)) {
-			type = AuxiliaryFunctionsXML.getNodeType(holder);
+		NodeList nodeList = holder.getElementsByTagName("type");
+		if (nodeList.getLength() > 0) {
+			setType(AuxiliaryFunctionsXML.filterAttributeType(nodeList.item(0)
+					.getAttributes().item(0).toString()));
 		} else {
-			type = holder.getNodeName();
+			setType(holder.getAttribute(ConstantsXML.TYPE_ONLY));
 		}
 	}
 
@@ -170,8 +175,6 @@ class ElementImpl implements com.pavelvlasov.uml.Element {
 		return (obj instanceof com.pavelvlasov.uml.Element)
 				&& getId().equals(((com.pavelvlasov.uml.Element) obj).getId());
 	}
-
-	
 
 	// /**
 	// * @return

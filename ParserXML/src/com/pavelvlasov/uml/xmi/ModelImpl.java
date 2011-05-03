@@ -213,6 +213,16 @@ class ModelImpl implements Model {
 		classes = new LinkedList();
 		NodeIterator nit = cachedXPathAPI.selectNodeIterator(holder,
 				"ownedMember");
+		addClasses(nit, acceptor);
+
+		if (classes.size() == 0) {
+			NodeIterator nitAux = cachedXPathAPI.selectNodeIterator(holder,
+					"packagedElement");
+			addClasses(nitAux, acceptor);
+		}
+	}
+
+	private void addClasses(NodeIterator nit, Acceptor acceptor) {
 		Element pe;
 		while ((pe = (Element) nit.nextNode()) != null) {
 			if (AuxiliaryFunctionsXML.equalsNodeType(pe, Constants.CLASS)

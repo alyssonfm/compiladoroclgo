@@ -1,7 +1,7 @@
 package cvslogic;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,7 +10,8 @@ import util.ConstantsXML;
 public class ConstraintContext {
 	private List<String> caminho = new LinkedList<String>();
 	private String nomeOperacao;
-	private HashMap<String, String> parametros = new HashMap<String, String>();
+	private TreeMap<String, String> parametros = new TreeMap<String, String>();
+	private List<String> keys = new LinkedList<String>();
 	private String tipoRetorno;
 	private String contextClass;
 
@@ -79,8 +80,8 @@ public class ConstraintContext {
 		return this.nomeOperacao;
 	}
 
-	public HashMap<String, String> findParameters(String pack) {
-		HashMap<String, String> map = new HashMap<String, String>();
+	public TreeMap<String, String> findParameters(String pack) {
+		TreeMap<String, String> map = new TreeMap<String, String>();
 		int rightIndex = pack.length() - 1;
 		if (!this.tipoRetorno.equals("")) {
 			rightIndex = pack.length()
@@ -96,6 +97,7 @@ public class ConstraintContext {
 							.substring(0, parameter.indexOf(":"));
 					String type = parameter
 							.substring(parameter.indexOf(":") + 1);
+					keys.add(name);
 					map.put(name, type);
 				}
 			}
@@ -103,22 +105,23 @@ public class ConstraintContext {
 		return map;
 	}
 
-	public HashMap<String, String> getParameters() {
+	public TreeMap<String, String> getParameters() {
 		return this.parametros;
 	}
-	
+
 	public String getContextClass() {
 		return this.contextClass;
 	}
 
 	public static void main(String[] args) {
 		ConstraintContext cc = new ConstraintContext();
-		cc.setContext("ProgramaFidelidade::getOperacao():Sequence(Servicos)");
+		cc
+				.setContext("ProgramaFidelidade::getOperacao(torada:Person, oi:String, op:Integer):Sequence(Servicos)");
 		System.out.println(cc.getCaminho());
 		System.out.println(cc.getContextClass());
 		System.out.println(cc.getOperacao());
 		System.out.println(cc.getParameters());
 		System.out.println(cc.getReturnType());
-		
+
 	}
 }
