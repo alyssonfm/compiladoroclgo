@@ -37,14 +37,20 @@ public class Elemento {
 		return valor + "(" + left + "," + right + ")";
 	}
 	
-	public static boolean tiposEquivalentes(String tipo1, String tipo2){
+	public static boolean tiposEquivalentes(String esperado, String passado){
 		
-		if(tipo1.equalsIgnoreCase(tipo2)){
+		
+		if(esperado.equalsIgnoreCase(passado)){
 			return true;
 		}
 		
-		if(tipo1 == "Real" || tipo1 == "Integer"){
-			if(tipo2 == "Real" || tipo2 == "Integer"){
+		if(ehCollection(esperado) && ehCollection(passado)){
+			if(tiposEquivalentes(tipoCollection(esperado), tipoCollection(passado)))
+				return true;
+		}
+		
+		if(esperado.equalsIgnoreCase("Real") || passado.equalsIgnoreCase("Integer")){
+			if(esperado.equalsIgnoreCase("Integer") || passado.equalsIgnoreCase("Real")){
 				return true;
 			}
 		}
@@ -52,16 +58,43 @@ public class Elemento {
 		return false;		
 	}
 	
-	public static String max(String tipo1, String tipo2) {
+	public static String tipoCollection(String collection){
+		return collection.substring(collection.indexOf("(") + 1, collection.indexOf(")"));
+	}
+	
+	public static boolean ehCollection(String id){
+		if(id.contains("(")){
+			id = id.substring(0, id.indexOf("("));
+		}
+		if(id.equalsIgnoreCase("Collection") || id.equalsIgnoreCase("Set") || id.equalsIgnoreCase("Bag") ||
+				id.equalsIgnoreCase("Sequence") || id.equalsIgnoreCase("OrderedSet")){
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean ehOperacaoColecao(String id){
+		if(id.equalsIgnoreCase("select") || id.equalsIgnoreCase("reject") ||
+				id.equalsIgnoreCase("forAll") || id.equalsIgnoreCase("exists") ||
+				id.equalsIgnoreCase("any") || id.equalsIgnoreCase("collect")){
+			return true;
+		}
+		return false;
+	}
+	
+	public static String max(String esperado, String passado) {
 		
-		if(tiposEquivalentes(tipo1, tipo2)){
+		if(tiposEquivalentes(esperado, passado)){
 			
-			if(tipo1.equalsIgnoreCase(tipo2)){
-				return tipo1;
+			if(esperado.equalsIgnoreCase(passado)){
+				return esperado;
 			}
 			
-			if(tipo1 == "Real" || tipo2 == "Real"){
+			if(esperado == "Real" || passado == "Integer"){
 				return "Real";
+			}
+			if(esperado == "Integer" || passado == "Real"){
+				return "Integer";
 			}
 			
 		}
@@ -72,6 +105,11 @@ public class Elemento {
 		if(tipo == "Integer" && novoTipo == "Real"){
 			Integer temp = Integer.parseInt(valor);
 			Double temp2 = temp.doubleValue();
+			return temp2.toString();			
+		}
+		if(tipo == "Real" && novoTipo == "Integer"){
+			Double temp = Double.parseDouble(valor);
+			Integer temp2 = temp.intValue();
 			return temp2.toString();			
 		}
 		return valor;

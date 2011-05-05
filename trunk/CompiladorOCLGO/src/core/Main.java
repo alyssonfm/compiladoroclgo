@@ -4,9 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
-
-
 import java_cup.runtime.Symbol;
+import util.ErroFatal;
 import util.Logger;
 import util.LoggerSemantico;
 import util.Util;
@@ -101,10 +100,14 @@ public class Main {
 			System.out.print(LoggerSemantico.getInstance());
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado!");
+		} catch (ErroFatal e) {
+			System.out.println("Erro na analise Semantica.");
+			System.out.print(LoggerSemantico.getInstance());
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Ocorreu algum erro sintatico");
 		}catch (Error e) {
-			System.out.print(e.getMessage());
+			e.printStackTrace();
 			System.out.println("Ocorreu algum erro lexico");
 		}
 		System.out.println("########  Finalizada Analise Semantica ########");
