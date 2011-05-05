@@ -245,4 +245,10 @@ class AdviceImpl implements Advice {
 		return null;
 	}
 
+	@Override
+	public boolean isStatic() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

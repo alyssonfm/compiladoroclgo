@@ -27,24 +27,31 @@ import java.util.Collection;
 
 /**
  * Model element.
+ * 
  * @author Pavel Vlasov
  * @version $Revision$
  */
-public interface ModelElement extends Element{
-	//String getStereotype();
+public interface ModelElement extends Element {
+	// String getStereotype();
 	String getType();
-	String getVisibility();
-	void accept(Visitor visitor);
 	
+	boolean isStatic();
+
+	String getVisibility();
+
+	void accept(Visitor visitor);
+
 	Collection getConstraints();
-	String getAbsoluteName();	
+
+	String getAbsoluteName();
+
 	// TODO Update model
 	String getAbsoluteName(String separator);
-	
+
 	/**
-	 * Example: for ModelElement a.b.c getRootPath("/") returns
-	 * ../../
-	 * @return path to the root of namespace. 
+	 * Example: for ModelElement a.b.c getRootPath("/") returns ../../
+	 * 
+	 * @return path to the root of namespace.
 	 */
 	String getRootPath(String separator);
 }

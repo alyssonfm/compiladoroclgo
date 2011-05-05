@@ -208,4 +208,10 @@ class AttributeDelegate implements Attribute {
 		return owner;
 	}
 
+	@Override
+	public boolean isStatic() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

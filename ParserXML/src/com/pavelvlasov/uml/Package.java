@@ -23,6 +23,8 @@
  */
 package com.pavelvlasov.uml;
 
+import java.util.Collection;
+
 
 /**
  * Package
@@ -34,4 +36,6 @@ public interface Package extends Classifier {
 	 * @return Classifier role tags
 	 */
 	//TaggedValues getClassifierRoleTaggedValues();
+	
+	Collection<Classifier> getClasses ();
 }

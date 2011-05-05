@@ -36,5 +36,6 @@ public class Constants {
 	public static final String EXTENSION_POINTS = "Extension Point";
 	public static final String SUPER_TYPE = "SuperType";
 	public static final String CLASS = "Class";
+	public static final String ENUMERATION = "Enumeration";
 
 }

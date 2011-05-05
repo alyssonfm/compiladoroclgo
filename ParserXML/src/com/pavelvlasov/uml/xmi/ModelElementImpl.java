@@ -45,53 +45,63 @@ abstract class ModelElementImpl extends ElementImpl implements ModelElement {
 	ModelElementImpl(ModelElementImpl owner, Element holder) {
 		super(owner, holder);
 	}
-	
-	ModelElementImpl(ModelImpl model, Element holder){
+
+	ModelElementImpl(ModelImpl model, Element holder) {
 		super(model, holder);
-	}	
-	
+	}
+
 	private String stereotype;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.pavelvlasov.uml.ModelElement#stereotype()
 	 */
 	public String getStereotype() {
-		if (stereotype==null) {
+		if (stereotype == null) {
 			try {
-				stereotype=getElementStereotype(holder, getModel().getCachedXPathAPI());
+				stereotype = getElementStereotype(holder, getModel()
+						.getCachedXPathAPI());
 			} catch (Exception e) {
-				throw new UmlException("Unable to load stereotype for element "+getId()+": "+e, e, getId());
+				throw new UmlException("Unable to load stereotype for element "
+						+ getId() + ": " + e, e, getId());
 			}
 		}
 		return stereotype;
 	}
-	
-	
 
-	static String getElementStereotype(Element holder, CachedXPathAPI cxpa) throws TransformerException {
-		Node node=cxpa.selectSingleNode(holder, "ModelElement.stereotype/Stereotype");
+	static String getElementStereotype(Element holder, CachedXPathAPI cxpa)
+			throws TransformerException {
+		Node node = cxpa.selectSingleNode(holder,
+				"ModelElement.stereotype/Stereotype");
 		if (node instanceof Element) {
-			return ((Element) node).getAttribute("name");	
+			return ((Element) node).getAttribute("name");
 		} else {
 			return "";
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.pavelvlasov.uml.ModelElement#getVisibility()
 	 */
 	public String getVisibility() {
 		return holder.getAttribute("visibility");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.pavelvlasov.uml.ModelElement#accept(com.pavelvlasov.uml.Visitor)
 	 */
 	public void accept(Visitor visitor) {
 		visitor.visit(this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.pavelvlasov.uml.ModelElement#getAbsoluteName()
 	 */
 	public String getAbsoluteName() {
@@ -99,51 +109,68 @@ abstract class ModelElementImpl extends ElementImpl implements ModelElement {
 	}
 
 	private Collection constraints;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.pavelvlasov.uml.ModelElement#getConstraints()
 	 */
 	public Collection getConstraints() {
-		if (constraints==null) {
+		if (constraints == null) {
 			try {
-				constraints=new LinkedList();
-				NodeIterator nit=getModel().getCachedXPathAPI().selectNodeIterator(holder, "ModelElement.constraint/Constraint");
+				constraints = new LinkedList();
+				NodeIterator nit = getModel().getCachedXPathAPI()
+						.selectNodeIterator(holder,
+								"ModelElement.constraint/Constraint");
 				Element ce;
-				while ((ce=(Element)nit.nextNode())!=null) {
-					constraints.add(new ConstraintImpl(this,ce));
-				}	
+				while ((ce = (Element) nit.nextNode()) != null) {
+					constraints.add(new ConstraintImpl(this, ce));
+				}
 			} catch (Exception e) {
-				throw new UmlException("Can't load tagged constraints for element "+getId()+": "+e, e, getId());
+				throw new UmlException(
+						"Can't load tagged constraints for element " + getId()
+								+ ": " + e, e, getId());
 			}
-			
-		}								
-				
+
+		}
+
 		return constraints;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.pavelvlasov.uml.ModelElement#getAbsoluteName(java.lang.String)
 	 */
 	public String getAbsoluteName(String separator) {
-		if (getOwner()==null) {
+		if (getOwner() == null) {
 			return getName();
 		} else {
-			String ownerName=((ModelElementImpl) getOwner()).getAbsoluteName(separator);
-			return ownerName.length()==0 ? getName() : ownerName+separator+getName();
+			String ownerName = ((ModelElementImpl) getOwner())
+					.getAbsoluteName(separator);
+			return ownerName.length() == 0 ? getName() : ownerName + separator
+					+ getName();
 		}
 	}
 
-	/*private boolean isNamespace(ModelElement e) {
-		return "1".equals(e.getToolTaggedValues().getValue("isnamespace",""));
-	}*/
+	/*
+	 * private boolean isNamespace(ModelElement e) { return
+	 * "1".equals(e.getToolTaggedValues().getValue("isnamespace","")); }
+	 */
 
 	public String getRootPath(String separator) {
-		if (getOwner()==null) {
+		if (getOwner() == null) {
 			return "";
 		} else {
-			return getOwner().getRootPath(separator)+".."+separator;
+			return getOwner().getRootPath(separator) + ".." + separator;
 		}
 	}
 
+	public boolean isStatic() {
+		if (holder.hasAttribute("isStatic")) {
+			return holder.getAttribute("isStatic").equals("true");
+		}
+		return false;
+	}
 
 }

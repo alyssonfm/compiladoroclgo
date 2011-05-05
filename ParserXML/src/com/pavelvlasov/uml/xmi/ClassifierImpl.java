@@ -65,6 +65,7 @@ class ClassifierImpl extends ModelElementImpl implements Classifier {
 	 * @param owner
 	 * @param holder
 	 */
+	
 
 	public ClassifierImpl(ModelElementImpl owner, Element holder,
 			Acceptor acceptor) {
@@ -97,6 +98,16 @@ class ClassifierImpl extends ModelElementImpl implements Classifier {
 	public Collection getIncludes() {
 		return includes;
 	}
+
+	private void addClass(Classifier classifier) {
+		classes.add(classifier);
+	}
+
+	public Collection<Classifier> getClasses() {
+		return classes;
+	}
+
+	Collection<Classifier> classes = new LinkedList<Classifier>();
 
 	Collection Extends;
 	Collection extensionPoints;
@@ -733,6 +744,15 @@ class ClassifierImpl extends ModelElementImpl implements Classifier {
 					} else if (AuxiliaryFunctionsXML.equalsNodeType(el,
 							Constants.ASSOCIATION)) {
 						me = new AssociationImpl(this, el);
+					} else if (AuxiliaryFunctionsXML.equalsNodeType(el,
+							Constants.CLASS)
+							|| AuxiliaryFunctionsXML.equalsNodeType(el,
+									Constants.ENUMERATION)) {
+						me = new ClassifierImpl(this, el, acceptor);
+						if (acceptor == null || acceptor.accept(me)) {
+							addClass((Classifier) me);
+						}
+
 					} else {
 						me = new ClassifierImpl(this, el, acceptor);
 					}
