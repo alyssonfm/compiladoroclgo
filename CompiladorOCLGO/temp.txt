@@ -1,0 +1,2 @@
+context Person::getSon(): Set(Person)
+body: Person.allInstances->select(s | s.father = asd or s.mother = asd)
