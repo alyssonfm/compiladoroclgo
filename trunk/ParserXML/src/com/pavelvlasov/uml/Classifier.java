@@ -170,6 +170,7 @@ public interface Classifier extends ModelElement {
 	Collection getIncludes();
 	
 	Collection getExtensionPoints();
+
 	
 	
 }

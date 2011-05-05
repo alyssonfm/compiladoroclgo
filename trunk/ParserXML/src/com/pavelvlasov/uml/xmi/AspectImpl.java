@@ -425,4 +425,9 @@ class AspectImpl implements Aspect {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public boolean isStatic() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

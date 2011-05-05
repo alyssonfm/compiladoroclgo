@@ -225,7 +225,8 @@ class ModelImpl implements Model {
 	private void addClasses(NodeIterator nit, Acceptor acceptor) {
 		Element pe;
 		while ((pe = (Element) nit.nextNode()) != null) {
-			if (AuxiliaryFunctionsXML.equalsNodeType(pe, Constants.CLASS)
+			if ((AuxiliaryFunctionsXML.equalsNodeType(pe, Constants.CLASS) || AuxiliaryFunctionsXML
+					.equalsNodeType(pe, Constants.ENUMERATION))
 					&& !pe.hasAttribute("href")) {
 				Classifier Class = new ClassifierImpl(this, pe, acceptor);
 				if (acceptor == null || acceptor.accept(Class)) {

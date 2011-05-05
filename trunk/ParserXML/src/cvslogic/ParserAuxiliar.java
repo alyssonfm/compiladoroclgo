@@ -17,7 +17,7 @@ import com.pavelvlasov.uml.Parameter;
 
 public class ParserAuxiliar {
 
-	public static String packageError = "Não existe o pacote especificado: ";
+	public static String packageError = "Não existe o caminho especificado: ";
 	public static String contexClassError = "Não existe a classe especificada: ";
 	public static String operationError = "Não existe a operação especificada: ";
 	public static String parameterError = "Não existe o parâmetro especificado: ";
@@ -34,6 +34,25 @@ public class ParserAuxiliar {
 		return null;
 	}
 
+	public static Classifier getClassByName(String className, Package pack) {
+		for (Object o : classes) {
+			if (pack != null) {
+				if (((Element) o).getName().equals(className)
+						&& ((Element) o).getOwner().getName().equals(
+								pack.getName())) {
+					return (Classifier) o;
+				}
+			} else {
+				if (((Element) o).getName().equals(className)
+						&& ((Element) o).getOwner().getName().equals("")) {
+					return (Classifier) o;
+				}
+			}
+
+		}
+		return null;
+	}
+
 	public static Classifier getClassById(String id) {
 		for (Object o : classes) {
 			if (((Element) o).getId().equals(id)) {
@@ -45,14 +64,25 @@ public class ParserAuxiliar {
 
 	public static Operation getOperationByName(Classifier classActual,
 			String name) {
-		for (Object o : classActual.getOperations()) {
-			if (((Operation) o).getName().equals(name)) {
-				return (Operation) o;
+		Collection<Operation> operations = classActual.getOperations();
+		Operation op = getOperation(name, operations);
+		if (op == null) {
+			operations = new LinkedList<Operation>();
+			for (String classe : getGeneralizations(classActual)) {
+				Classifier classAux = getClassByName(classe);
+				operations.addAll(classAux.getOperations());
 			}
+			op = getOperation(name, operations);
+			if (op != null) {
+				if (!op.getVisibility().equals("private")
+						&& !op.getVisibility().equals("package")) {
+					return op;
+				}
+			}
+		} else if (op != null) {
+			return op;
 		}
-
 		return null;
-
 	}
 
 	public static Parameter getParameter(Operation operation, String name,
@@ -96,7 +126,7 @@ public class ParserAuxiliar {
 		classes.clear();
 		for (Object p : model.getPackages()) {
 			Package pack = ((Package) p);
-			classes.addAll(pack.getElements(Constants.CLASS));
+			classes.addAll(pack.getClasses());
 		}
 		classes.addAll(model.getClasses());
 	}
@@ -104,9 +134,8 @@ public class ParserAuxiliar {
 	public static List<String> getOperationParameters(String name,
 			Collection<Operation> operations) {
 		Operation op = getOperation(name, operations);
-		List<String> out = null;
+		List<String> out = new LinkedList<String>();
 		if (op != null) {
-			out = new LinkedList<String>();
 			for (Object param : op.getParameters()) {
 				out.add(formatType(((Element) param)));
 			}
@@ -132,13 +161,46 @@ public class ParserAuxiliar {
 							.replace("Collection(", "")) + ")";
 
 		} else {
-			return ((Element) element).getType();
+			return filterType(((Element) element).getType());
 		}
 	}
 
-	public static String getOperationType(String name,
-			Collection<Operation> operations) {
-		Operation op = getOperation(name, operations);
+	public static List<String> getOperationParameters(String name,
+			String classeName, Package pack) {
+		Classifier classe = getClassByName(classeName, pack);
+		if (classe != null) {
+			return getOperationParameters(name, classe.getOperations());
+		}
+
+		return null;
+	}
+
+	public static String getOperationType(String name, String classeName,
+			Package pack) {
+		Classifier classe = getClassByName(classeName, pack);
+		if (classe != null) {
+			Operation op = getOperationByName(classe, name);
+			if (op != null) {
+				return formatType((Element) op);
+			}
+		}
+		return null;
+	}
+
+	public static String getAttributeType(String name, String classeName,
+			Package pack) {
+		Classifier classe = getClassByName(classeName, pack);
+		if (classe != null) {
+			Attribute op = getAttribute(name, classe.getAttributes());
+			if (op != null) {
+				return formatType((Element) op);
+			}
+		}
+		return null;
+	}
+
+	public static String getOperationType(String name, Classifier classe) {
+		Operation op = getOperationByName(classe, name);
 		if (op != null) {
 			return formatType((Element) op);
 		}
@@ -155,14 +217,26 @@ public class ParserAuxiliar {
 		return null;
 	}
 
-	public static String getAttributeType(String name,
-			Collection<Attribute> attributes) {
+	public static String getAttributeType(String name, Classifier classifier) {
+		Collection<Attribute> attributes = classifier.getAttributes();
 		Attribute att = getAttribute(name, attributes);
-		if (att != null) {
+		if (att == null) {
+			attributes = new LinkedList<Attribute>();
+			for (String classe : getGeneralizations(classifier)) {
+				Classifier classAux = getClassByName(classe);
+				attributes.addAll(classAux.getAttributes());
+			}
+			att = getAttribute(name, attributes);
+			if (att != null) {
+				if (!att.getVisibility().equals("private")
+						&& !att.getVisibility().equals("package")) {
+					return formatType((Element) att);
+				}
+			}
+		} else if (att != null) {
 			return formatType((Element) att);
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	public static String getSuperType(String type, String typeReduz) {
