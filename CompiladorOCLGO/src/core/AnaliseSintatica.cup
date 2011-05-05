@@ -1,6 +1,7 @@
 package core;
 import java_cup.runtime.Symbol;
 import util.sym;
+import java.util.LinkedList;
 import util.*;
 
 parser code {:
@@ -94,24 +95,68 @@ precedence left COLLECTIONOPERATION, DOT;
 
 start with packageDeclaration;
 
-packageDeclaration ::=  PACKAGE pathName:pn packageDeclarationAux ENDPACKAGE
-						| packageDeclarationAux;
+packageDeclaration ::=  PACKAGE pathName:pn {:
+	XMIParserBasic.getInstancia().setPackage(pn.toString());
+	if(!XMIParserBasic.getInstancia().existsPackage()){
+		LoggerSemantico.getInstance().addError(StringErro.packageInvalido(pn.toString()));
+		throw new ErroFatal();
+	}
+:}  
+packageDeclarationAux ENDPACKAGE
+
+|{:
+	XMIParserBasic.getInstancia().setPackage(null);
+:} 
+packageDeclarationAux;
+
 packageDeclarationAux ::= contextDeclaration packageDeclarationAux |;
 pathName ::= IDENTIFIER:id pathNameAux:aux {: RESULT = id.toString() + aux.toString(); :};
 pathNameAux ::= PATHNAME:pn pathName:path {: RESULT = "::" + path.toString(); :}  
 				| {: RESULT = ""; :};
 pathNameOperation ::= PATHNAME:pn pathName:path {: RESULT = "::"+ path.toString(); :};
-contextDeclaration ::= CONTEXT operation:op bodyDeclaration;
-bodyDeclaration ::= BODY COLON oclExpression;
-operation ::= IDENTIFIER:id pathNameOperation:pno LEFT_PAR operationParAux:ope RIGHT_PAR COLON typeName:type
-			  {: RESULT = id.toString() + pno.toString() + "(" + ope.toString() + ")" + ":" + type.toString(); :};
+
+contextDeclaration ::= CONTEXT operation:op {:
+	Elemento val = (Elemento) op;
+	XMIParserBasic.getInstancia().setContext(val.getAtributo("string"));
+	if(!XMIParserBasic.getInstancia().existsContext()){
+		LoggerSemantico.getInstance().addError(StringErro.contextoInvalido(val.toString()));
+		throw new ErroFatal();
+	}
+:} 
+
+bodyDeclaration:b {: 
+	Elemento val = (Elemento) op;
+	val.setAtributo("tipo", XMIParserBasic.getInstancia().getOperationType(val.getAtributo("operacao")));	
+	Elemento body = (Elemento) b;
+	
+	if(!Elemento.tiposEquivalentes(val.getAtributo("tipo"), body.getAtributo("tipo"))){
+		LoggerSemantico.getInstance().addError(StringErro.tipoConsultaInvalida(body.toString(), val.getAtributo("tipo"), body.getAtributo("tipo")));
+	}
+	
+	val.setAtributo("tipo", Elemento.max(val.getAtributo("tipo"), body.getAtributo("tipo")));
+	RESULT = val;
+:};
+
+bodyDeclaration ::= BODY COLON oclExpression:exp {: RESULT = exp; :};
+
+operation ::= IDENTIFIER:id pathNameOperation:pno LEFT_PAR operationParAux:ope RIGHT_PAR COLON typeName:type{:
+	Elemento val = new Elemento(id.toString() + pno.toString(), idleft, idright);
+	String[] splited = pno.toString().split("::");
+	val.setAtributo("operacao", splited[splited.length - 1]);
+	val.setAtributo("string", id.toString() + pno.toString() + "(" + ope.toString() + ")" + ":" + type.toString());
+	RESULT =  val;
+:};
+			  
 operationParAux ::= parameters:p {: RESULT = p.toString(); :}  
 					| {: RESULT = ""; :};
+					
 parameters ::= variableDeclaration:v {: RESULT = v.toString(); :}
 			| variableDeclaration:v COMMA parameters:p {: RESULT = v.toString() + "," + p.toString(); :};
 
-collectionType ::= collectionTypeIdentifier:c LEFT_PAR typeName:t RIGHT_PAR 
-				   {: RESULT = c.toString() + "(" + t.toString() + ")"; :};
+collectionType ::= collectionTypeIdentifier:c LEFT_PAR typeName:t RIGHT_PAR {:
+	RESULT = c.toString() + "(" + t.toString() + ")";
+:};
+
 collectionTypeIdentifier ::= COLLECTION:c {: RESULT = c.toString(); :};
 			 
 typeName ::= primaryTypes:p {: RESULT = p.toString(); :} 
@@ -171,18 +216,15 @@ relationalExpression ::= additiveExpression:add relationalExpressionAux:aux {:
 	if(aux != null){
 		Elemento auxElem = (Elemento) aux; 
 		if((auxElem.getAtributo("operacao") != "=") && (auxElem.getAtributo("operacao") != "<>")){
-			if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
+			if((!val.getAtributo("tipo").equalsIgnoreCase("Real")) && (!val.getAtributo("tipo").equalsIgnoreCase("Integer"))){
 				LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
 			}
-		}else if((auxElem.getAtributo("operacao") == "=") || (auxElem.getAtributo("operacao") == "<>")){
+		}else{
 			if(!Elemento.tiposEquivalentes(val.getAtributo("tipo"), auxElem.getAtributo("tipo"))){
 				LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val.toString(), auxElem.toString()));
-			}else{
-				String tipoMax = Elemento.max(val.getAtributo("tipo"), auxElem.getAtributo("tipo"));
-				val.valor = Elemento.coercao(val.valor, val.getAtributo("tipo"), tipoMax);
-				val.setAtributo("tipo", tipoMax);
 			}
 		}
+		val.setAtributo("tipo", "Boolean");
 	}
 	RESULT = val;
 :}; 
@@ -199,12 +241,9 @@ relationalExpressionAux ::= relationalOperator:op additiveExpression:add relatio
 		if((auxElem.getAtributo("operacao") == "=") || (auxElem.getAtributo("operacao") == "<>")){
 			if(!Elemento.tiposEquivalentes(val.getAtributo("tipo"), auxElem.getAtributo("tipo"))){
 				LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val.toString(), auxElem.toString()));
-			}else{
-				String tipoMax = Elemento.max(val.getAtributo("tipo"), auxElem.getAtributo("tipo"));
-				val.valor = Elemento.coercao(val.valor, val.getAtributo("tipo"), tipoMax);
-				val.setAtributo("tipo", tipoMax);
 			}
 		}
+		val.setAtributo("tipo", "Boolean");
 	}
 	RESULT = val;
 :} 
@@ -263,8 +302,80 @@ unaryExpression ::= unaryOperator:op postfixExpression:post {:
 :}
 | postfixExpression:post {: RESULT = post; :};
 
-postfixExpression ::= primaryExpression:pri postfixExpressionAux {: RESULT = pri; :};
-postfixExpressionAux ::= operationCall propertyCall postfixExpressionAux |;
+postfixExpression ::= primaryExpression:pri {:
+	Elemento val = (Elemento) pri;
+	String tipo = val.getAtributo("tipo");
+	if(Elemento.ehCollection(tipo)){
+		tipo = Elemento.tipoCollection(tipo);
+	}
+	XMIParserBasic.getInstancia().setTempContext(tipo);
+:}
+postfixExpressionAux:aux {:
+    Elemento source = (Elemento) pri;
+    
+    if(aux != null){
+    	Elemento post = (Elemento) aux;
+    	Elemento res = new Elemento(source.valor, prileft, priright);
+    	res.setAtributo("tipo", post.getAtributo("tipo"));
+		if(post.getAtributo("collection") == "true"){
+			if(!Elemento.ehCollection(source.getAtributo("tipo"))){
+				LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(source.toString(), "Collection"));
+				throw new ErroFatal();
+			}
+			if(post.getAtributo("tipo") == "Source"){
+				res.setAtributo("tipo", Elemento.tipoCollection(source.getAtributo("tipo")));
+			}else if(post.getAtributo("tipo") == "Collection(Source)"){
+				res.setAtributo("tipo", source.getAtributo("tipo"));
+			}			
+		}
+		RESULT = res;
+	}else{
+		RESULT = pri;
+	}
+ 
+:};
+
+postfixExpressionAux ::= operationCall:op {:
+	XMIParserBasic.getInstancia().ativarNavegando();
+:}
+propertyCall:p {:
+	Elemento val = (Elemento) p;
+	String tipo = val.getAtributo("tipo");
+	if(Elemento.ehCollection(tipo)){
+		tipo = Elemento.tipoCollection(tipo);
+	}
+	XMIParserBasic.getInstancia().setTempContext(tipo);
+:}
+postfixExpressionAux:aux {:
+	Elemento pro = (Elemento) p; 
+	if(op.toString() == "->"){
+		if(pro.getAtributo("collection") != "true"){
+			LoggerSemantico.getInstance().addError(StringErro.funcaoOperacaoInvalida(pro.toString()));
+			throw new ErroFatal();
+		}
+	}
+	XMIParserBasic.getInstancia().desativarNavegando();
+	if(aux != null){
+		Elemento post = (Elemento) aux;
+    	Elemento res = new Elemento(pro.valor, pleft, pright);
+    	res.setAtributo("tipo", post.getAtributo("tipo"));
+		if(post.getAtributo("collection") == "true"){
+			if(!Elemento.ehCollection(pro.getAtributo("tipo"))){
+				LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(pro.toString(), "Collection"));
+				throw new ErroFatal();
+			}
+			if(post.getAtributo("tipo") == "Source"){
+				res.setAtributo("tipo", Elemento.tipoCollection(pro.getAtributo("tipo")));
+			}else if(post.getAtributo("tipo") == "Collection(Source)"){
+				res.setAtributo("tipo", pro.getAtributo("tipo"));
+			}			
+		}
+		RESULT = res;
+	}else{
+		RESULT = pro;
+	}
+:} 
+|;
 
 operationCall ::= COLLECTIONOPERATION {: RESULT = "->"; :} 
 				  | DOT {: RESULT = "."; :};
@@ -283,7 +394,7 @@ ifExp ::= IF:ifToken oclExpression:exp THEN oclExpression:exp1 ELSE oclExpressio
 	Elemento val1 = (Elemento) exp1;
 	Elemento val2 = (Elemento) exp2;
 	
-	Elemento res = new Elemento("Expressao Condicional", ifTokenleft, ifTokenright);
+	Elemento res = new Elemento("Comando IF", ifTokenleft, ifTokenright);
 	res.setAtributo("tipo", val1.getAtributo("tipo"));
 	
 	if(val.getAtributo("tipo") != "Boolean"){
@@ -299,11 +410,41 @@ ifExp ::= IF:ifToken oclExpression:exp THEN oclExpression:exp1 ELSE oclExpressio
 :}
 ;
 
-propertyCall ::= pathName qualifiers propertyCallParameters;
+propertyCall ::= pathName:p qualifiers propertyCallParameters:par {:
+	String tipo = XMIParserBasic.getInstancia().getOperationType(p.toString());
+	Elemento val = new Elemento(p.toString(), pleft, pright);
+	
+	if(tipo == null){
+		tipo = XMIParserBasic.getInstancia().getAttributeType(p.toString());
+		if(tipo == null){
+			LoggerSemantico.getInstance().addError(StringErro.naoExiste("Identificador", val.toString()));
+			throw new ErroFatal();
+		}
+		if(par != null){
+			LoggerSemantico.getInstance().addError(StringErro.naoExiste("Funcao", val.toString()));
+			throw new ErroFatal();
+		}
+	}else{
+	
+		LinkedList<String> parametros = (LinkedList<String>) XMIParserBasic.getInstancia().getParametersType(p.toString());
+			
+		if(!((Parametros) par).parametrosValidos(parametros)){
+			LoggerSemantico.getInstance().addError(StringErro.parametrosInvalidos(val.toString(), parametros, ((Parametros) par).lista));
+			throw new ErroFatal();
+		}
+	}
+	val.setAtributo("collection", "false");
+	if(Elemento.ehOperacaoColecao(val.valor)){
+		val.setAtributo("collection", "true");
+	}
+	val.setAtributo("tipo", tipo);
+	RESULT = val;
+	
+:};
 
 qualifiers ::= LEFT_BRK expressionParameter RIGHT_BRK|;
 
-propertyCallParameters ::= LEFT_PAR expressionParameter RIGHT_PAR
+propertyCallParameters ::= LEFT_PAR expressionParameter:exp RIGHT_PAR {: RESULT = exp; :} 
 						   |LEFT_PAR declarator expressionParameter RIGHT_PAR
 						   |;
 						   
@@ -311,8 +452,47 @@ declarator ::= IDENTIFIER declaratorAux colonPathName  BAR oclExpression;
 declaratorAux ::= COMMA IDENTIFIER declaratorAux|;
 colonPathName ::= COLON pathName |;
 
-expressionParameter ::= oclExpression expressionParameterAux | IDENTIFIER expressionParameterAux |;
-expressionParameterAux ::= COMMA oclExpression expressionParameterAux | COMMA IDENTIFIER expressionParameterAux |;
+expressionParameter ::= oclExpression:exp expressionParameterAux:aux {:
+	Elemento val = (Elemento) exp;
+	Parametros p = (Parametros) aux;
+	p.push(val.getAtributo("tipo"));
+	RESULT = p;
+:}
+|IDENTIFIER:id expressionParameterAux:aux {:
+	String tipo = XMIParserBasic.getInstancia().getAttributeType(id.toString());
+	Elemento val = new Elemento(id.toString(), idleft, idright);
+	if(tipo == null){
+		LoggerSemantico.getInstance().addError(StringErro.naoExiste("Identificador", val.toString()));
+		throw new ErroFatal();
+	}
+	
+	val.setAtributo("tipo", tipo);
+	Parametros p = (Parametros) aux;
+	p.push(tipo);
+	RESULT = p;
+:}
+| {: RESULT = new Parametros(); :};
+
+expressionParameterAux ::= COMMA oclExpression:exp expressionParameterAux:aux {:
+	Elemento val = (Elemento) exp;
+	Parametros p = (Parametros) aux;
+	p.push(val.getAtributo("tipo"));
+	RESULT = p;
+:}
+|COMMA IDENTIFIER:id expressionParameterAux:aux {:
+	String tipo = XMIParserBasic.getInstancia().getAttributeType(id.toString());
+	Elemento val = new Elemento(id.toString(), idleft, idright);
+	if(tipo == null){
+		LoggerSemantico.getInstance().addError(StringErro.naoExiste("Identificador", id.toString()));
+		throw new ErroFatal();
+	}
+	
+	val.setAtributo("tipo", tipo);
+	Parametros p = (Parametros) aux;
+	p.push(tipo);
+	RESULT = p;
+:} 
+| {: RESULT = new Parametros(); :};
 
 logicalOperator ::= AND | OR | XOR | IMPLIES;
 
