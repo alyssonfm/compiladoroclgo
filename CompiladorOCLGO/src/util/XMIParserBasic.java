@@ -1,5 +1,6 @@
 package util;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -12,11 +13,13 @@ public class XMIParserBasic extends XMIParser {
 	public Stack<String> context;
 	private boolean navegando;
 	private static String path;
+	private HashMap<String, String> variaveis;
 	
 	private XMIParserBasic() {
 		super();
 		context = new Stack<String>();
 		navegando = false;
+		variaveis = new HashMap<String, String>();
 	}
 	
 	public static void setPath(String path){
@@ -57,8 +60,47 @@ public class XMIParserBasic extends XMIParser {
 		return navegando;
 	}
 	
+	public boolean addVariavel(String id, String tipo){
+		if(!variaveis.containsKey(id)){
+			variaveis.put(id, tipo);
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean addVariavel(LinkedList<String> lista, String tipo){
+		boolean retorno = true;
+		for(String i : lista){
+			if(!addVariavel(i, tipo)){
+				retorno = false;
+			}
+		}
+		return retorno;
+	}
+	
+	public boolean containsVariavel(String id){
+		return variaveis.containsKey(id);
+	}
+	
+	public void deleteVariavel(String id){
+		variaveis.remove(id);
+	}
+	
+	public void deleteAllVariaveis(){
+		variaveis = new HashMap<String, String>();
+	}
+	
+	public void deleteVariavel(LinkedList<String> lista){
+		for(String i : lista){
+			deleteVariavel(i);
+		}
+	}
+	
 	@Override
 	public String getAttributeType(String identifier) {
+		if(variaveis.containsKey(identifier)){
+			return variaveis.get(identifier);
+		}
 		if(isNavegando()){
 			return super.getAttributeType(context.lastElement(), identifier);
 		}
@@ -68,13 +110,13 @@ public class XMIParserBasic extends XMIParser {
 	@Override
 	public String getOperationType(String identifier) {
 		if(identifier.equalsIgnoreCase("select") || identifier.equalsIgnoreCase("reject")){
-			return "Collection(Source)";
+			return "Collection(" + context.lastElement() + ")";
 		}
 		if(identifier.equalsIgnoreCase("forAll") || identifier.equalsIgnoreCase("exists")){
 			return "Boolean";
 		}
 		if(identifier.equalsIgnoreCase("any")){
-			return "Source";
+			return context.lastElement();
 		}
 		if(isNavegando()){
 			return super.getOperationType(context.lastElement(), identifier);

@@ -108,6 +108,7 @@ public class Main {
 			System.out.println("Erro na analise Semantica.");
 			System.out.print(LoggerSemantico.getInstance());
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Ocorreu algum erro sintatico");
 		}catch (Error e) {
 			e.printStackTrace();
