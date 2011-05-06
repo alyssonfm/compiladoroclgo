@@ -8,8 +8,9 @@ public class StringErro {
 		return "Tipo de " + token + " deveria ser " + tipo;
 	}
 	
-	public static String tipoDiferentes(String token1, String token2){
-		return "Tipo de " + token1 + " eh diferente do tipo de " + token2;
+	public static String tipoDiferentes(String token1, String token2, String tipo1, String tipo2){
+		return "Tipo de " + token1 + " eh diferente do tipo de " + token2 + ": [" + 
+		tipo1 + "] " + "[" + tipo2 + "] respectivamente.";
 	}
 	
 	public static String naoExiste(String element, String token){

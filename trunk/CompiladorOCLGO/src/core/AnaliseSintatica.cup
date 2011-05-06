@@ -221,7 +221,7 @@ relationalExpression ::= additiveExpression:add relationalExpressionAux:aux {:
 			}
 		}else{
 			if(!Elemento.tiposEquivalentes(val.getAtributo("tipo"), auxElem.getAtributo("tipo"))){
-				LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val.toString(), auxElem.toString()));
+				LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val.toString(), auxElem.toString(), val.getAtributo("tipo"), auxElem.getAtributo("tipo")));
 			}
 		}
 		val.setAtributo("tipo", "Boolean");
@@ -240,7 +240,7 @@ relationalExpressionAux ::= relationalOperator:op additiveExpression:add relatio
 		Elemento auxElem = (Elemento) aux;
 		if((auxElem.getAtributo("operacao") == "=") || (auxElem.getAtributo("operacao") == "<>")){
 			if(!Elemento.tiposEquivalentes(val.getAtributo("tipo"), auxElem.getAtributo("tipo"))){
-				LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val.toString(), auxElem.toString()));
+				LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val.toString(), auxElem.toString(), val.getAtributo("tipo"), auxElem.getAtributo("tipo")));
 			}
 		}
 		val.setAtributo("tipo", "Boolean");
@@ -297,7 +297,7 @@ unaryExpression ::= unaryOperator:op postfixExpression:post {:
 			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
 		}
 	}
-	val.valor = op.toString() + val.valor;
+	val.valor = op.toString() + " " + val.valor;
 	RESULT = post;
 :}
 | postfixExpression:post {: RESULT = post; :};
@@ -312,7 +312,6 @@ postfixExpression ::= primaryExpression:pri {:
 :}
 postfixExpressionAux:aux {:
     Elemento source = (Elemento) pri;
-    
     if(aux != null){
     	Elemento post = (Elemento) aux;
     	Elemento res = new Elemento(source.valor, prileft, priright);
@@ -328,11 +327,20 @@ postfixExpressionAux:aux {:
 				res.setAtributo("tipo", source.getAtributo("tipo"));
 			}			
 		}
+		if(post.getAtributo("operacao") == "."){
+			if(Elemento.ehCollection(source.getAtributo("tipo")) && !Elemento.ehCollection(res.getAtributo("tipo"))){
+				res.setAtributo("tipo", "Collection(" + res.getAtributo("tipo") + ")");
+			}
+		}
 		RESULT = res;
 	}else{
 		RESULT = pri;
 	}
- 
+	if(Elemento.ehCollection(source.getAtributo("tipo"))){
+		XMIParserBasic.getInstancia().desativarNavegando(Elemento.tipoCollection(source.getAtributo("tipo")));
+	}else{
+		XMIParserBasic.getInstancia().desativarNavegando(source.getAtributo("tipo"));
+	}
 :};
 
 postfixExpressionAux ::= operationCall:op {:
@@ -354,7 +362,6 @@ postfixExpressionAux:aux {:
 			throw new ErroFatal();
 		}
 	}
-	XMIParserBasic.getInstancia().desativarNavegando();
 	if(aux != null){
 		Elemento post = (Elemento) aux;
     	Elemento res = new Elemento(pro.valor, pleft, pright);
@@ -370,9 +377,21 @@ postfixExpressionAux:aux {:
 				res.setAtributo("tipo", pro.getAtributo("tipo"));
 			}			
 		}
+		if(post.getAtributo("operacao") == "."){
+			if(Elemento.ehCollection(pro.getAtributo("tipo")) && !Elemento.ehCollection(res.getAtributo("tipo"))){
+				res.setAtributo("tipo", "Collection(" + res.getAtributo("tipo") + ")");
+			}
+		}
+		res.setAtributo("operacao",op.toString());
 		RESULT = res;
 	}else{
+		pro.setAtributo("operacao",op.toString());
 		RESULT = pro;
+	}
+	if(Elemento.ehCollection(pro.getAtributo("tipo"))){
+		XMIParserBasic.getInstancia().desativarNavegando(Elemento.tipoCollection(pro.getAtributo("tipo")));
+	}else{
+		XMIParserBasic.getInstancia().desativarNavegando(pro.getAtributo("tipo"));
 	}
 :} 
 |;
@@ -401,7 +420,7 @@ ifExp ::= IF:ifToken oclExpression:exp THEN oclExpression:exp1 ELSE oclExpressio
 		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Boolean"));
 	}
 	if(!Elemento.tiposEquivalentes(val1.getAtributo("tipo"), val2.getAtributo("tipo"))){
-		LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val1.toString(), val2.toString()));
+		LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val1.toString(), val2.toString(), val1.getAtributo("tipo"), val2.getAtributo("tipo")));
 	}else{
 		res.setAtributo("tipo", Elemento.max(val1.getAtributo("tipo"), val2.getAtributo("tipo")));
 	}

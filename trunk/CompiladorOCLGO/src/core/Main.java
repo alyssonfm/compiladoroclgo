@@ -9,6 +9,7 @@ import util.ErroFatal;
 import util.Logger;
 import util.LoggerSemantico;
 import util.Util;
+import util.XMIParserBasic;
 
 
 public class Main {
@@ -151,6 +152,7 @@ public class Main {
 				System.exit(0);
 			}
 		}
+		XMIParserBasic.setPath("files//in//Profe2.xml");
 		
 		if(tipo == 1){
 			analiseLexica(filePath);
@@ -164,6 +166,7 @@ public class Main {
 		
 		System.out.println("Obrigado por usar nosso compilador!");
 		System.out.println("Pressione ENTER para sair.");
+		System.out.println(XMIParserBasic.getInstancia().context);
 		//Scanner in = new Scanner(System.in);
 		//in.nextLine();
 		

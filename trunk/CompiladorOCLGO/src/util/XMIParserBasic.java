@@ -38,7 +38,6 @@ public class XMIParserBasic extends XMIParser {
 	public void setTempContext(String context){
 		if(super.getSuperType(context, context) != null){
 			this.context.push(context);
-			System.out.println(this.context);
 		}
 	}
 	
@@ -47,11 +46,10 @@ public class XMIParserBasic extends XMIParser {
 			navegando = true;
 	}
 	
-	public void desativarNavegando(){
-		if(!context.empty()){
+	public void desativarNavegando(String classe){
+		if(!context.empty() && context.lastElement().equalsIgnoreCase(classe)){
 			context.pop();
-			System.out.println(context);
-		}
+		}if(context.empty())
 			navegando = false;
 	}
 	
