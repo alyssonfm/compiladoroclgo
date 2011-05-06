@@ -241,9 +241,9 @@ public MainFrame() {
 			e.printStackTrace();
 		}
 		  if(lexica.isSelected()) {
-			  messages.append("########  Iniciando Analise Léxica  ########");
+			  messages.append("########  Iniciando Analise Léxica  ########\n");
 			  messages.append(Main.analiseLexica(file).toString());
-			  messages.append("########  Finalizada Analise Léxica ########");
+			  messages.append("########  Finalizada Analise Léxica ########\n");
 		  }
 		  else if(sintatica.isSelected()) {
 			  messages.append("########  Iniciando Analise Sintática  ########\n");
