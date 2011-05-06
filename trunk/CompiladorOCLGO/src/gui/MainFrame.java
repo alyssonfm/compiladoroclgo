@@ -25,6 +25,10 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
+
+import util.XMIParserBasic;
 
 @SuppressWarnings("serial")
 final public class MainFrame extends Frame implements Handles {
@@ -85,8 +89,8 @@ public MainFrame() {
     dir        = new TextField(10);
     specChoose = new Button("Browse");
     spec       = new TextField(10);            
-    messages   = new TextArea(10, 100);
-    oclSpecification = new TextArea(10, 100);
+    messages   = new TextArea(10000, 100);
+    oclSpecification = new TextArea(1000, 100);
     lexica = new JRadioButton("Léxica ", true);
     sintatica = new JRadioButton("Sintática ", false);
     semantica = new JRadioButton("Semântica ", false);
@@ -125,19 +129,23 @@ public MainFrame() {
 
     specChoose.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        specChoose();
+    	  specChoose();    	
       }
     } );
 
-    dirChoose.addActionListener( new ActionListener() {
+   /* dirChoose.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         dirChoose();
       }
-    } );
+    } );*/
 
     spec.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        fileName = spec.getText();
+    	  if (spec.getText() == null) {
+			messages.append("Erro");
+		} else{
+			fileName = spec.getText();
+		}        
         //generate();
       }
     } );
@@ -148,7 +156,7 @@ public MainFrame() {
       }
     } );
     
-    dir.addActionListener( new ActionListener() {
+    /*dir.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         dirName = dir.getText();
         //generate();
@@ -159,7 +167,7 @@ public MainFrame() {
       public void textValueChanged(TextEvent e) {
         dirName = dir.getText();
       }
-    } );
+    } );*/
     
     btg.add(lexica);
     btg.add(sintatica);
@@ -173,7 +181,7 @@ public MainFrame() {
     radioPanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createEtchedBorder(), "Análise: "));
     
-    GridPanel north = new GridPanel(3,4,10,10);
+    GridPanel north = new GridPanel(3,3,10,10);
     north.setInsets( new Insets(5,8,10,10) );
     
     GridPanel other = new GridPanel(3,4,10,10);
@@ -182,9 +190,9 @@ public MainFrame() {
     north.add( 0,1, 2,1, spec);
     north.add( 2,1, specChoose);
 
-    north.add( 0,2, BOTTOM, labOutDir);
+    /*north.add( 0,2, BOTTOM, labOutDir);
     north.add( 0,3, 2,1, dir);
-    north.add( 2,3, dirChoose);
+    north.add( 2,3, dirChoose);*/
     
     other.add( 0, 0, BOTTOM, labSpecification);
     other.add( 0, 1, 2, 1, oclSpecification);
@@ -201,15 +209,6 @@ public MainFrame() {
 
     setEnabledAll(false);
   }
-
- /* @SuppressWarnings("deprecation")
-protected void showOptions() {
-    if (dialog == null) {
-      dialog = new OptionsDialog(this);
-    }
-    dialog.show();
-  }*/
-
 
   public Dimension getPreferredSize() {
     Dimension d = super.getPreferredSize();
@@ -228,37 +227,37 @@ protected void showOptions() {
   }
 
   private void generate() {
-	  String file = "temp.txt";
-	  FileWriter x;
-	  try {
-		x = new FileWriter(file,false);
-		x.write(oclSpecification.getText());
-		x.close();
-	} catch (IOException e) {
-		e.printStackTrace();
+	  if (XMIParserBasic.getPath() == null) {
+		messages.append("Erro, escolha o arquivo XML ...");
+	} else {
+		String file = "temp.txt";
+		  FileWriter x;
+		  try {
+			x = new FileWriter(file,false);
+			x.write(oclSpecification.getText());
+			x.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		  if(lexica.isSelected()) {
+			  messages.append(""+gui.Main.analiseLexica(file));
+		  }
+		  else if(sintatica.isSelected()) {
+			  messages.append("\n"+gui.Main.analiseSintatica(file, false));
+		  }
+		  else if(semantica.isSelected()){
+			  messages.append("\n"+gui.Main.analiseSemantica(file, false));
+		  }
 	}
-	  if(lexica.isSelected()) {
-		  messages.append(""+gui.Main.analiseLexica(file));
-	  }
-	  else if(sintatica.isSelected()) messages.append("\n"+gui.Main.analiseSintatica(file, false));
-	  else if(semantica.isSelected()) messages.append("\n"+gui.Main.analiseSemantica(file, false));
+	  
   } 
-
-  public void generationFinished(boolean success) {
-    setEnabledAll(false);
-    
-    /*if (success) 
-      messages.append(Out.NL+"Generation finished successfully."+Out.NL);
-    else
-      messages.append(Out.NL+"Generation aborted."+Out.NL);*/
-  }
 
   private void quit() {
     setVisible(false);
     System.exit(0);
   }
   
-  @SuppressWarnings("deprecation")
+ /* @SuppressWarnings("deprecation")
 private void dirChoose() {
     choosing = true;
     
@@ -271,7 +270,7 @@ private void dirChoose() {
     }
     
     choosing = false;    
-  }
+  }*/
 
   @SuppressWarnings("deprecation")
 private void specChoose() {
@@ -279,13 +278,15 @@ private void specChoose() {
     
     FileDialog d = new FileDialog(this, "Choose file XML", FileDialog.LOAD);
     
-    d.setFile("*.xml");
     d.show();
     
     if (d.getFile() != null) {
       fileName = d.getDirectory()+d.getFile();
-      dir.setText(d.getDirectory());
       spec.setText(fileName);
+      XMIParserBasic.setPath(fileName);
+    } else
+    {
+    	messages.append("Erro, escolha o arquivo XML ...");
     }
     
     choosing = false;    
