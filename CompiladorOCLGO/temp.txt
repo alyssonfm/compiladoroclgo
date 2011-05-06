@@ -1,8 +1,2 @@
 context Conta::debitar(pts:Integer): Boolean
 body: transacoes->any(true).cartao->any(valido).proprietario.idade() = transacoes->any(pontos = 0).pontos
-
-context ProgramaFidelidade::obtemServicos(): Set(Servico)
-body: parceiros.servicosOferecidos->select(a, b | asd)
-
-context Conta::debitar(pts:Integer): Boolean
-body: estaVazia(transacoes->any(true).cartao.proprietario.nome, transacoes.cartao) = transacoes = transacoes
