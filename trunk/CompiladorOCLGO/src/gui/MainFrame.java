@@ -138,7 +138,7 @@ public MainFrame() {
     spec.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         fileName = spec.getText();
-        generate();
+        //generate();
       }
     } );
     
@@ -151,7 +151,7 @@ public MainFrame() {
     dir.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         dirName = dir.getText();
-        generate();
+        //generate();
       }
     } );
     
@@ -235,7 +235,6 @@ protected void showOptions() {
 		x.write(oclSpecification.getText());
 		x.close();
 	} catch (IOException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 	  if(lexica.isSelected()) {
