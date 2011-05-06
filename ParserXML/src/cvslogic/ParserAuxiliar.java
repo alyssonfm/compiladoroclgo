@@ -27,8 +27,12 @@ public class ParserAuxiliar {
 
 	public static Classifier getClassByName(String className) {
 		for (Object o : classes) {
-			if (((Element) o).getName().equals(className)) {
-				return (Classifier) o;
+			if (((Element) o).getOwner() != null) {
+				if (!((Element) o).getOwner().getName().equals("")) {
+					if (((Element) o).getName().equals(className)) {
+						return (Classifier) o;
+					}
+				}
 			}
 		}
 		return null;
@@ -37,18 +41,16 @@ public class ParserAuxiliar {
 	public static Classifier getClassByName(String className, Package pack) {
 		for (Object o : classes) {
 			if (pack != null) {
-				if (((Element) o).getName().equals(className)
-						&& ((Element) o).getOwner().getName().equals(
-								pack.getName())) {
-					return (Classifier) o;
-				}
-			} else {
-				if (((Element) o).getName().equals(className)
-						&& ((Element) o).getOwner().getName().equals("")) {
+				if (!pack.getName().equals("")) {
+					if (((Element) o).getName().equals(className)
+							&& ((Element) o).getOwner().getName().equals(
+									pack.getName())) {
+						return (Classifier) o;
+					}
+				} else if (((Element) o).getName().equals(className)) {
 					return (Classifier) o;
 				}
 			}
-
 		}
 		return null;
 	}
@@ -191,9 +193,9 @@ public class ParserAuxiliar {
 			Package pack) {
 		Classifier classe = getClassByName(classeName, pack);
 		if (classe != null) {
-			Attribute op = getAttribute(name, classe.getAttributes());
-			if (op != null) {
-				return formatType((Element) op);
+			Attribute att = getAttribute(name, classe.getAttributes());
+			if (att != null) {
+				return formatType((Element) att);
 			}
 		}
 		return null;
@@ -210,8 +212,18 @@ public class ParserAuxiliar {
 	private static Attribute getAttribute(String name,
 			Collection<Attribute> attributes) {
 		for (Object att : attributes) {
+			// System.out.println("aqui: " + ((Attribute)
+			// att).getName().equals(""));
 			if (((Attribute) att).getName().equals(name)) {
 				return (Attribute) att;
+			} else if (((Attribute) att).getName().equals("")) {
+				Classifier classAux = getClassById(((Attribute) att)
+						.getType());
+				if (classAux != null) {
+					if (classAux.getName().equals(name)) {
+						return (Attribute) att;
+					}
+				}
 			}
 		}
 		return null;
