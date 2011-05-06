@@ -3,13 +3,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
-
-
 import java_cup.runtime.Symbol;
+import util.ErroFatal;
 import util.Logger;
+import util.LoggerSemantico;
 import util.Util;
+import util.XMIParserBasic;
 import util.sym;
 import analise_lexica.AnaliseLexica;
+import analise_semantica.AnaliseSemantica;
 import analise_sintatica.AnaliseSintatica;
 
 
@@ -81,13 +83,37 @@ public class Main {
 		} catch (FileNotFoundException e) {
 			System.err.println("Arquivo nao encontrado!");
 		} catch (Exception e) {
-			e.printStackTrace();
 			System.out.println("Ocorreu algum erro sintatico");
 		}catch (Error e) {
 			System.out.print(e.getMessage());
 			System.out.println("Ocorreu algum erro lexico");
 		}
 		System.out.println("########  Finalizada Analise Sintatica ########");
+	}
+	
+	private static void analiseSemantica(String fileName, boolean debug) {
+		System.out.println("########  Iniciando Analise Semantica  ########");
+		try {
+			AnaliseLexica l = createScanner(fileName);
+			AnaliseSemantica g = new AnaliseSemantica(l);
+			if(debug){
+				g.debug_parse();
+			}else{
+				g.parse();
+			}
+			System.out.print(LoggerSemantico.getInstance());
+		} catch (FileNotFoundException e) {
+			System.err.println("Arquivo nao encontrado!");
+		} catch (ErroFatal e) {
+			System.out.println("Erro na analise Semantica.");
+			System.out.print(LoggerSemantico.getInstance());
+		} catch (Exception e) {
+			System.out.println("Ocorreu algum erro sintatico");
+		}catch (Error e) {
+			e.printStackTrace();
+			System.out.println("Ocorreu algum erro lexico");
+		}
+		System.out.println("########  Finalizada Analise Semantica ########");
 	}
 
 	public static void main(String[] args) {
@@ -108,11 +134,13 @@ public class Main {
 				
 				System.out.println("1 - Analise Lexica");
 				System.out.println("2 - Analise Sintatica");
+				System.out.println("3 - Analise Semantica");
 				in = new Scanner(System.in);
 				tipo = in.nextInt();
 			}else{
 				System.out.println("1 - Analise Lexica");
 				System.out.println("2 - Analise Sintatica");
+				System.out.println("3 - Analise Semantica");
 				in = new Scanner(System.in);
 				tipo = in.nextInt();
 				filePath = args[0];
@@ -126,18 +154,21 @@ public class Main {
 				System.exit(0);
 			}
 		}
+		XMIParserBasic.setPath("files//in//Profe2.xml");
 		
 		if(tipo == 1){
 			analiseLexica(filePath);
 		}else if(tipo == 2){
 			analiseSintatica(filePath, false);
+		}else if(tipo == 3){
+			analiseSemantica(filePath, false);
 		}else{
-			System.out.println("Deve escolher entre 1 ou 2.");
+			System.out.println("Deve escolher entre 1, 2 ou 3.");
 		}
 		
 		System.out.println("Obrigado por usar nosso compilador!");
 		System.out.println("Pressione ENTER para sair.");
-		Scanner in = new Scanner(System.in);
+		//Scanner in = new Scanner(System.in);
 		//in.nextLine();
 		
 	}
