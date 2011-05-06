@@ -105,7 +105,7 @@ packageDeclaration ::=  PACKAGE pathName:pn {:
 packageDeclarationAux ENDPACKAGE
 
 |{:
-	XMIParserBasic.getInstancia().setPackage(null);
+	XMIParserBasic.getInstancia().setPackage("");
 :} 
 packageDeclarationAux;
 
@@ -135,6 +135,7 @@ bodyDeclaration:b {:
 	
 	val.setAtributo("tipo", Elemento.max(val.getAtributo("tipo"), body.getAtributo("tipo")));
 	RESULT = val;
+	XMIParserBasic.getInstancia().deleteAllVariaveis();
 :};
 
 bodyDeclaration ::= BODY COLON oclExpression:exp {: RESULT = exp; :};
@@ -189,7 +190,10 @@ literal ::= REAL:v {:
 	RESULT = elem;
 :};
 			
-variableDeclaration ::= IDENTIFIER:id COLON typeName:type {: RESULT = id.toString() + ":" + type.toString(); :};
+variableDeclaration ::= IDENTIFIER:id COLON typeName:type {:
+	XMIParserBasic.getInstancia().addVariavel(id.toString(),type.toString());
+	RESULT = id.toString() + ":" + type.toString(); 
+:};
 
 oclExpression ::= relationalExpression:r oclExpressionAux:aux {:
 	RESULT = r;
@@ -321,14 +325,13 @@ postfixExpressionAux:aux {:
 				LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(source.toString(), "Collection"));
 				throw new ErroFatal();
 			}
-			if(post.getAtributo("tipo") == "Source"){
-				res.setAtributo("tipo", Elemento.tipoCollection(source.getAtributo("tipo")));
-			}else if(post.getAtributo("tipo") == "Collection(Source)"){
-				res.setAtributo("tipo", source.getAtributo("tipo"));
-			}			
 		}
-		if(post.getAtributo("operacao") == "."){
-			if(Elemento.ehCollection(source.getAtributo("tipo")) && !Elemento.ehCollection(res.getAtributo("tipo"))){
+		if(post.valor.equalsIgnoreCase("any") || post.valor.equalsIgnoreCase("forAll") || post.valor.equalsIgnoreCase("exists")){
+			res.setAtributo("especial", "true");
+		} else if(post.getAtributo("operacao") == "."){
+			if(post.getAtributo("especial") != null){
+				res.setAtributo("especial", "true");
+			}else if(Elemento.ehCollection(source.getAtributo("tipo")) && !Elemento.ehCollection(res.getAtributo("tipo"))){
 				res.setAtributo("tipo", "Collection(" + res.getAtributo("tipo") + ")");
 			}
 		}
@@ -362,6 +365,12 @@ postfixExpressionAux:aux {:
 			throw new ErroFatal();
 		}
 	}
+	if(op.toString() == "."){
+		if(Elemento.ehOperacaoColecao(pro.valor)){
+			LoggerSemantico.getInstance().addError(StringErro.atributoOperacaoInvalida(pro.toString()));
+			throw new ErroFatal();
+		}
+	}
 	if(aux != null){
 		Elemento post = (Elemento) aux;
     	Elemento res = new Elemento(pro.valor, pleft, pright);
@@ -371,20 +380,22 @@ postfixExpressionAux:aux {:
 				LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(pro.toString(), "Collection"));
 				throw new ErroFatal();
 			}
-			if(post.getAtributo("tipo") == "Source"){
-				res.setAtributo("tipo", Elemento.tipoCollection(pro.getAtributo("tipo")));
-			}else if(post.getAtributo("tipo") == "Collection(Source)"){
-				res.setAtributo("tipo", pro.getAtributo("tipo"));
-			}			
 		}
-		if(post.getAtributo("operacao") == "."){
-			if(Elemento.ehCollection(pro.getAtributo("tipo")) && !Elemento.ehCollection(res.getAtributo("tipo"))){
+		if(post.valor.equalsIgnoreCase("any") || post.valor.equalsIgnoreCase("forAll") || post.valor.equalsIgnoreCase("exists") || post.getAtributo("especial") != null){
+			res.setAtributo("especial", "true");
+		} else if(post.getAtributo("operacao") == "."){
+			if(post.getAtributo("especial") != null){
+				res.setAtributo("especial", "true");
+			}else if(Elemento.ehCollection(pro.getAtributo("tipo")) && !Elemento.ehCollection(res.getAtributo("tipo"))){
 				res.setAtributo("tipo", "Collection(" + res.getAtributo("tipo") + ")");
 			}
 		}
 		res.setAtributo("operacao",op.toString());
 		RESULT = res;
 	}else{
+		if(pro.valor.equalsIgnoreCase("any") || pro.valor.equalsIgnoreCase("forAll") || pro.valor.equalsIgnoreCase("exists")){
+			pro.setAtributo("especial", "true");
+		}
 		pro.setAtributo("operacao",op.toString());
 		RESULT = pro;
 	}
@@ -403,11 +414,30 @@ primaryExpression ::= literalCollection:l {: RESULT = l; :}
 					| literal:li {: RESULT = li; :}
 					| propertyCall:p {: RESULT = p; :}
 					| LEFT_PAR oclExpression:exp RIGHT_PAR {: RESULT = exp; :}
-					| SELF
+| SELF:id {:
+	String tipo = XMIParserBasic.getInstancia().getAttributeType(id.toString());
+	Elemento val = new Elemento(id.toString(), idleft, idright);
+	if(tipo == null){
+		LoggerSemantico.getInstance().addError(StringErro.naoExiste("Identificador", val.toString()));
+		throw new ErroFatal();
+	}
+	
+	val.setAtributo("tipo", tipo);
+	RESULT = val;
+:}					
 					| ifExp:exp {: RESULT = exp; :};
 
-literalCollection ::= collectionTypeIdentifier LEFT_BRA expressionParameter RIGHT_BRA {:
-	
+literalCollection ::= collectionTypeIdentifier:col LEFT_BRA expressionParameter:exp RIGHT_BRA {:
+	Parametros p = (Parametros) exp;
+	String tipo = p.tipoParametrosIguais();
+	if(tipo == null){
+		LoggerSemantico.getInstance().addError(StringErro.invalidoCollectionLiteral());
+		throw new ErroFatal();
+	}else{
+		Elemento e = new Elemento(col.toString(), colleft, colright);
+		e.setAtributo("tipo", e.valor + "(" + tipo + ")");
+		RESULT = e;
+	}
 :};
  
 ifExp ::= IF:ifToken oclExpression:exp THEN oclExpression:exp1 ELSE oclExpression:exp2 ENDIF {:
@@ -446,7 +476,7 @@ propertyCall ::= pathName:p qualifiers propertyCallParameters:par {:
 			throw new ErroFatal();
 		}
 	}else{
-	
+	    
 		LinkedList<String> parametros = (LinkedList<String>) XMIParserBasic.getInstancia().getParametersType(p.toString());
 			
 		if(!((Parametros) par).parametrosValidos(parametros)){
@@ -465,13 +495,57 @@ propertyCall ::= pathName:p qualifiers propertyCallParameters:par {:
 
 qualifiers ::= LEFT_BRK expressionParameter RIGHT_BRK|;
 
-propertyCallParameters ::= LEFT_PAR expressionParameter:exp RIGHT_PAR {: RESULT = exp; :} 
-						   |LEFT_PAR declarator RIGHT_PAR
+propertyCallParameters ::= LEFT_PAR expressionParameter:exp RIGHT_PAR {: RESULT = exp; :}
+ 
+|LEFT_PAR declarator:d RIGHT_PAR {:
+	Parametros dec = (Parametros) d;
+	Parametros ret = new Parametros();
+	ret.push(dec.lista.get(0));  
+	RESULT = ret; 
+	XMIParserBasic.getInstancia().deleteVariavel(dec.lista);
+:}
 						   |;
 						   
-declarator ::= IDENTIFIER declaratorAux colonPathName  BAR oclExpression;
-declaratorAux ::= COMMA IDENTIFIER declaratorAux|;
-colonPathName ::= COLON pathName |;
+declarator ::= IDENTIFIER:id declaratorAux:aux colonPathName:path  BAR {:
+	Parametros p = (Parametros) aux;
+	Elemento val = new Elemento(id.toString(), idleft, idright);
+	if(XMIParserBasic.getInstancia().containsVariavel(val.valor) || p.lista.contains(val.valor)){
+		LoggerSemantico.getInstance().addError(StringErro.jaExiste("Identificador", val.toString()));
+		throw new ErroFatal();
+	}
+	String tipo = XMIParserBasic.getInstancia().context.lastElement();
+	p.push(val.valor);
+	if(path != null){
+		if(!Elemento.tiposEquivalentes(XMIParserBasic.getInstancia().context.lastElement(), path.toString())){
+			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), XMIParserBasic.getInstancia().context.lastElement()));
+			throw new ErroFatal();
+		}
+		tipo = Elemento.max(XMIParserBasic.getInstancia().context.lastElement(), path.toString());
+	}
+	XMIParserBasic.getInstancia().addVariavel(p.lista,tipo);
+:}
+oclExpression:exp {:
+	Elemento val = (Elemento) exp;
+	Parametros p = (Parametros) aux;
+	p.push(id.toString());
+	p.push(val.getAtributo("tipo"));
+	RESULT = p;
+:};
+
+declaratorAux ::= COMMA IDENTIFIER:id declaratorAux:aux {:
+	Parametros p = (Parametros) aux;
+	Elemento val = new Elemento(id.toString(), idleft, idright);
+	if(XMIParserBasic.getInstancia().containsVariavel(val.valor) || p.lista.contains(val.valor)){
+		LoggerSemantico.getInstance().addError(StringErro.jaExiste("Identificador", val.toString()));
+		throw new ErroFatal();
+	}
+	p.push(val.valor);
+	RESULT = p;
+:}
+
+| {: RESULT = new Parametros(); :};
+
+colonPathName ::= COLON pathName:pa {: RESULT = pa.toString(); :} |;
 
 expressionParameter ::= oclExpression:exp expressionParameterAux:aux {:
 	Elemento val = (Elemento) exp;

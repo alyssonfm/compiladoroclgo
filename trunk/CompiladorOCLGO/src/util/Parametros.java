@@ -14,6 +14,16 @@ public class Parametros {
 		lista.addFirst(tipo);
 	}
 	
+	public String tipoParametrosIguais(){
+		int tamanho = lista.size();
+		for(int i = 0; i < tamanho - 1; i++){
+			if(!lista.get(i).equalsIgnoreCase(lista.get(i + 1))){
+				return null;
+			}
+		}
+		return lista.get(0);
+	}
+	
 	public boolean parametrosValidos(LinkedList<String> lista2){
 		if(lista.size() != lista2.size()){
 			return false;
