@@ -138,18 +138,7 @@ class ClassifierImpl extends ModelElementImpl implements Classifier {
 				generalizations.add(new GeneralizationImpl(this, (Element) list
 						.item(i)));
 			}
-			if (list.item(i).getNodeName().equals(
-					Constants.INCLUDE.toLowerCase())) {
-				includes.add(new IncludeImpl(this, (Element) list.item(i)));
-			}
-			if (list.item(i).getNodeName().equals(
-					Constants.EXTEND.toLowerCase())) {
-				Extends.add(new ExtendsImpl(this, (Element) list.item(i)));
-			}
-			if (list.item(i).getNodeName().equals(Constants.EXTENSION_POINT)) {
-				extensionPoints.add(new ExtensionPointImpl(this, (Element) list
-						.item(i)));
-			}
+			
 		}
 
 		// System.out.println(listGeneralization.getLength());
@@ -855,5 +844,4 @@ class ClassifierImpl extends ModelElementImpl implements Classifier {
 
 		return ret;
 	}
-
 }

@@ -2,9 +2,6 @@ package util;
 
 import com.pavelvlasov.uml.Element;
 import com.pavelvlasov.uml.Generalization;
-import com.pavelvlasov.uml.xmi.ExtendsImpl;
-import com.pavelvlasov.uml.xmi.ExtensionPointImpl;
-import com.pavelvlasov.uml.xmi.IncludeImpl;
 
 public class AuxiliaryFunctions {
 
@@ -47,27 +44,5 @@ public class AuxiliaryFunctions {
 		return out.toString();
 	}
 
-	public static String getIncludedElements(Object[] includes) {
-		StringBuilder out = new StringBuilder();
-		for (int i = 0; i < includes.length; i++) {
-			out.append(((IncludeImpl) includes[i]).toString() + "; ");
-		}
-		return out.toString();
-	}
 
-	public static String getExcludedElements(Object[] excludes) {
-		StringBuilder out = new StringBuilder();
-		for (int i = 0; i < excludes.length; i++) {
-			out.append(((ExtendsImpl) excludes[i]).getId().toString() + "; ");
-		}
-		return out.toString();
-	}
-
-	public static String getExtensionPoints(Object[] points) {
-		StringBuilder out = new StringBuilder();
-		for (int i = 0; i < points.length; i++) {
-			out.append(((ExtensionPointImpl) points[i]).toString() + "; ");
-		}
-		return out.toString();
-	}
 }
