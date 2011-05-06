@@ -56,18 +56,18 @@ public class XMIParser {
 	public static void main(String[] args) {
 		XMIParser parser = new XMIParser();
 		parser.loadModel("Modelos/profe.xml");
-		parser.setPackage("");
+		parser.setPackage("PacoteSistema");
 		System.out.println(parser.existsPackage());
 		System.out.println(parser.getError());
 		parser.setContext("Cliente::idade():Integer");
 		System.out.println(parser.existsContext());
 		System.out.println(parser.getError());
-		parser.getAttributeType("ProgramaFidelidade", "socio");
-		parser.getOperationType("ProgramaFidelidade", "obtemServicos");
+		System.out.println(parser.getAttributeType("Servico", "ParceiroPrograma"));
+		//parser.getOperationType("ProgramaFidelidade", "obtemServicos");
 		// parser.getOperationType("getMulta");
-		System.out.println(parser.getParametersType("ProgramaFidelidade",
-				"obtemServicos"));
-		// parser.getSuperType("Transacao", "Cheque");
+		//System.out.println(parser.getParametersType("ProgramaFidelidade",
+		//		"obtemServicos"));
+		//parser.getSuperType("Transacao", "Cheque");
 
 	}
 
@@ -102,7 +102,7 @@ public class XMIParser {
 		return null;
 	}
 
-	private void setPackage(String string) {
+	public void setPackage(String string) {
 		constraintPackage = new ConstraintPackage();
 		constraintPackage.setCaminho(string);
 
@@ -129,12 +129,11 @@ public class XMIParser {
 	}
 
 	public boolean existsContext() {
-
 		if (existsPackage() || notExistPackage()) {
 			Classifier classActual;
 			if (notExistPackage()) {
 				classActual = ParserAuxiliar.getClassByName(cc
-						.getContextClass());
+						.getContextClass(), null);
 			} else {
 				classActual = ParserAuxiliar.getClassByName(cc
 						.getContextClass(), getPackageActual());
@@ -171,9 +170,10 @@ public class XMIParser {
 					}
 				}
 			}
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	private void setBodyClass(Classifier classActual) {
