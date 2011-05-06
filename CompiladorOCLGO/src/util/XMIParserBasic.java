@@ -38,6 +38,11 @@ public class XMIParserBasic extends XMIParser {
 		return instancia;
 	}
 	
+	public static XMIParserBasic getNewInstancia(){
+		instancia = null;
+		return getInstancia();
+	}
+	
 	public void setTempContext(String context){
 		if(super.getSuperType(context, context) != null){
 			this.context.push(context);

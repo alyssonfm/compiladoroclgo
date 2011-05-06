@@ -10,3 +10,4 @@ body: estaVazia(transacoes->any(true).cartao.proprietario.nome, transacoes.carta
 
 context Conta::debitar(pts:Integer): Boolean
 body: pontos = pts
+
