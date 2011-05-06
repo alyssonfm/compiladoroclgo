@@ -242,18 +242,18 @@ public MainFrame() {
 		}
 		  if(lexica.isSelected()) {
 			  messages.append("########  Iniciando Analise Léxica  ########");
-			  //messages.append(analiseLexica(file));
+			  messages.append(Main.analiseLexica(file).toString());
 			  messages.append("########  Finalizada Analise Léxica ########");
 		  }
 		  else if(sintatica.isSelected()) {
-			  messages.append("########  Iniciando Analise Sintática  ########");
-			  //messages.append(analiseSintatica(file, false));
-			  messages.append("########  Finalizada Analise Sintática ########");
+			  messages.append("########  Iniciando Analise Sintática  ########\n");
+			  messages.append(Main.analiseSintatica(file, false).toString());
+			  messages.append("########  Finalizada Analise Sintática ########\n");
 		  }
 		  else if(semantica.isSelected()){
-			  messages.append("########  Iniciando Analise Semântica  ########");
-			 // messages.append(analiseSemantica(file, false));
-			  messages.append("########  Finalizada Analise Semântica ########");
+			  messages.append("########  Iniciando Analise Semântica  ########\n");
+			  messages.append(Main.analiseSemantica(file, false).toString());
+			  messages.append("########  Finalizada Analise Semântica ########\n");
 		  }
 	}
 	  

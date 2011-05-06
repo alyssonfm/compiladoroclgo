@@ -399,14 +399,16 @@ postfixExpressionAux:aux {:
 operationCall ::= COLLECTIONOPERATION {: RESULT = "->"; :} 
 				  | DOT {: RESULT = "."; :};
 				  
-primaryExpression ::= literalCollection
+primaryExpression ::= literalCollection:l {: RESULT = l; :}
 					| literal:li {: RESULT = li; :}
 					| propertyCall:p {: RESULT = p; :}
 					| LEFT_PAR oclExpression:exp RIGHT_PAR {: RESULT = exp; :}
 					| SELF
 					| ifExp:exp {: RESULT = exp; :};
 
-literalCollection ::= collectionTypeIdentifier LEFT_BRA expressionParameter RIGHT_BRA;
+literalCollection ::= collectionTypeIdentifier LEFT_BRA expressionParameter RIGHT_BRA {:
+	
+:};
  
 ifExp ::= IF:ifToken oclExpression:exp THEN oclExpression:exp1 ELSE oclExpression:exp2 ENDIF {:
 	Elemento val = (Elemento) exp;
@@ -464,7 +466,7 @@ propertyCall ::= pathName:p qualifiers propertyCallParameters:par {:
 qualifiers ::= LEFT_BRK expressionParameter RIGHT_BRK|;
 
 propertyCallParameters ::= LEFT_PAR expressionParameter:exp RIGHT_PAR {: RESULT = exp; :} 
-						   |LEFT_PAR declarator expressionParameter RIGHT_PAR
+						   |LEFT_PAR declarator RIGHT_PAR
 						   |;
 						   
 declarator ::= IDENTIFIER declaratorAux colonPathName  BAR oclExpression;

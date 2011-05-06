@@ -167,7 +167,7 @@ propertyCall ::= pathName qualifiers propertyCallParameters;
 qualifiers ::= LEFT_BRK expressionParameter RIGHT_BRK|;
 
 propertyCallParameters ::= LEFT_PAR expressionParameter RIGHT_PAR 
-						   |LEFT_PAR declarator expressionParameter RIGHT_PAR
+						   |LEFT_PAR declarator RIGHT_PAR
 						   |;
 						   
 declarator ::= IDENTIFIER declaratorAux colonPathName  BAR oclExpression;
