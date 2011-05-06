@@ -117,6 +117,7 @@ public MainFrame() {
     
     generate.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e) {
+    	  messages.setText("");
         generate();
       }
     } );
@@ -226,7 +227,7 @@ public MainFrame() {
     spec.setEnabled( !enable );
   }
 
-  private void generate() {
+  private void generate() {  
 	  if (XMIParserBasic.getPath() == null) {
 		messages.append("Erro, escolha o arquivo XML ...");
 	} else {
@@ -240,13 +241,19 @@ public MainFrame() {
 			e.printStackTrace();
 		}
 		  if(lexica.isSelected()) {
-			  messages.append(""+gui.Main.analiseLexica(file));
+			  messages.append("########  Iniciando Analise Léxica  ########");
+			  //messages.append(analiseLexica(file));
+			  messages.append("########  Finalizada Analise Léxica ########");
 		  }
 		  else if(sintatica.isSelected()) {
-			  messages.append("\n"+gui.Main.analiseSintatica(file, false));
+			  messages.append("########  Iniciando Analise Sintática  ########");
+			  //messages.append(analiseSintatica(file, false));
+			  messages.append("########  Finalizada Analise Sintática ########");
 		  }
 		  else if(semantica.isSelected()){
-			  messages.append("\n"+gui.Main.analiseSemantica(file, false));
+			  messages.append("########  Iniciando Analise Semântica  ########");
+			 // messages.append(analiseSemantica(file, false));
+			  messages.append("########  Finalizada Analise Semântica ########");
 		  }
 	}
 	  
