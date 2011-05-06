@@ -1,4 +1,4 @@
-package core;
+package analise_semantica;
 import java_cup.runtime.Symbol;
 import util.sym;
 import java.util.LinkedList;

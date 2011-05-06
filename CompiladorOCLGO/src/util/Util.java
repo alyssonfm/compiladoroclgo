@@ -10,6 +10,8 @@ public class Util {
 			if (sym.left != -1){
 				System.out.println("Erro Sintatico na linha " + (sym.left + 1) + " e coluna " + (sym.right + 1));
 				System.out.println("Palavra " + sym.value + " nao esperada.");
+			}else{
+				System.out.println("Final de Arquivo e Restricao Invalida");
 			}
 		}
 	}

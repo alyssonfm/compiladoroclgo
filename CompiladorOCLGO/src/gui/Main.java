@@ -5,15 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
-import core.sym;
 
 import analise_lexica.AnaliseLexica;
 import analise_sintatica.AnaliseSintatica;
 
 import java_cup.runtime.Symbol;
-import util.Logger;
-import util.LoggerSemantico;
-import util.Util;
+import util.*;
 
 
 public class Main {
