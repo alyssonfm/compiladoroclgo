@@ -9,6 +9,7 @@ import util.ErroFatal;
 import util.Logger;
 import util.LoggerSemantico;
 import util.Util;
+import util.XMIParserBasic;
 import util.sym;
 import analise_lexica.AnaliseLexica;
 import analise_semantica.AnaliseSemantica;
@@ -89,6 +90,7 @@ public class Main {
         }
         
         public static Logger analiseSemantica(String fileName, boolean debug) {
+        	XMIParserBasic.getNewInstancia();
         	Logger log = LoggerSemantico.getNewInstance();
             Util.setLog(log);
                 try {
@@ -104,7 +106,6 @@ public class Main {
                 } catch (ErroFatal e) {
         			log.addMessage("Erro na analise Semantica.");
                 } catch (Exception e) {
-                	log.addError(e.getStackTrace().toString());
                 	log.addMessage("Ocorreu algum erro sintatico");
                 }catch (Error e) {
                         log.addError(e.getMessage());
