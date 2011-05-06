@@ -9,8 +9,9 @@ import cvslogic.XMIParser;
 public class XMIParserBasic extends XMIParser {
 	
 	private static XMIParserBasic instancia;
-	private Stack<String> context;
+	public Stack<String> context;
 	private boolean navegando;
+	private static String path;
 	
 	private XMIParserBasic() {
 		super();
@@ -18,10 +19,18 @@ public class XMIParserBasic extends XMIParser {
 		navegando = false;
 	}
 	
+	public static void setPath(String path){
+		XMIParserBasic.path = path;
+	}
+	
+	public static String getPath() {
+		return path;
+	}
+	
 	public static XMIParserBasic getInstancia(){
 		if(instancia == null){
 			instancia = new XMIParserBasic();
-			instancia.loadModel("files//in//Profe2.xml");
+			instancia.loadModel(path);
 		}
 		return instancia;
 	}
@@ -29,6 +38,7 @@ public class XMIParserBasic extends XMIParser {
 	public void setTempContext(String context){
 		if(super.getSuperType(context, context) != null){
 			this.context.push(context);
+			System.out.println(this.context);
 		}
 	}
 	
@@ -40,8 +50,9 @@ public class XMIParserBasic extends XMIParser {
 	public void desativarNavegando(){
 		if(!context.empty()){
 			context.pop();
+			System.out.println(context);
 		}
-		navegando = false;
+			navegando = false;
 	}
 	
 	public boolean isNavegando(){
@@ -67,6 +78,9 @@ public class XMIParserBasic extends XMIParser {
 		if(identifier.equalsIgnoreCase("any")){
 			return "Source";
 		}
+		if(isNavegando()){
+			return super.getOperationType(context.lastElement(), identifier);
+		}
 		return super.getOperationType(identifier);
 	}
 	
@@ -78,6 +92,9 @@ public class XMIParserBasic extends XMIParser {
 				operation.equalsIgnoreCase("any")){
 			par.add("Boolean");
 			return par;
+		}
+		if(isNavegando()){
+			return super.getParametersType(context.lastElement(), operation);
 		}
 		return super.getParametersType(operation);
 	}
