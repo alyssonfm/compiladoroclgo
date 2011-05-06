@@ -3,14 +3,30 @@ package util;
 import java_cup.runtime.Symbol;
 
 public class Util {
+	
+	private static Logger log;
+	
+	public static void setLog(Logger l){
+		log = l;
+	}
+	
+	public static Logger getLog() {
+		return log;
+	}
 
 	public static void report_error(String message, Object info) {
 		if (info instanceof Symbol){
 			Symbol sym = (Symbol) info;
 			if (sym.left != -1){
+				if(log != null){
+					log.addError("Erro Sintatico na linha " + (sym.left + 1) + " e coluna " + (sym.right + 1) + "\n" + "Palavra " + sym.value + " nao esperada.");
+				}
 				System.out.println("Erro Sintatico na linha " + (sym.left + 1) + " e coluna " + (sym.right + 1));
 				System.out.println("Palavra " + sym.value + " nao esperada.");
 			}else{
+				if(log != null){
+					log.addError("Final de Arquivo e Restricao Invalida");
+				}
 				System.out.println("Final de Arquivo e Restricao Invalida");
 			}
 		}

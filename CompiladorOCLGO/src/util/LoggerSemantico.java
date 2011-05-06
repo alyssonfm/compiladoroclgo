@@ -10,5 +10,9 @@ public class LoggerSemantico extends Logger {
 		}
 		return instancia;
 	}
+	public static LoggerSemantico getNewInstance(){
+		instancia = new LoggerSemantico();
+		return instancia;
+	}
 
 }
