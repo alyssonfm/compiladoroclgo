@@ -55,6 +55,10 @@ public class Elemento {
 			}
 		}
 		
+		if(XMIParserBasic.getInstancia().getSuperType(passado, esperado) != null){
+			return true;
+		}
+		
 		return false;		
 	}
 	
@@ -96,6 +100,8 @@ public class Elemento {
 			if(esperado == "Integer" || passado == "Real"){
 				return "Integer";
 			}
+			
+			return XMIParserBasic.getInstancia().getSuperType(passado, esperado);
 			
 		}
 		return null;
