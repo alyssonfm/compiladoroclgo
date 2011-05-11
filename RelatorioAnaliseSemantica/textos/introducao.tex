@@ -29,7 +29,28 @@ A conversão entre tipos ocorre da seguinte maneira \ldots
 \subsection{Verificação Estática}
 
 Na verificação estática usamos ações semânticas para cada um das regras de
-produção da gramática \ldots
+produção da gramática. A seguir é exemplificado uma das ações semânticas usadas
+na análise semântica.
+
+\scriptsize
+\begin{lstlisting}[frame=single, caption={Exemplo de uma ação semântica}]
+packageDeclaration ::=  PACKAGE pathName:pn {:
+	XMIParserBasic.getInstancia().setPackage(pn.toString());
+	if(!XMIParserBasic.getInstancia().existsPackage()){
+		LoggerSemantico.getInstance().addError(StringErro.packageInvalido(pn.toString()));
+		throw new ErroFatal();
+	}
+:}  
+packageDeclarationAux ENDPACKAGE
+\end{lstlisting}
+\normalsize
+
+A ação semântica anterior está asssociada à regra de produção:
+packageDeclaration ::= PACKAGE pathName packageDeclarationAux ENDPACKAGE, que é
+a regra de produção inicial da gramática. Nesta ação semântica, o parser do XMI
+é instanciado recebendo como pacote o valor de pn (variável usada para
+referenciar pathName), caso o pacote pn não exista no modelo, um log de erros
+é gerado e uma exceção do tipo ErroFatal é lançada.
 
 \section{Anexo - AnaliseSemantica.cup}
 \scriptsize
