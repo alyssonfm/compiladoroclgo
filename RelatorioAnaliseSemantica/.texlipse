@@ -1,0 +1,13 @@
+#TeXlipse project settings
+#Fri May 06 22:41:40 GMT-03:00 2011
+builderNum=4
+outputDir=
+makeIndSty=
+bibrefDir=
+outputFormat=pdf
+tempDir=tmp
+mainTexFile=RelatorioAnaliseSemantica.tex
+outputFile=RelatorioAnaliseSemantica.pdf
+langSpell=en
+markDer=true
+srcDir=
