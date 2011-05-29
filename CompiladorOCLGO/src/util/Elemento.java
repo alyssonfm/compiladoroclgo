@@ -51,8 +51,8 @@ public class Elemento {
 				return true;
 		}
 		
-		if(esperado.equalsIgnoreCase("Real") || passado.equalsIgnoreCase("Integer")){
-			if(esperado.equalsIgnoreCase("Integer") || passado.equalsIgnoreCase("Real")){
+		if(esperado.equalsIgnoreCase("Real") || passado.equalsIgnoreCase("Real")){
+			if(esperado.equalsIgnoreCase("Integer") || passado.equalsIgnoreCase("Integer")){
 				return true;
 			}
 		}
@@ -109,18 +109,18 @@ public class Elemento {
 		return null;
 	}
 	
-	public static String coercao(String valor, String tipo, String novoTipo){
+	public void coercao(String novoTipo){
+		String tipo = getAtributo("tipo");
 		if(tipo == "Integer" && novoTipo == "Real"){
 			Integer temp = Integer.parseInt(valor);
 			Double temp2 = temp.doubleValue();
-			return temp2.toString();			
+			valor = temp2.toString();			
 		}
 		if(tipo == "Real" && novoTipo == "Integer"){
 			Double temp = Double.parseDouble(valor);
 			Integer temp2 = temp.intValue();
-			return temp2.toString();			
+			valor = temp2.toString();			
 		}
-		return valor;
 	}
 
 }

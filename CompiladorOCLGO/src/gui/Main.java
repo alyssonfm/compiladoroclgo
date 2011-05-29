@@ -122,7 +122,7 @@ public class Main {
         	XMIParserBasic.getNewInstancia();
         	Gerador gerador = Gerador.getNewInstance();
         	LoggerGerador log = LoggerGerador.getNewInstance();
-            Util.setLog(log);
+            Util.setLog(LoggerGerador.getLogger());
                 try {
                         AnaliseLexica l = createScanner(fileName);
                         GeracaoCodigo g = new GeracaoCodigo(l);
