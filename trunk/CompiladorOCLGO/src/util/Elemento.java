@@ -5,8 +5,8 @@ import java.util.HashMap;
 public class Elemento {
 	
 	public String valor;
-	public int left;
-	public int right;
+	public Integer left;
+	public Integer right;
 	private HashMap<String, String> map;
 	
 	public Elemento() {
@@ -34,6 +34,8 @@ public class Elemento {
 	
 	@Override
 	public String toString() {
+		if(left == null || right == null)
+			return valor;
 		return valor + "(" + left + "," + right + ")";
 	}
 	

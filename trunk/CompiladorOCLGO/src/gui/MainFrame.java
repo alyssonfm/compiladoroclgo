@@ -17,6 +17,7 @@ import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import javax.swing.JRadioButton;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
+import util.LoggerGerador;
 import util.XMIParserBasic;
 
 @SuppressWarnings("serial")
@@ -58,6 +60,8 @@ final public class MainFrame extends Frame implements Handles {
   private Label labSpecification;
   private Label labOutDir;
   private Label labAnalysis;
+
+private JRadioButton geracao;
 
   //private GeneratorThread thread;
 
@@ -91,9 +95,10 @@ public MainFrame() {
     spec       = new TextField(10);            
     messages   = new TextArea(10000, 100);
     oclSpecification = new TextArea(1000, 100);
-    lexica = new JRadioButton("Léxica ", true);
+    lexica = new JRadioButton("Léxica ", false);
     sintatica = new JRadioButton("Sintática ", false);
     semantica = new JRadioButton("Semântica ", false);
+    geracao = new JRadioButton("Geracao ", true);
     btg = new ButtonGroup();
     radioPanel = new JPanel();
     labAnalysis = new Label("Analysis Output:");
@@ -173,11 +178,13 @@ public MainFrame() {
     btg.add(lexica);
     btg.add(sintatica);
     btg.add(semantica);
+    btg.add(geracao);
     
     radioPanel.setLayout(new GridLayout(3, 1));
     radioPanel.add(lexica);
     radioPanel.add(sintatica);
     radioPanel.add(semantica);
+    radioPanel.add(geracao);
     
     radioPanel.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createEtchedBorder(), "Análise: "));
@@ -254,6 +261,19 @@ public MainFrame() {
 			  messages.append("########  Iniciando Analise Semântica  ########\n");
 			  messages.append(Main.analiseSemantica(file, false).toString());
 			  messages.append("########  Finalizada Analise Semântica ########\n");
+		  }
+		  else if(geracao.isSelected()){
+			  LoggerGerador log = Main.geracaoCodigo(file, false);
+			  messages.append("########  Iniciando Geracao Codigo  ########\n");
+			  messages.append(log.toString() + "\n");
+			  messages.append("########  Finalizada Geracao Codigo ########\n");
+			  try {
+				BufferedWriter out = new BufferedWriter(new FileWriter("files\\out\\code.go", false));
+				out.write(log.getCode());
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		  }
 	}
 	  

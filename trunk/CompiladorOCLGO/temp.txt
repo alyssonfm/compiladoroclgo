@@ -1,2 +1,2 @@
-context Conta::debitar(pts:Integer): Boolean
-body: transacoes->any(true).cartao->any(valido).proprietario.idade() = transacoes->any(pontos = 0).pontos
+context Cliente::idade(): Integer
+body: if true then 1 else 2 endif 
