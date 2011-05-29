@@ -1,12 +1,16 @@
 package gui;
 
+import geracao_codigo.GeracaoCodigo;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java_cup.runtime.Symbol;
 import util.ErroFatal;
+import util.Gerador;
 import util.Logger;
+import util.LoggerGerador;
 import util.LoggerSemantico;
 import util.Util;
 import util.XMIParserBasic;
@@ -112,6 +116,34 @@ public class Main {
                         log.addMessage("Ocorreu algum erro lexico");
                 }
                 return log;
+        }
+
+        public static LoggerGerador geracaoCodigo(String fileName, boolean debug) {
+        	XMIParserBasic.getNewInstancia();
+        	Gerador gerador = Gerador.getNewInstance();
+        	LoggerGerador log = LoggerGerador.getNewInstance();
+            Util.setLog(log);
+                try {
+                        AnaliseLexica l = createScanner(fileName);
+                        GeracaoCodigo g = new GeracaoCodigo(l);
+                        if(debug){
+                                g.debug_parse();
+                        }else{
+                                g.parse();
+                        }
+                } catch (FileNotFoundException e) {
+                	log.addError("Arquivo nao encontrado!");
+                } catch (ErroFatal e) {
+        			log.addMessage("Erro na analise Semantica.");
+                } catch (Exception e) {
+                	e.printStackTrace();
+                	log.addMessage("Ocorreu algum erro sintatico");
+                }catch (Error e) {
+                        log.addError(e.getMessage());
+                        log.addMessage("Ocorreu algum erro lexico");
+                }
+                log.setCode(gerador.getCode());
+            	return log;
         }
         public static void main(String[] args) {
 			MainFrame mf = new MainFrame();

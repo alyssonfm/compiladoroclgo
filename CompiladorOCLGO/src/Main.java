@@ -1,3 +1,5 @@
+import geracao_codigo.GeracaoCodigo;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -116,6 +118,32 @@ public class Main {
 		}
 		System.out.println("########  Finalizada Analise Semantica ########");
 	}
+	
+	private static void geracaoCodigo(String fileName, boolean debug) {
+		System.out.println("########  Iniciando Analise Semantica  ########");
+		try {
+			AnaliseLexica l = createScanner(fileName);
+			GeracaoCodigo g = new GeracaoCodigo(l);
+			if(debug){
+				g.debug_parse();
+			}else{
+				g.parse();
+			}
+			System.out.print(LoggerSemantico.getInstance());
+		} catch (FileNotFoundException e) {
+			System.err.println("Arquivo nao encontrado!");
+		} catch (ErroFatal e) {
+			System.out.println("Erro na analise Semantica.");
+			System.out.print(LoggerSemantico.getInstance());
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Ocorreu algum erro sintatico");
+		}catch (Error e) {
+			e.printStackTrace();
+			System.out.println("Ocorreu algum erro lexico");
+		}
+		System.out.println("########  Finalizada Analise Semantica ########");
+	}
 
 	public static void main(String[] args) {
 		
@@ -125,8 +153,16 @@ public class Main {
 		System.out.println("COMPILADOR OCL -> GO");
 		System.out.println("Autores: Alysson, Delano e Nata");
 		
+		Scanner in;
+		System.out.print("Arquivo XML: ");
+		in = new Scanner(System.in);
+		try{
+			XMIParserBasic.setPath(in.nextLine());
+		}catch(Exception e){
+			System.out.println("Arquivo invalido.");
+		}
+		
 		if(args.length < 2){
-			Scanner in;
 			
 			if(args.length < 1){
 				System.out.print("Arquivo com consultas OCL: ");
@@ -136,12 +172,14 @@ public class Main {
 				System.out.println("1 - Analise Lexica");
 				System.out.println("2 - Analise Sintatica");
 				System.out.println("3 - Analise Semantica");
+				System.out.println("4 - Geracao Codigo");
 				in = new Scanner(System.in);
 				tipo = in.nextInt();
 			}else{
 				System.out.println("1 - Analise Lexica");
 				System.out.println("2 - Analise Sintatica");
 				System.out.println("3 - Analise Semantica");
+				System.out.println("4 - Geracao Codigo");
 				in = new Scanner(System.in);
 				tipo = in.nextInt();
 				filePath = args[0];
@@ -155,7 +193,6 @@ public class Main {
 				System.exit(0);
 			}
 		}
-		XMIParserBasic.setPath("files//in//Profe2.xml");
 		
 		if(tipo == 1){
 			analiseLexica(filePath);
@@ -163,14 +200,16 @@ public class Main {
 			analiseSintatica(filePath, false);
 		}else if(tipo == 3){
 			analiseSemantica(filePath, false);
+		}else if(tipo == 4){
+			geracaoCodigo(filePath, false);
 		}else{
-			System.out.println("Deve escolher entre 1, 2 ou 3.");
+			System.out.println("Deve escolher entre 1, 2, 3 ou 4.");
 		}
 		
 		System.out.println("Obrigado por usar nosso compilador!");
 		System.out.println("Pressione ENTER para sair.");
-		//Scanner in = new Scanner(System.in);
-		//in.nextLine();
+		in = new Scanner(System.in);
+		in.nextLine();
 		
 	}
 

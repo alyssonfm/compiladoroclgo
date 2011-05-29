@@ -14,5 +14,5 @@ public class LoggerSemantico extends Logger {
 		instancia = new LoggerSemantico();
 		return instancia;
 	}
-
+	
 }

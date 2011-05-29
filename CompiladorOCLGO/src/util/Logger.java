@@ -34,6 +34,10 @@ public class Logger {
 		return out;
 	}
 	
+	public boolean hasError(){
+		return errors.size() > 0 ? true:false;
+	}
+	
 	public String getMessages(){
 		String out = "";
 		if(messages.size() > 0){
