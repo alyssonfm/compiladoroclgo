@@ -1,6 +1,6 @@
 package util;
 
-public class LoggerGerador extends LoggerSemantico{
+public class LoggerGerador{
 	
 	private static LoggerGerador instancia;
 	private static LoggerSemantico semantico;
@@ -14,6 +14,10 @@ public class LoggerGerador extends LoggerSemantico{
 		semantico = LoggerSemantico.getNewInstance();
 		instancia = new LoggerGerador();
 		return instancia;
+	}
+	
+	public static LoggerSemantico getLogger(){
+		return semantico;
 	}
 	
 	private String code;
@@ -30,7 +34,13 @@ public class LoggerGerador extends LoggerSemantico{
 	public String toString() {
 		if(semantico.hasError())
 			return semantico.toString();
-		return semantico.toString() + "\n" + code;
+		return code;
+	}
+	public void addError(String error) {
+		semantico.addError(error);
+	}
+	public void addMessage(String message) {
+		semantico.addMessage(message);
 	}
 	
 

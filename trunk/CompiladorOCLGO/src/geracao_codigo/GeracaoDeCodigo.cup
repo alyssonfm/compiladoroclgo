@@ -274,12 +274,16 @@ relationalExpression ::= additiveExpression:add relationalExpressionAux:aux {:
 			}
 		}
 		val.setAtributo("tipo", "Boolean");
+		val.setAtributo("code", TemplateCode.RELATIONALEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"), auxElem.getAtributo("code")));
 	}
 	RESULT = val;
 :}; 
 relationalExpressionAux ::= relationalOperator:op additiveExpression:add relationalExpressionAux:aux {:
 	Elemento val = (Elemento) add;
-	val.setAtributo("operacao", op.toString());
+	Elemento oper = (Elemento) op;
+	val.setAtributo("code", val.getAtributo("code"));
+	val.setAtributo("operacao", oper.toString());
+	val.setAtributo("operacaoCode", oper.getAtributo("code"));
 	if((val.getAtributo("operacao") != "=") && (val.getAtributo("operacao") != "<>")){
 		if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
 			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
@@ -292,7 +296,9 @@ relationalExpressionAux ::= relationalOperator:op additiveExpression:add relatio
 				LoggerSemantico.getInstance().addError(StringErro.tipoDiferentes(val.toString(), auxElem.toString(), val.getAtributo("tipo"), auxElem.getAtributo("tipo")));
 			}
 		}
+		auxElem.coercao(val.getAtributo("tipo"));
 		val.setAtributo("tipo", "Boolean");
+		val.setAtributo("code", TemplateCode.RELATIONALEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"),auxElem.getAtributo("code")));
 	}
 	RESULT = val;
 :} 
@@ -638,14 +644,66 @@ expressionParameterAux ::= COMMA oclExpression:exp expressionParameterAux:aux {:
 
 logicalOperator ::= AND | OR | XOR | IMPLIES;
 
-relationalOperator ::= EQ {: RESULT = "="; :} 
-|NE {: RESULT = "<>"; :}
-|LE {: RESULT = "<="; :}
-|GE {: RESULT = ">="; :}
-|GT {: RESULT = "<"; :}
-|LT {: RESULT = ">"; :};
+relationalOperator ::= EQ {:
+	Elemento elem = new Elemento("=");
+	elem.setAtributo("code", "=="); 
+	RESULT = elem; 
+:} 
+|NE {: 
+	Elemento elem = new Elemento("<>");
+	elem.setAtributo("code", "!="); 
+	RESULT = elem; 
+:}
+|LE {: 
+	Elemento elem = new Elemento("<=");
+	elem.setAtributo("code", "<="); 
+	RESULT = elem; 
+:}
+|GE {: 
+	Elemento elem = new Elemento(">=");
+	elem.setAtributo("code", ">="); 
+	RESULT = elem; 
+:}
+|GT {: 
+	Elemento elem = new Elemento(">");
+	elem.setAtributo("code", ">"); 
+	RESULT = elem;
+:}
+|LT {: 
+	Elemento elem = new Elemento("<");
+	elem.setAtributo("code", "<"); 
+	RESULT = elem; 
+:};
 
-addOperator ::= PLUS | MINUS;
-multiplyOperator ::= TIMES | DIVIDE;
-unaryOperator ::= MINUS {: RESULT = "-"; :}
-|NOT {: RESULT = "NOT"; :};
+addOperator ::= PLUS {:
+	Elemento elem = new Elemento("+");
+	elem.setAtributo("code", "+"); 
+	RESULT = elem;
+:} 
+|MINUS{:
+	Elemento elem = new Elemento("-");
+	elem.setAtributo("code", "-"); 
+	RESULT = elem;
+:};
+
+multiplyOperator ::= TIMES{:
+	Elemento elem = new Elemento("*");
+	elem.setAtributo("code", "*"); 
+	RESULT = elem;
+:} 
+|DIVIDE{:
+	Elemento elem = new Elemento("/");
+	elem.setAtributo("code", "/"); 
+	RESULT = elem;
+:};
+
+unaryOperator ::= MINUS {:
+	Elemento elem = new Elemento("-");
+	elem.setAtributo("code", "-"); 
+	RESULT = elem; 
+:}
+|NOT {: 
+	Elemento elem = new Elemento("NOT");
+	elem.setAtributo("code", "!"); 
+	RESULT = elem; 
+:};
