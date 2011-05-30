@@ -39,6 +39,7 @@ final public class MainFrame extends Frame implements Handles {
   private Button specChoose; 
   private Button dirChoose;
   private Button compile;
+  private Button execute;
   
   private JRadioButton lexica;
   private JRadioButton sintatica;
@@ -81,6 +82,7 @@ public MainFrame() {
     quit       = new Button("Quit");
     dirChoose  = new Button("Browse");
     compile	   = new Button("Compilar");
+    execute    = new Button("Executar");
     specChoose = new Button("Browse");
     spec       = new TextField(10);
     dir        = new TextField(10);
@@ -152,6 +154,12 @@ public MainFrame() {
 			compile();
 		}
 	});
+    
+    execute.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			execute();
+		}
+	});
       
     btg.add(lexica);
     btg.add(sintatica);
@@ -183,7 +191,8 @@ public MainFrame() {
     other.add(0, 3, 2, 1, messages);
     
     other.add(2, 1, radioPanel);
-    other.add(2, 3, compile);
+    other.add(2, 2, compile);
+    other.add(2, 3, execute);
     north.add(2,0, quit);
     north.add(2,2, generate);
  
@@ -210,25 +219,25 @@ public MainFrame() {
   }
   
 private void compile(){
-	/*if (XMIParserBasic.getPath() == null) {
+	if (XMIParserBasic.getPath() == null) {
 		messages.append("Erro, escolha o arquivo XML ...");
 	}else{
 		try{
 			Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");
 			Runtime.getRuntime().exec("c:\\Go\\bin\\8l files\\out\\code.8");
-			Runtime.getRuntime().exec("\\files\\out\\8.out.exe");
 		}catch (IOException e){
 			e.printStackTrace();
 		}
-	}*/
-	try{
-		Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");
-		Runtime.getRuntime().exec("c:\\Go\\bin\\8l files\\out\\code.8");
-		Runtime.getRuntime().exec("8.out.exe");
-	}catch (IOException e){
-		e.printStackTrace();
-	}
+	}	
   }
+
+	private void execute(){
+		try {
+			Runtime.getRuntime().exec("8.out.exe");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
   private void generate() {  
 	  if (XMIParserBasic.getPath() == null) {
