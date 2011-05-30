@@ -18,7 +18,6 @@ import java.awt.event.TextListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -26,8 +25,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.Popup;
-import javax.swing.PopupFactory;
 
 import util.LoggerGerador;
 import util.XMIParserBasic;
@@ -35,15 +32,14 @@ import util.XMIParserBasic;
 @SuppressWarnings("serial")
 final public class MainFrame extends Frame implements Handles {
 
-  private volatile boolean choosing;
-
   private String fileName = "";
-  private String dirName = "";
   
   private Button quit; 
   private Button generate;
   private Button specChoose; 
   private Button dirChoose;
+  private Button compile;
+  
   private JRadioButton lexica;
   private JRadioButton sintatica;
   private JRadioButton semantica;
@@ -58,16 +54,10 @@ final public class MainFrame extends Frame implements Handles {
   
   private Label labXml;
   private Label labSpecification;
-  private Label labOutDir;
   private Label labAnalysis;
 
 private JRadioButton geracao;
 
-  //private GeneratorThread thread;
-
-  //private OptionsDialog dialog;
-
-  
   @SuppressWarnings("deprecation")
 public MainFrame() {
     super("Compilador Ocl -> Go ");
@@ -90,9 +80,10 @@ public MainFrame() {
     generate   = new Button("Run");
     quit       = new Button("Quit");
     dirChoose  = new Button("Browse");
-    dir        = new TextField(10);
+    compile	   = new Button("Compilar");
     specChoose = new Button("Browse");
-    spec       = new TextField(10);            
+    spec       = new TextField(10);
+    dir        = new TextField(10);
     messages   = new TextArea(10000, 100);
     oclSpecification = new TextArea(1000, 100);
     lexica = new JRadioButton("Léxica ", false);
@@ -102,7 +93,7 @@ public MainFrame() {
     btg = new ButtonGroup();
     radioPanel = new JPanel();
     labAnalysis = new Label("Analysis Output:");
-    labOutDir = new Label("Output directory:");
+    new Label("Output directory:");
     labSpecification = new Label("Ocl Specification: ");
     labXml = new Label("XML Model:");
 
@@ -123,7 +114,7 @@ public MainFrame() {
     generate.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e) {
     	  messages.setText("");
-        generate();
+    	  generate();
       }
     } );
 
@@ -139,12 +130,6 @@ public MainFrame() {
       }
     } );
 
-   /* dirChoose.addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        dirChoose();
-      }
-    } );*/
-
     spec.addActionListener( new ActionListener() {
       public void actionPerformed(ActionEvent e) {
     	  if (spec.getText() == null) {
@@ -152,7 +137,6 @@ public MainFrame() {
 		} else{
 			fileName = spec.getText();
 		}        
-        //generate();
       }
     } );
     
@@ -162,19 +146,13 @@ public MainFrame() {
       }
     } );
     
-    /*dir.addActionListener( new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        dirName = dir.getText();
-        //generate();
-      }
-    } );
-    
-    dir.addTextListener( new TextListener() {
-      public void textValueChanged(TextEvent e) {
-        dirName = dir.getText();
-      }
-    } );*/
-    
+    compile.addActionListener(new ActionListener() {		
+		public void actionPerformed(ActionEvent e) {
+			messages.setText("");
+			compile();
+		}
+	});
+      
     btg.add(lexica);
     btg.add(sintatica);
     btg.add(semantica);
@@ -197,10 +175,6 @@ public MainFrame() {
     north.add( 0,0, BOTTOM, labXml);
     north.add( 0,1, 2,1, spec);
     north.add( 2,1, specChoose);
-
-    /*north.add( 0,2, BOTTOM, labOutDir);
-    north.add( 0,3, 2,1, dir);
-    north.add( 2,3, dirChoose);*/
     
     other.add( 0, 0, BOTTOM, labSpecification);
     other.add( 0, 1, 2, 1, oclSpecification);
@@ -209,6 +183,7 @@ public MainFrame() {
     other.add(0, 3, 2, 1, messages);
     
     other.add(2, 1, radioPanel);
+    other.add(2, 3, compile);
     north.add(2,0, quit);
     north.add(2,2, generate);
  
@@ -232,6 +207,20 @@ public MainFrame() {
     dir.setEnabled( !enable );
     specChoose.setEnabled( !enable );
     spec.setEnabled( !enable );
+  }
+  
+private void compile(){
+	if (XMIParserBasic.getPath() == null) {
+		messages.append("Erro, escolha o arquivo XML ...");
+	}else{
+		try{
+			Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");
+			Runtime.getRuntime().exec("c:\\Go\\bin\\8l files\\out\\code.8");
+			//Runtime.getRuntime().exec("\\files\\out\\8.out.exe");
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+	}
   }
 
   private void generate() {  
@@ -283,26 +272,9 @@ public MainFrame() {
     setVisible(false);
     System.exit(0);
   }
-  
- /* @SuppressWarnings("deprecation")
-private void dirChoose() {
-    choosing = true;
-    
-    FileDialog d = new FileDialog(this, "Choose directory", FileDialog.LOAD);
-    
-    d.show();
-    
-    if (d.getDirectory() != null) {
-      dir.setText( (new File(d.getDirectory())).getAbsolutePath() );
-    }
-    
-    choosing = false;    
-  }*/
 
   @SuppressWarnings("deprecation")
 private void specChoose() {
-    choosing = true;
-    
     FileDialog d = new FileDialog(this, "Choose file XML", FileDialog.LOAD);
     
     d.show();
@@ -314,9 +286,7 @@ private void specChoose() {
     } else
     {
     	messages.append("Erro, escolha o arquivo XML ...");
-    }
-    
-    choosing = false;    
+    }    
   }
     
 }
