@@ -86,9 +86,9 @@ public MainFrame() {
     dir        = new TextField(10);
     messages   = new TextArea(10000, 100);
     oclSpecification = new TextArea(1000, 100);
-    lexica = new JRadioButton("L√©xica ", false);
-    sintatica = new JRadioButton("Sint√°tica ", false);
-    semantica = new JRadioButton("Sem√¢ntica ", false);
+    lexica = new JRadioButton("LÈxica ", false);
+    sintatica = new JRadioButton("Sint·tica ", false);
+    semantica = new JRadioButton("Sem‚ntica ", false);
     geracao = new JRadioButton("Geracao ", true);
     btg = new ButtonGroup();
     radioPanel = new JPanel();
@@ -165,7 +165,7 @@ public MainFrame() {
     radioPanel.add(geracao);
     
     radioPanel.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createEtchedBorder(), "An√°lise: "));
+            BorderFactory.createEtchedBorder(), "An·lise: "));
     
     GridPanel north = new GridPanel(3,3,10,10);
     north.setInsets( new Insets(5,8,10,10) );
@@ -210,16 +210,23 @@ public MainFrame() {
   }
   
 private void compile(){
-	if (XMIParserBasic.getPath() == null) {
+	/*if (XMIParserBasic.getPath() == null) {
 		messages.append("Erro, escolha o arquivo XML ...");
 	}else{
 		try{
 			Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");
 			Runtime.getRuntime().exec("c:\\Go\\bin\\8l files\\out\\code.8");
-			Runtime.getRuntime().exec("8.out.exe");
+			Runtime.getRuntime().exec("\\files\\out\\8.out.exe");
 		}catch (IOException e){
 			e.printStackTrace();
 		}
+	}*/
+	try{
+		Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");
+		Runtime.getRuntime().exec("c:\\Go\\bin\\8l files\\out\\code.8");
+		Runtime.getRuntime().exec("8.out.exe");
+	}catch (IOException e){
+		e.printStackTrace();
 	}
   }
 
@@ -237,19 +244,19 @@ private void compile(){
 			e.printStackTrace();
 		}
 		  if(lexica.isSelected()) {
-			  messages.append("########  Iniciando Analise L√©xica  ########\n");
+			  messages.append("########  Iniciando Analise LÈxica  ########\n");
 			  messages.append(Main.analiseLexica(file).toString());
-			  messages.append("########  Finalizada Analise L√©xica ########\n");
+			  messages.append("########  Finalizada Analise LÈxica ########\n");
 		  }
 		  else if(sintatica.isSelected()) {
-			  messages.append("########  Iniciando Analise Sint√°tica  ########\n");
+			  messages.append("########  Iniciando Analise Sint·tica  ########\n");
 			  messages.append(Main.analiseSintatica(file, false).toString());
-			  messages.append("########  Finalizada Analise Sint√°tica ########\n");
+			  messages.append("########  Finalizada Analise Sint·tica ########\n");
 		  }
 		  else if(semantica.isSelected()){
-			  messages.append("########  Iniciando Analise Sem√¢ntica  ########\n");
+			  messages.append("########  Iniciando Analise Sem‚ntica  ########\n");
 			  messages.append(Main.analiseSemantica(file, false).toString());
-			  messages.append("########  Finalizada Analise Sem√¢ntica ########\n");
+			  messages.append("########  Finalizada Analise Sem‚ntica ########\n");
 		  }
 		  else if(geracao.isSelected()){
 			  LoggerGerador log = Main.geracaoCodigo(file, false);
