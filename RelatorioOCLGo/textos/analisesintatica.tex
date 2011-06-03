@@ -1,0 +1,211 @@
+\section{Análise Sintática}
+
+\subsection{Ferramenta JCup}
+
+A ferramenta \textbf{JCup} gera analisadores sintáticos em Java a partir da
+especificação dos terminais, não terminais e das regras de produção da gramática
+a ser utilizada na análise sintática. A especificação requerida é escrita
+utilizando a linguagem \textbf{JCup} (um clone da linguagem YACC - do UNIX), que
+tem como extensão \textbf{.cup}.
+
+\begin{figure}[h!] 
+	\centering
+		\includegraphics[scale=0.5]{imagens/analiseSintatica.png}
+	\caption{(Esquema - ferramenta JCup.)}
+\end{figure}
+
+O esquema acima, ilustra a ferramenta JCup recebendo como entrada o arquivo
+\textbf{AnaliseSintatica.cup} e gerando as classes
+\textbf{AnaliseSintatica.java} e \textbf{sym.java}. Em linhas gerais, o código
+resultante lê um arquivo de entrada, chama o analisador léxico para extrair os tokens e constrói a árvore de derivação de acordo com as regras de produção e a gramática associada.
+
+\subsection{Linguagem JCup}
+
+O arquivo \textbf{AnaliseSintatica.cup} é dividido em quatro seções. A primeira seção
+possui a declaração de ''packages'' e \textit{imports}, que serão inseridos no
+topo do arquivo gerado pelo JCup (similar à primeira seção do arquivo de especificação do JFlex), e diretivas do JCup. A segunda seção contém a declaração de terminais e não-terminais. Na terceira seção é definida a precedência e associatividade de terminais. Na quarta seção é definida a gramática.
+
+\subsection{Explicitando o arquivo AnaliseSintatica.cup}
+
+A seguir será explicado o código do arquivo \textit{AnaliseSintatica.cup}. As
+linhas que são citadas nas próximas seções referem-se aos códigos que estão na
+seção Anexo, mais especificamente Anexo B - Arquivo AnaliseSintatica.cup.
+
+\subsection{Primeira Seção}
+
+\subsubsection{Declaração de pacotes e imports}
+
+Na primeira seção são descritos trechos de código Java. Na linha 1 é definido o
+pacote \verb!analise_sintatica!. Nas linhas 2 e 3 são realizados os imports para
+a classe Symbol  e Util, objetivando auxiliar a manipulação dos terminais, não terminais e das regras de produção do analisador a ser gerado.
+
+\subsubsection{Diretivas JCup}
+
+As diretivas do JCup nos permitem definir variáveis e métodos para a classe do
+Analisador Sintático, similarmente ao que ocorre com a diretiva \verb!%{...}%!
+do JLex. Das linhas 5 a 22, por meio da diretiva \textbf{parser code}, são
+descritos códigos Java que serão inseridos na classe do Analisador Sintático.
+
+\subsection{Segunda Seção}
+
+Na segunda seção é realizada a declaração da lista de símbolos que será
+utilizada pelo analisador sintático, onde são definidos os terminais e os não
+terminais da gramática. A sintaxe usada para definição dos terminais é a
+seguinte: \textbf{terminal [classe] nome0, nome1, ...;} - os terminais da
+gramática são definidos nas linhas de 24 a 35. Para a definição dos não terminais, a sintaxe é
+bem similar: \textbf{non terminal [classe] nome0, nome1, ...;} -  os não
+terminais, são definidos das linhas 37 a 80.
+
+\subsubsection{Terminais}
+
+Os terminais definidos para a gramática, que correspondem aos tokens gerados na análise léxica,  foram os seguintes:
+
+\verb!PACKAGE!, \verb!ENDPACKAGE!, \verb!CONTEXT!, \verb!BODY!,
+\verb!COLLECTION!, \verb!DOT!, \verb!COMMA!, \verb!COLON!, \verb!PATHNAME!,
+\verb!LEFT_PAR!, \verb!LEFT_BRK!, \verb!LEFT_BRA!, \verb!RIGHT_PAR!,
+\verb!RIGHT_BRK!, \verb!RIGHT_BRA!, \verb!COLLECTIONOPERATION!, \verb!EQ!,
+\verb!NE!, \verb!LE!, \verb!GE!, \verb!GT!, \verb!LT!, \verb!AND!, \verb!OR!,
+\verb!NOT!, \verb!XOR!, \verb!IMPLIES!, \verb!IF!, \verb!ELSE!, \verb!THEN!,
+\verb!ENDIF!, \verb!PLUS!, \verb!MINUS!, \verb!TIMES!, \verb!DIVIDE!,
+\verb!Integer INTEGER!, \verb!Double REAL!, \verb!String STRING!,
+\verb!IDENTIFIER!, \verb!BOOLEAN!, \verb!BAR!, \verb!INTEGERTYPE!,
+\verb!REALTYPE!, \verb!BOOLEANTYPE!, \verb!STRINGTYPE, SELF!.
+
+\subsubsection{Não Terminais}
+
+Os não terminais, que representam sequência de caracteres terminais e/ou não
+terminais, definidos foram os seguintes:
+
+packageDeclaration, packageDeclarationAux, contextDeclaration, bodyDeclaration,
+operation, operationParAux, oclExpression, parameters, pathName, pathNameAux, pathNameOperation, collectionTypeIdentifier, ifExp, collectionType, typeName, variableDeclaration, relationalExpression, relationalExpressionAux, additiveExpression, additiveExpressionAux, multiplicativeExpression, multiplicativeExpressionAux, postfixExpression, postfixExpressionAux, operationCall, propertyCall, propertyCallParameters, declarator, declaratorAux, literalCollection, expressionParameter, expressionParameterAux, qualifiers, primaryExpression, unaryExpression, oclExpressionAux, unaryOperator, multiplyOperator, addOperator, relationalOperator, logicalOperator, literal, primaryTypes, colonPathName.
+
+\subsection{Terceira Seção}
+
+Na terceira seção são definidas as precedências e associatividades dos
+terminais, que possuem a seguinte sintaxe:
+\textbf{precedence left terminal [, terminal, ...]; }
+\textbf{precedence right terminal [, terminal, ...]; }
+\textbf{precedence nonassoc terminal [, terminal, ...];}
+
+
+A precedência definida para gramática  (descrita das linhas 82 a 92) cresce de
+cima para baixo, logo, os operadores ''->'' (COLLECTIONOPERATION) e ''.'' (DOT) 
+tem a maior precedência, seguidos pelos parênteses (\verb!LEFT_PAR! e
+\verb!RIGHT_PAR!), operador ''not'' (NOT), operadores de multiplicação e divisão
+(TIMES e DIVIDE), operadores de soma e subtração (PLUS e MINUS), símbolos que
+formam a expressão ''if-then-else'' (IF, THEN, ELSE e ENDIF), operadores
+comparação (LE, GE, GT, LT, EQ, NE), operadores lógicos (AND, OR e XOR),
+operador lógico ''implies'' (IMPLIES) e pela vírgula (COMMA).
+
+\subsection{Quarta Seção}
+
+Na quarta seção ocorre a especificação das regras de produção da gramática, que
+são definidas da seguinte forma:
+\textbf{não terminal ::= <símbolos e ações>}
+Os símbolos à direita de ''::='' podem ser terminais ou não terminais. As ações
+correspondem ao código que será executado quando a regra de produção é aplicada.
+Além disso, é possível definir a diretiva opcional: \textbf{start with non terminal;}, à qual indica qual é o não terminal inicial da gramática. Se essa diretiva for omitida, o Analisador Sintático assume o primeiro não terminal declarado nas produções da gramática.
+
+\subsubsection{Gramática}
+
+Para definição da gramática a ser utilizada nesse projeto foi realizada uma
+redução da gramática OCL. Uma vez que o projeto propõe a construção de um
+compilador de \textbf{operações de consulta em OCL para Go}, restringiu-se as
+regras de produção àquelas necessárias para cobrir o escopo do projeto.
+
+Na linha 94, define-se como símbolo inicial da gramática o não-terminal
+\textbf{packageDeclaration}. Das linhas 96 a 156 são definidas as regras de
+produção.
+
+\subsection{Explicação das regras de produção da Gramática}
+
+Para explicar as regras de produção da gramática será apresentada a árvore de
+derivação do seguinte trecho de OCL:
+
+\scriptsize
+\begin{lstlisting}[caption={Trecho 1}]
+package Behavioral_Elements::Activity_Graphs
+context Person::getSon(): Set(Person)
+body: Person.allInstances->select(s | s.father = fathername)
+endpackage
+\end{lstlisting}
+\normalsize
+
+As restrições de OCL deverão está em um arquivo. Este, poderá ter somente um
+pacote (package) contendo zero ou mais restrições. Esta forma estrutural é
+definida pela regra \textbf{packageDeclaration} (linha 96). Abaixo, um exemplo
+de derivação a partir desta regra.
+
+\begin{figure}[h!]
+\centering
+	\includegraphics[scale=0.3]{imagens/ex1.png}
+	\caption{Árvore de Derivação da regra packageDeclaration}
+\end{figure}
+
+A regra \textbf{packageDeclarationAux} (linha 97) permite definir várias
+restrições em um mesmo pacote. A imagem a seguir apresenta a árvore de derivação
+partindo desta regra.
+
+\begin{figure}[h!]
+\centering
+	\includegraphics[scale=0.3]{imagens/ex2.png}
+	\caption{Árvore de Derivação da regra packageDeclarationAux}
+\end{figure}
+
+Como se pode perceber, a regra \textbf{packageDeclarationAux} deriva para
+\textbf{contextDeclaration} (linha 101), que a partir dela pode-se definir o
+contexto (terminal \textbf{context} seguido pela regra \textbf{operation}) e o
+corpo da operação (a partir do não terminal \textbf{bodyDeclaration}). A regra
+\textbf{operation} permite definir os nomes dos pacotes e da operação
+(\textbf{pathnameOperation} - linha 100), além dos parâmetros e do tipo de
+retorno (\textbf{typeName} - linha 111). 
+Para definir o corpo da operação, é
+utilizada a regra \textbf{bodyDeclaration} (linha 103), como pode-se ver abaixo:
+
+\begin{figure}[h!]
+\centering
+	\includegraphics[scale=0.3]{imagens/ex3.png}
+	\caption{Árvore de Derivação da regra bodyDeclaration}
+\end{figure}
+
+A regra \textbf{bodyDeclaration} é composta de um \textbf{BODY}, seguido por um
+\textbf{COLON} e uma regra \textbf{relationalExpression}. Na figura anterior,
+são apresentadas todas as derivações utilizadas para se chegar do
+\textbf{bodyDeclaration} até a expressão do \textbf{Trecho 1} correspondente.
+Sua continuação é apresentada a seguir.
+
+A seguir é apresentado é apresentada a árvore de derivação para a regra
+\textbf{propertyCall} utilizada no complemento da árvore de derivação da regra
+anterior, representando os passos para derivar o trecho de código:
+\textbf{select(s | \ldots)} do \textbf{Trecho 1}.
+
+\begin{figure}[h!]
+\centering
+	\includegraphics[scale=0.3]{imagens/ex4.png}
+	\caption{Árvore de Derivação da regra propertyCall}
+\end{figure}
+
+Conforme podemos observar, a regra \textbf{propertyCall} é composta por um
+\textbf{pathName} e \textbf{propertyCallParameters}. A regra
+\textbf{propertyCallParameters}, por sua vez é composta de
+\verb!LEFT_PAR!, \textbf{declarator} e \verb!RIGHT_PAR!.
+
+\subsection{Observações}
+
+Apenas letras minúsculas para operações pré-definidas e keywords em OCL.
+O analisador sintático é case sensitive.
+
+
+\subsection{Ambiguidade}
+Ocorre ambiguidade na regra pathNameCS (pathName), como solução tirou-se
+\verb!pathName :: IDENTIFIER! e colocou-se IDENTIFIER pathNameAux.
+
+A gramática OCL possui ambiguidades que geram conflitos de
+shift/reduce, porém, o JCup resolve esses conflitos. No nosso caso, os conflitos
+resolvidos são entre: pathNameAux e expressionParameterAux - resolvido em favor
+da primeira produção; pathNameAux e declaratorAux - resolvido em favor
+da primeira produção; pathNameAux sob o símbolo \verb!RIGHT_PAR! - resolvido
+em favor de deslocamento; expressionParameterAux e declaratorAux - resolvido em
+favor da segunda produção; expressionParameterAux sob o símbolo \verb!RIGHT_PAR!
+- resolvido em favor de deslocamento; e declaratorAux sob o símbolo \verb!RIGHT_PAR!
+- resolvido em favor de deslocamento.
