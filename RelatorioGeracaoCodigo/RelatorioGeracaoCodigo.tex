@@ -1,0 +1,56 @@
+\documentclass[a4paper,12pt,dvipdfm]{article}
+
+\usepackage{sbc-template}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[pdftex,raiselinks=false,colorlinks=true,linkcolor=blue,anchorcolor=blue,citecolor=blue,filecolor=blue,urlcolor=blue,linktocpage=true,bookmarksopen=true,pagebackref=true]{hyperref}
+\usepackage[latin1]{inputenc}  
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage[brazil]{babel}
+
+\title{Relatório de Geração de Código \newline Operações de Consulta OCL -
+Go}
+
+\author{Alysson Milanez\inst{1}\\ Delano Oliveira\inst{1}\\ Natã Melo\inst{1}}
+
+\address{
+  Departamento de Sistemas e Computação\\
+  Universidade Federal de Campina Grande (UFCG) -- Campina Grande, PB -- Brasil
+  \email{\{alyssonfilgueira, delanohelio, nata.venancio.melo\}@gmail.com}
+}
+
+\sloppy
+
+\pagenumbering{arabic}
+
+\begin{document}
+\maketitle
+\tableofcontents{}
+\newpage
+\section{Introdução}
+%
+A geração de código representa a última etapa de construção de compiladores, é a etapa de síntese, na qual o compilador realiza uma das suas tarefas mais importantes, que é o mapeamento de uma linguagem fonte numa linguagem destino. Para realizar tal mapeamento o compilador realiza uma série de análises sobre o código fonte na busca por erros léxicos, sintáticos ou semânticos, uma vez que tais erros não existam, o código é então mapeado para a linguagem destino. O programa na linguagem destino deve preservar o significado semântico do programa fonte.
+%
+\newpage
+\section{Geração de Código}
+%
+%
+\newpage
+\section{Conclusão}
+%
+Nessa, que é a última etapa do projeto, desenvolvemos o componente de
+síntese do nosso compilador. Ao longo do desenvolvimento do projeto, fizemos
+uso das ferramentas JFlex para o analisador léxico e do o JCup para o
+analisador sintático, para o analisador semântico e para geração de código. 
+
+O desenvolvimento do projeto nos proporcionou colocar em prática toda a teoria que
+vimos em sala de aula, desde a especificação das expressões regulares utilizada
+para criação dos tokens, até a geração de código numa linguagem destino (no
+nosso caso, Linguagem Go) por meio da
+definição de templates para realizar a geração do código destino dado a
+realização prévia das análises do código fonte. Implementamos tanto o front-end
+quanto o back-end de um compilador, (quase) todos os seus componentes (exceto
+os otimizadores de código).
+%
+\end{document}
