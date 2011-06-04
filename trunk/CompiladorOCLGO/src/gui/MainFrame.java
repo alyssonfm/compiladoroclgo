@@ -157,6 +157,7 @@ public MainFrame() {
     
     execute.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
+			messages.setText("");
 			execute();
 		}
 	});
@@ -232,10 +233,14 @@ private void compile(){
   }
 
 	private void execute(){
-		try {
-			Runtime.getRuntime().exec("8.out.exe");
-		} catch (IOException e) {
-			e.printStackTrace();
+		 if (XMIParserBasic.getPath() == null) {
+				messages.append("Erro, escolha o arquivo XML ...");
+		} else {
+			try {
+				Runtime.getRuntime().exec("8.out.exe");
+			} catch (IOException e) {
+				messages.append(e.getMessage());
+			}
 		}
 	}
 
