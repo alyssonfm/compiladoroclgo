@@ -239,7 +239,7 @@ private void compile(){
 			try {
 				Runtime.getRuntime().exec("8.out.exe");
 			} catch (IOException e) {
-				messages.append(e.getMessage());
+				
 			}
 		}
 	}
