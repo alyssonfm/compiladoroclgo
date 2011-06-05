@@ -14,4 +14,8 @@ public class TemplateCode {
 		return "(" + left + " " + operador + " " + right + ")";		
 	}
 	
+	public static String ARITIMETICEXPRESSION(String left, String operador, String right){
+		return left + " " + operador + " " + right;		
+	}
+	
 }

@@ -137,6 +137,7 @@ bodyDeclaration:b {:
 	val.setAtributo("tipo", Elemento.max(val.getAtributo("tipo"), body.getAtributo("tipo")));
 	RESULT = val;
 	XMIParserBasic.getInstancia().deleteAllVariaveis();
+	Gerador.getInstance().gen(body.getAtributo("code"));
 :};
 
 bodyDeclaration ::= BODY COLON oclExpression:exp {: 
@@ -254,22 +255,44 @@ variableDeclaration ::= IDENTIFIER:id COLON typeName:type {:
 :};
 
 oclExpression ::= relationalExpression:r oclExpressionAux:aux {:
-	RESULT = r;
+	
+	Elemento val = (Elemento) r;
+	
 	if(aux != null){
-		Elemento rel = (Elemento) r;
-		if(rel.getAtributo("tipo") != "Boolean"){
-			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(rel.toString(), "Boolean"));
+		if(val.getAtributo("tipo") != "Boolean"){
+			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Boolean"));
 		}
 		
+		Elemento auxElem = (Elemento) aux;
+		if(auxElem.getAtributo("operacao").equalsIgnoreCase("IMPLIES")){
+			val.setAtributo("code", Gerador.getInstance().addIMPLIES(val.getAtributo("code"), auxElem.getAtributo("code")));		
+		}else{
+			val.setAtributo("code", TemplateCode.RELATIONALEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"), auxElem.getAtributo("code")));
+		}
+	}
+	RESULT = val;
+:};
+oclExpressionAux ::= logicalOperator:op relationalExpression:r oclExpressionAux:aux {:
+	Elemento val = (Elemento) r;
+	Elemento oper = (Elemento) op;
+	
+	val.setAtributo("operacao", oper.toString());
+	val.setAtributo("operacaoCode", oper.getAtributo("code"));
+	  
+	if(val.getAtributo("tipo") != "Boolean"){
+		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Boolean"));
 	}
 	
-:};
-oclExpressionAux ::= logicalOperator relationalExpression:r oclExpressionAux {:
-	Elemento rel = (Elemento) r;  
-	if(rel.getAtributo("tipo") != "Boolean"){
-		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(rel.toString(), "Boolean"));
+	if(aux != null){
+		Elemento auxElem = (Elemento) aux;
+		if(auxElem.getAtributo("operacao").equalsIgnoreCase("IMPLIES")){
+			val.setAtributo("code", Gerador.getInstance().addIMPLIES(val.getAtributo("code"), auxElem.getAtributo("code")));		
+		}else{
+			val.setAtributo("code", TemplateCode.RELATIONALEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"), auxElem.getAtributo("code")));
+		}
 	}
-	RESULT = rel; 
+	
+	RESULT = val; 
 :} 
 |;
 
@@ -324,7 +347,7 @@ additiveExpression ::= multiplicativeExpression:mult additiveExpressionAux:aux {
 			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
 		}
 		Elemento auxElem = (Elemento) aux;
-		val.setAtributo("code", TemplateCode.RELATIONALEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"),auxElem.getAtributo("code")));
+		val.setAtributo("code", TemplateCode.ARITIMETICEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"),auxElem.getAtributo("code")));
 	}
 	RESULT = mult;
 :};
@@ -341,7 +364,7 @@ additiveExpressionAux ::= addOperator:op multiplicativeExpression:mult additiveE
 	
 	if(aux != null){
 		Elemento auxElem = (Elemento) aux;
-		val.setAtributo("code", TemplateCode.RELATIONALEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"),auxElem.getAtributo("code")));
+		val.setAtributo("code", TemplateCode.ARITIMETICEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"),auxElem.getAtributo("code")));
 	}
 	
 	RESULT = val;
@@ -354,20 +377,33 @@ multiplicativeExpression ::= unaryExpression:un multiplicativeExpressionAux:aux 
 		if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
 			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
 		}
+		Elemento auxElem = (Elemento) aux;
+		val.setAtributo("code", TemplateCode.ARITIMETICEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"),auxElem.getAtributo("code")));
 	}
 	RESULT = un;
 :};
-multiplicativeExpressionAux ::= multiplyOperator unaryExpression:un multiplicativeExpressionAux{:
+multiplicativeExpressionAux ::= multiplyOperator:op unaryExpression:un multiplicativeExpressionAux:aux{:
 	Elemento val = (Elemento) un;
+	Elemento oper = (Elemento) op;
+	val.setAtributo("code", val.getAtributo("code"));
+	val.setAtributo("operacaoCode", oper.getAtributo("code"));
+	
 	if((val.getAtributo("tipo") != "Real") && (val.getAtributo("tipo") != "Integer") ){
 		LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
 	}
-	RESULT = un;
+	if(aux != null){
+		Elemento auxElem = (Elemento) aux;
+		val.setAtributo("code", TemplateCode.ARITIMETICEXPRESSION(val.getAtributo("code"), auxElem.getAtributo("operacaoCode"),auxElem.getAtributo("code")));
+	}
+	
+	RESULT = val;
 :} 
 |;
 
 unaryExpression ::= unaryOperator:op postfixExpression:post {:
 	Elemento val = (Elemento) post;
+	Elemento oper = (Elemento) op;
+	
 	if(op.toString() == "NOT"){
 		if(val.getAtributo("tipo") != "Boolean"){
 			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Boolean"));
@@ -377,8 +413,10 @@ unaryExpression ::= unaryOperator:op postfixExpression:post {:
 			LoggerSemantico.getInstance().addError(StringErro.tipoInvalido(val.toString(), "Integer ou Real"));
 		}
 	}
-	val.valor = op.toString() + " " + val.valor;
-	RESULT = post;
+	
+	val.valor = oper.toString() + " " + val.valor;
+	val.setAtributo("code", oper.getAtributo("code") + val.getAtributo("code"));  
+	RESULT = val;
 :}
 | postfixExpression:post {: RESULT = post; :};
 
@@ -489,7 +527,12 @@ operationCall ::= COLLECTIONOPERATION {: RESULT = "->"; :}
 primaryExpression ::= literalCollection:l {: RESULT = l; :}
 					| literal:li {: RESULT = li; :}
 					| propertyCall:p {: RESULT = p; :}
-					| LEFT_PAR oclExpression:exp RIGHT_PAR {: RESULT = exp; :}
+| LEFT_PAR oclExpression:exp RIGHT_PAR {:
+ 	Elemento val = (Elemento) exp;
+ 	val.setAtributo("code", "(" + val.getAtributo("code") + ")");
+	RESULT = val; 
+:}
+
 | SELF:id {:
 	String tipo = XMIParserBasic.getInstancia().getAttributeType(id.toString());
 	Elemento val = new Elemento(id.toString(), idleft, idright);
@@ -533,7 +576,7 @@ ifExp ::= IF:ifToken oclExpression:exp THEN oclExpression:exp1 ELSE oclExpressio
 		res.setAtributo("tipo", Elemento.max(val1.getAtributo("tipo"), val2.getAtributo("tipo")));
 	}
 	
-	Gerador.getInstance().addIF(val.getAtributo("code"), val1.getAtributo("code"), val2.getAtributo("code"), Gerador.type(res.getAtributo("tipo")));  
+	res.setAtributo("code", Gerador.getInstance().addIF(val.getAtributo("code"), val1.getAtributo("code"), val2.getAtributo("code"), Gerador.type(res.getAtributo("tipo"))));  
 	
 	RESULT = res;
 :}
@@ -667,7 +710,25 @@ expressionParameterAux ::= COMMA oclExpression:exp expressionParameterAux:aux {:
 :} 
 | {: RESULT = new Parametros(); :};
 
-logicalOperator ::= AND | OR | XOR | IMPLIES;
+logicalOperator ::= AND {:
+	Elemento elem = new Elemento("AND");
+	elem.setAtributo("code", "&&"); 
+	RESULT = elem; 
+:} 
+|OR {:
+	Elemento elem = new Elemento("OR");
+	elem.setAtributo("code", "||"); 
+	RESULT = elem;
+:}
+|XOR {:
+	Elemento elem = new Elemento("XOR");
+	elem.setAtributo("code", "!="); 
+	RESULT = elem; 
+:}
+|IMPLIES {:
+	Elemento elem = new Elemento("IMPLIES");
+	RESULT = elem; 
+:};
 
 relationalOperator ::= EQ {:
 	Elemento elem = new Elemento("=");

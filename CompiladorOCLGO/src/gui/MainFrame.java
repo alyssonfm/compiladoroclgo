@@ -286,11 +286,14 @@ private void compile(){
 			  messages.append("########  Iniciando Geracao Codigo  ########\n");
 			  messages.append(log.toString() + "\n");
 			  messages.append("########  Finalizada Geracao Codigo ########\n");
+			  messages.append("Gravando em arquivo...\n");
 			  try {
 				BufferedWriter out = new BufferedWriter(new FileWriter("files\\out\\code.go", false));
 				out.write(log.getCode());
 				out.close();
+				messages.append("Gravado!\n");
 			} catch (IOException e) {
+				messages.append("Erro na gravacao!\n");
 				e.printStackTrace();
 			}
 		  }
