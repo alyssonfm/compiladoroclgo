@@ -104,6 +104,14 @@ public class ParserAuxiliar {
 		}
 		return null;
 	}
+	
+	public static String filterOperationCollection(String type) {
+		if (type.startsWith("Collection")){
+			String limpo = type.substring(11, type.length() - 1);
+			return "Collection(" + filterType(limpo) + ")";
+		}
+		return filterType(type);
+	}
 
 	public static String filterOperationType(Element element) {
 		if (element.getType().startsWith("_")) {
