@@ -226,9 +226,13 @@ private void compile(){
 		messages.append("Erro, escolha o arquivo XML ...");
 	}else{
 		try{
-			Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");
-			Runtime.getRuntime().exec("c:\\Go\\bin\\8l files\\out\\code.8");
-			messages.append("Compilou...");
+			Process p = Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");
+			if(p.waitFor() != 0){
+				messages.append("Nao foi possivel compilar o arquivo...");
+			} else{
+				Runtime.getRuntime().exec("c:\\Go\\bin\\8l files\\out\\code.8");
+				messages.append("Compilou...");
+			}
 		}catch (Exception e){
 			messages.append(e.getMessage());
 		}
