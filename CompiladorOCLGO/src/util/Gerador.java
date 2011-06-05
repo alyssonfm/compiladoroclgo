@@ -15,10 +15,13 @@ public class Gerador {
 	
 	public static Gerador getNewInstance(){
 		instance = new Gerador();
-		instance.code = cabecalho();
-		instance.funcoes = new HashMap<String, Funcao>();
-		instance.temp = 0;
 		return instance;
+	}
+	
+	private Gerador() {
+		code = cabecalho();
+		funcoes = new HashMap<String, Funcao>();
+		temp = 0;
 	}
 	
 	public void setFuncao(String nome){
@@ -99,6 +102,9 @@ public class Gerador {
 		if(t.equalsIgnoreCase("Boolean"))
 			return "bool";
 		return t;
+	}
+	
+	private static void criarClasses(){
 	}
 	
 }

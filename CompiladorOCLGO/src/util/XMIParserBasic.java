@@ -34,6 +34,7 @@ public class XMIParserBasic extends XMIParser {
 		if(instancia == null){
 			instancia = new XMIParserBasic();
 			instancia.loadModel(path);
+			System.out.println(instancia.getClassesComp());
 		}
 		return instancia;
 	}
