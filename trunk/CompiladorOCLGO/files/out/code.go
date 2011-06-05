@@ -2,6 +2,6 @@ package main
 
 import "fmt"
 
-func idade() (int) {
+func obtemServicos() (Set(Servico)) {
 return 
 }

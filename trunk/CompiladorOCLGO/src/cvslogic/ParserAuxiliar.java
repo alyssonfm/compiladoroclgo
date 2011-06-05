@@ -53,6 +53,10 @@ public class ParserAuxiliar {
 				} else if (((Element) o).getName().equals(className)) {
 					return (Classifier) o;
 				}
+			} else {
+				if (((Element) o).getName().equals(className)) {
+					return (Classifier) o;
+				}
 			}
 		}
 		return null;
@@ -104,9 +108,9 @@ public class ParserAuxiliar {
 		}
 		return null;
 	}
-	
+
 	public static String filterOperationCollection(String type) {
-		if (type.startsWith("Collection")){
+		if (type.startsWith("Collection")) {
 			String limpo = type.substring(11, type.length() - 1);
 			return "Collection(" + filterType(limpo) + ")";
 		}
