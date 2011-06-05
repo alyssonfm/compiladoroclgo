@@ -45,16 +45,22 @@ public class Gerador {
 		funcaoAtual.corpo += s;
 	}
 	
-	public void addIF(String condicao, String verdade, String falso, String tipo){
-		Funcao f = new Funcao("IFTemp" + temp++, tipo);
+	private String addFUNCAOCONDICIONAL(String nome, String condicao, String verdade, String falso, String tipo){
+		Funcao f = new Funcao(nome + "Temp" + temp++, tipo);
 		f.corpo = TemplateCode.IF("condicao", "verdadeiro", "falso");
 		f.parametros.add(new Parametro("condicao", "bool"));
 		f.parametros.add(new Parametro("verdadeiro", tipo));
 		f.parametros.add(new Parametro("falso", tipo));
 		funcoes.put(f.nome, f);
-		funcaoAtual.corpo += f.nome + "(" + condicao + "," + verdade + "," + falso +")\n";
-		
-		
+		return f.nome + "(" + condicao + "," + verdade + "," + falso +")";
+	}
+	
+	public String addIF(String condicao, String verdade, String falso, String tipo){
+		return addFUNCAOCONDICIONAL("IF", condicao, verdade, falso, tipo);
+	}
+	
+	public String addIMPLIES(String condicao, String resultado){
+		return addFUNCAOCONDICIONAL("IMPLIES", condicao, resultado, "!" + resultado, "bool");
 	}
 	
 	public void addFuncao(String classe, String nome, LinkedList<Parametro> parametros, String retornoTipo){
