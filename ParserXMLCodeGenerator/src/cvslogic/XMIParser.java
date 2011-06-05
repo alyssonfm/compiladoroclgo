@@ -12,10 +12,10 @@ import util.ConstantsXML;
 import com.pavelvlasov.uml.Classifier;
 import com.pavelvlasov.uml.CompositeAcceptor;
 import com.pavelvlasov.uml.Element;
-
+import com.pavelvlasov.uml.Generalization;
 import com.pavelvlasov.uml.Model;
-import com.pavelvlasov.uml.Package;
 import com.pavelvlasov.uml.Operation;
+import com.pavelvlasov.uml.Package;
 import com.pavelvlasov.uml.Parameter;
 import com.pavelvlasov.uml.eval.PrefixedCompositeEvaluator;
 import com.pavelvlasov.uml.xmi.ModelBuilder;
@@ -29,6 +29,7 @@ public class XMIParser {
 	private String errorActual = "";
 	// private static Package bodyPack = null;
 	private static Classifier bodyClass = null;
+	private static List<ClasseComp> classesComp = new LinkedList<ClasseComp>();
 
 	// private static Operation bodyOperation = null;
 
@@ -42,6 +43,7 @@ public class XMIParser {
 				new CompositeAcceptor(), new PrintStreamLogger(),
 				new PrefixedCompositeEvaluator());
 		ParserAuxiliar.setClasses(model);
+		loadAllClassesComp();
 	}
 
 	public Model getModel() {
@@ -56,6 +58,7 @@ public class XMIParser {
 	public static void main(String[] args) {
 		XMIParser parser = new XMIParser();
 		parser.loadModel("Modelos/profe.xml");
+		System.out.println("Aqui:" + parser.getClassesComp());
 		parser.setPackage("PacoteSistema");
 		System.out.println(parser.existsPackage());
 		System.out.println(parser.getError());
@@ -75,6 +78,90 @@ public class XMIParser {
 		// .getParametersType("PacoteDaTorada::Torada::getTorada(torada : PacoteSistema::Cheque)"));
 		// System.out.println(parser.getSuperType("Transacao", "Cheque"));
 
+	}
+	
+	public List<ClasseComp> getClassesComp (){
+		return classesComp;
+	}
+
+	public static List<ClasseComp> loadAllClassesComp() {
+		for (Classifier classe : ParserAuxiliar.classes) {
+			ClasseComp classeComp = new ClasseComp(classe.getName());
+
+			for (Object att : classe.getAttributes()) {
+				AtributoComp attr = new AtributoComp(((Element) att).getName(),
+						ParserAuxiliar.filterOperationCollection(ParserAuxiliar
+								.filterType(((Element) att).getType())));
+				classeComp.addAtributo(attr);
+			}
+
+			for (Object opp : classe.getOperations()) {
+				OperacaoComp opComp = new OperacaoComp(((Element) opp)
+						.getName(), ParserAuxiliar
+						.filterOperationCollection((ParserAuxiliar
+								.filterOperationType(((Element) opp)))));
+
+				for (Object att : ((Operation) opp).getParameters()) {
+					AtributoComp attr = new AtributoComp(((Parameter) att)
+							.getName(), ParserAuxiliar
+							.filterOperationCollection(ParserAuxiliar
+									.filterType(((Element) att).getType())));
+					opComp.addParametro(attr);
+				}
+
+				classeComp.addOperacao(opComp);
+			}
+			classesComp.add(classeComp);
+		}
+		ajustarHerancas();
+		return classesComp;
+	}
+
+	private static ClasseComp getClasseComp(String nome) {
+		for (ClasseComp classeComp : classesComp) {
+			if (classeComp.getNome().equals(nome)) {
+				return classeComp;
+			}
+		}
+		return null;
+	}
+
+	private static void removerClasseComp(String nome) {
+		for (int i = 0; i < classesComp.size(); i++) {
+			if (classesComp.get(i).getNome().equals(nome)) {
+				classesComp.remove(i);
+			}
+		}
+	}
+
+	private static void ajustarHerancas() {
+		for (Object classe : ParserAuxiliar.classes) {
+			Collection<String> generalizations = ParserAuxiliar
+					.getGeneralizations((Classifier) classe);
+			if (generalizations != null) {
+				for (String superType : generalizations) {
+					mergeClasses(superType, ((Classifier) classe).getName());
+				}
+			}
+		}
+	}
+
+	private static void mergeClasses(String classePai, String classeFilha) {
+		ClasseComp pai = getClasseComp(classePai);
+		ClasseComp filha = getClasseComp(classeFilha);
+
+		for (AtributoComp attr : pai.getAtt()) {
+			if (!filha.temAtributo(attr.getNome())) {
+				filha.addAtributo(attr);
+			}
+		}
+		for (OperacaoComp attr : pai.getOperacoes()) {
+			if (!filha.temOperacao(attr.getNome())) {
+				filha.addOperacao((attr));
+			}
+		}
+		removerClasseComp(filha.getNome());
+		classesComp.add(filha);
 	}
 
 	public Package getPackageActual() {
@@ -306,7 +393,7 @@ public class XMIParser {
 		String idClass;
 		List<String> caminho = Arrays.asList(idPath);
 		idName = (idPath[idPath.length - 1]).replace("self.", "");
-		
+
 		if (idPath.length == 1) {
 			if (idName.equals("self")) {
 				return getBodyClass().getName();
