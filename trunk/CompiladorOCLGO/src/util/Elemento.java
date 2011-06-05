@@ -1,6 +1,7 @@
 package util;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class Elemento {
 	
@@ -107,6 +108,19 @@ public class Elemento {
 			
 		}
 		return null;
+	}
+	
+	public static String parametrosToString(LinkedList<Parametro> list){
+		String str = "";
+		for(int i = 0; i < list.size(); i++){
+			Parametro p = list.get(i);
+			str += p.nome + ":" + p.tipo;
+			
+			if(i + 1 != list.size()){
+				str += ",";
+			}
+		}
+		return str;
 	}
 	
 	public void coercao(String novoTipo){

@@ -1,15 +1,23 @@
 package util;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+
 
 public class Gerador {
 	
 	private String code;
 	private static Gerador instance;
 	private static String funcao;
+	private HashMap<String, Funcao> funcoes;
+	private Funcao funcaoAtual;
+	private int temp;
 	
 	public static Gerador getNewInstance(){
 		instance = new Gerador();
 		instance.code = cabecalho();
+		instance.funcoes = new HashMap<String, Funcao>();
+		instance.temp = 0;
 		return instance;
 	}
 	
@@ -34,14 +42,39 @@ public class Gerador {
 	}
 	
 	public void gen(String s) {
-		code += s;
+		funcaoAtual.corpo += s;
 	}
+	
+	public void addIF(String condicao, String verdade, String falso, String tipo){
+		Funcao f = new Funcao("IFTemp" + temp++, tipo);
+		f.corpo = TemplateCode.IF(condicao, verdade, falso);
+		funcoes.put(f.nome, f);
+		funcaoAtual.corpo += f.nome + "()\n";
+		
+		
+	}
+	
+	public void addFuncao(String classe, String nome, LinkedList<Parametro> parametros, String retornoTipo){
+		Funcao f = new Funcao(nome, retornoTipo);
+		funcoes.put(nome, f);
+		f.parametros = parametros;
+		f.corpo = "return ";
+		funcaoAtual = f;
+	}
+	
 	
 	public void print(){
 		System.out.println(code);
 	}
 	
+	private void gerarTudo(){
+		for(Funcao f : funcoes.values()){
+			code += f.code();
+		}
+	}
+
 	public String getCode(){
+		gerarTudo();
 		if(funcao == null)
 			return code;
 		return code + mainExp();
