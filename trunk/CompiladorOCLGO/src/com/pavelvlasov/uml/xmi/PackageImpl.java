@@ -24,18 +24,13 @@
 package com.pavelvlasov.uml.xmi;
 
 import java.util.Collection;
-import java.util.LinkedList;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.traversal.NodeIterator;
 
-import util.AuxiliaryFunctionsXML;
 import util.Constants;
 
 import com.pavelvlasov.uml.Acceptor;
 import com.pavelvlasov.uml.Classifier;
-import com.pavelvlasov.uml.ModelElement;
 import com.pavelvlasov.uml.Package;
 
 class PackageImpl extends ClassifierImpl implements Package {

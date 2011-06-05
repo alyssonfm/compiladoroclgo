@@ -7,7 +7,6 @@
 package analise_sintatica;
 
 import java_cup.runtime.Symbol;
-import util.sym;
 import util.Util;
 
 /** CUP v0.11a beta 20060608 generated parser.

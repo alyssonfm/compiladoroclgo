@@ -7,12 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import util.Constants;
-import util.ConstantsXML;
+import util.xmi.ConstantsXML;
 
 import com.pavelvlasov.uml.Classifier;
 import com.pavelvlasov.uml.CompositeAcceptor;
 import com.pavelvlasov.uml.Element;
-import com.pavelvlasov.uml.Generalization;
 import com.pavelvlasov.uml.Model;
 import com.pavelvlasov.uml.Operation;
 import com.pavelvlasov.uml.Package;

@@ -28,7 +28,6 @@ import java.util.Iterator;
 
 import com.pavelvlasov.uml.ModelElement;
 import com.pavelvlasov.uml.Operation;
-import com.pavelvlasov.uml.TaggedValues;
 import com.pavelvlasov.uml.Visitor;
 
 /**

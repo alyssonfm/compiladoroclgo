@@ -2,8 +2,8 @@
 
 package analise_lexica;
 
-import java_cup.runtime.*;
-import util.sym; 
+import java_cup.runtime.Symbol;
+import util.sym;
 
 
 /**

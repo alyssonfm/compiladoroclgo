@@ -25,7 +25,6 @@ package com.pavelvlasov.uml.xmi;
 
 import org.w3c.dom.Element;
 
-import com.pavelvlasov.uml.Classifier;
 import com.pavelvlasov.uml.Generalization;
 
 /**

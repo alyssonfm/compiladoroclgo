@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.pavelvlasov.uml.Package;
+import util.xmi.ConstantsXML;
 
-import util.ConstantsXML;
+import com.pavelvlasov.uml.Package;
 
 public class ConstraintPackage {
 	// Cada indice representará os pacotes em sequência do package;

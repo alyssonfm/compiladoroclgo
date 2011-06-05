@@ -1,6 +1,5 @@
 package util;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Funcao {

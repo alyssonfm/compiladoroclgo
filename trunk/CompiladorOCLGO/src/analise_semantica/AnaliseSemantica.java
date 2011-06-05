@@ -6,10 +6,16 @@
 
 package analise_semantica;
 
-import java_cup.runtime.Symbol;
-import util.sym;
 import java.util.LinkedList;
-import util.*;
+
+import java_cup.runtime.Symbol;
+import util.Elemento;
+import util.ErroFatal;
+import util.LoggerSemantico;
+import util.Parametros;
+import util.StringErro;
+import util.Util;
+import util.XMIParserBasic;
 
 /** CUP v0.11a beta 20060608 generated parser.
   * @version Fri May 06 06:44:43 GMT-03:00 2011

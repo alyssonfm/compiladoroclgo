@@ -31,9 +31,9 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import util.AuxiliaryFunctionsXML;
 import util.Constants;
-import util.ConstantsXML;
+import util.xmi.AuxiliaryFunctionsXML;
+import util.xmi.ConstantsXML;
 
 import com.pavelvlasov.uml.ModelElement;
 

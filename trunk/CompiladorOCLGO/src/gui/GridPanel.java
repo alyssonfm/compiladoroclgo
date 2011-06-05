@@ -20,8 +20,12 @@
 
 package gui;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Panel;
+import java.awt.Rectangle;
+import java.util.Vector;
 
 public class GridPanel extends Panel implements Handles {
 
