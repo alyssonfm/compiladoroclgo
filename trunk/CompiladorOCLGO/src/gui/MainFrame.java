@@ -17,9 +17,12 @@ import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -226,8 +229,9 @@ private void compile(){
 		try{
 			Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");
 			Runtime.getRuntime().exec("c:\\Go\\bin\\8l files\\out\\code.8");
-		}catch (IOException e){
-			e.printStackTrace();
+			messages.append("Compilou...");
+		}catch (Exception e){
+			messages.append(e.getMessage());
 		}
 	}	
   }
@@ -237,9 +241,14 @@ private void compile(){
 				messages.append("Erro, escolha o arquivo XML ...");
 		} else {
 			try {
-				Runtime.getRuntime().exec("8.out.exe");
-			} catch (IOException e) {
-				
+				Process p = Runtime.getRuntime().exec("8.out.exe");				  
+				BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream())); 				  
+				String line = "";  
+				while ((line = br.readLine()) != null) {
+					messages.append(line);
+				} 
+			} catch (Exception e) {
+				messages.append(e.getMessage());
 			}
 		}
 	}
