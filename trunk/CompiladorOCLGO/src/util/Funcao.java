@@ -36,7 +36,7 @@ public class Funcao {
 		for(int i = 0; i < parametros.size(); i++){
 			
 			Parametro p = parametros.get(i);
-			s += p.tipo + " " + p.nome;
+			s += p.nome + " " + p.tipo;
 			
 			if(i + 1 != parametros.size()){
 				s += ", ";

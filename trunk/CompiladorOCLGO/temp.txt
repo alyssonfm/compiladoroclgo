@@ -1,2 +1,2 @@
-context Cliente::idade(): Integer
-body: if true then 2 else 1 endif
+context Cliente::idade() : Integer
+body: 1 + 1
