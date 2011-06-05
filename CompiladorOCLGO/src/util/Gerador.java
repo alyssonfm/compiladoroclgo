@@ -47,9 +47,12 @@ public class Gerador {
 	
 	public void addIF(String condicao, String verdade, String falso, String tipo){
 		Funcao f = new Funcao("IFTemp" + temp++, tipo);
-		f.corpo = TemplateCode.IF(condicao, verdade, falso);
+		f.corpo = TemplateCode.IF("condicao", "verdadeiro", "falso");
+		f.parametros.add(new Parametro("condicao", "bool"));
+		f.parametros.add(new Parametro("verdadeiro", tipo));
+		f.parametros.add(new Parametro("falso", tipo));
 		funcoes.put(f.nome, f);
-		funcaoAtual.corpo += f.nome + "()\n";
+		funcaoAtual.corpo += f.nome + "(" + condicao + "," + verdade + "," + falso +")\n";
 		
 		
 	}
@@ -69,7 +72,7 @@ public class Gerador {
 	
 	private void gerarTudo(){
 		for(Funcao f : funcoes.values()){
-			code += f.code();
+			code += f.code() + "\n";
 		}
 	}
 
@@ -78,6 +81,18 @@ public class Gerador {
 		if(funcao == null)
 			return code;
 		return code + mainExp();
+	}
+	
+	public static String type(String t){
+		if(t.equalsIgnoreCase("Integer"))
+			return "int";
+		if(t.equalsIgnoreCase("Real"))
+			return "float";
+		if(t.equalsIgnoreCase("String"))
+			return "string";
+		if(t.equalsIgnoreCase("Boolean"))
+			return "bool";
+		return t;
 	}
 	
 }
