@@ -57,7 +57,7 @@ public class XMIParser {
 	public static void main(String[] args) {
 		XMIParser parser = new XMIParser();
 		parser.loadModel("Modelos/profe.xml");
-		//System.out.println("Aqui:" + parser.getClassesComp());
+		// System.out.println("Aqui:" + parser.getClassesComp());
 		parser.setPackage("PacoteSistema");
 		System.out.println(parser.existsPackage());
 		System.out.println(parser.getError());
@@ -65,9 +65,9 @@ public class XMIParser {
 		// parser.setContext("Conta::debitar(pts:Integer):Boolean");
 		// parser.setContext("Cheque::programa():ProgramaFidelidade");
 		parser.setContext("Cheque::programa():ProgramaFidelidade");
-		//System.out.println(parser.existsContext());
-		//System.out.println(parser.getError());
-		//System.out.println("oi " + parser.getAttributeType("servico"));
+		// System.out.println(parser.existsContext());
+		// System.out.println(parser.getError());
+		// System.out.println("oi " + parser.getAttributeType("servico"));
 		// System.out
 		// .println(parser
 		// .getOperationType("getTorada"));
@@ -250,7 +250,9 @@ public class XMIParser {
 	}
 
 	public boolean existsContext() {
+
 		if (existsPackage() || notExistPackage()) {
+
 			Classifier classActual = null;
 			if (notExistPackage()) {
 				if (cc.getCaminho().size() == 0) {
