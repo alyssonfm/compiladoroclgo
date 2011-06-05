@@ -2,8 +2,6 @@ package com.pavelvlasov.uml.xmi;
 
 import org.w3c.dom.Element;
 
-import util.ConstantsXML;
-
 public class ExtendsImpl extends ModelElementImpl {
 
 	public ExtendsImpl(ClassifierImpl classifierImpl, Element item) {

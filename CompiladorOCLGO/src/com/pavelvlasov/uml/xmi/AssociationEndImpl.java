@@ -26,8 +26,7 @@ package com.pavelvlasov.uml.xmi;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import util.Constants;
-import util.ConstantsXML;
+import util.xmi.ConstantsXML;
 
 import com.pavelvlasov.uml.Association;
 import com.pavelvlasov.uml.AssociationEnd;

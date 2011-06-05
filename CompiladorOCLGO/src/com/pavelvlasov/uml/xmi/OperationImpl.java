@@ -31,8 +31,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.NodeIterator;
 
-import util.AuxiliaryFunctionsXML;
-import util.ConstantsXML;
+import util.xmi.AuxiliaryFunctionsXML;
+import util.xmi.ConstantsXML;
 
 import com.pavelvlasov.uml.Advice;
 import com.pavelvlasov.uml.Operation;

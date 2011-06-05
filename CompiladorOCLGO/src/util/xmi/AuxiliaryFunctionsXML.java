@@ -7,7 +7,6 @@ import java.util.List;
 import org.w3c.dom.Element;
 
 import com.pavelvlasov.uml.Association;
-import com.pavelvlasov.uml.Generalization;
 import com.pavelvlasov.uml.Model;
 
 public class AuxiliaryFunctionsXML {

@@ -37,7 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.traversal.NodeIterator;
 
-import util.AuxiliaryFunctionsXML;
+import util.xmi.AuxiliaryFunctionsXML;
 import util.xmi.Constants;
 
 import com.pavelvlasov.uml.Acceptor;

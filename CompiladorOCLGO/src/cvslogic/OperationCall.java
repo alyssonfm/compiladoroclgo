@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
-import util.ConstantsXML;
+import util.xmi.ConstantsXML;
 
 public class OperationCall {
 
