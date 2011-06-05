@@ -141,49 +141,62 @@ bodyDeclaration:b {:
 
 bodyDeclaration ::= BODY COLON oclExpression:exp {: 
 	RESULT = exp;
-	Gerador.getInstance().gen("\n}"); 
 :};
 
 operation ::= IDENTIFIER:id pathNameOperation:pno LEFT_PAR operationParAux:ope RIGHT_PAR COLON typeName:type{:
 	
-	Elemento opeElem = (Elemento) ope;
+	LinkedList<Parametro> opeParametros = (LinkedList<Parametro>) ope;
 	Elemento typeElem = (Elemento) type;
 	
 	Elemento val = new Elemento(id.toString() + pno.toString(), idleft, idright);
 	String[] splited = pno.toString().split("::");
 	val.setAtributo("operacao", splited[splited.length - 1]);
-	if(ope == null){
-		Gerador.getInstance().gen(TemplateCode.FUNCTION(splited[splited.length - 2], splited[splited.length - 1], "", typeElem.getAtributo("code")));
-		val.setAtributo("string", id.toString() + pno.toString() + "()" + ":" + typeElem.toString());
-	}else{
-		Gerador.getInstance().gen(TemplateCode.FUNCTION(splited[splited.length - 2], splited[splited.length - 1], opeElem.getAtributo("code"), typeElem.getAtributo("code")));
-		val.setAtributo("string", id.toString() + pno.toString() + "(" + opeElem.getAtributo("string") + ")" + ":" + typeElem.toString());
-	}
+	
+	Gerador.getInstance().addFuncao(splited[splited.length - 2], splited[splited.length - 1], opeParametros, typeElem.getAtributo("code"));
+	val.setAtributo("string", id.toString() + pno.toString() + "(" + Elemento.parametrosToString(opeParametros) + ")" + ":" + typeElem.toString());
+	
 	RESULT =  val;
 :};
 			  
-operationParAux ::= parameters:p {: RESULT = p; :}  |;
+operationParAux ::= parameters:p {: RESULT = p; :}  
+|{: RESULT = new LinkedList<Parametro>(); :};
 					
-parameters ::= variableDeclaration:v {: RESULT = v; :}
+parameters ::= variableDeclaration:v {:
+	Elemento vElem = (Elemento) v;
+	String str[] = vElem.getAtributo("string").split(":");
+	
+	LinkedList<Parametro> pa = new LinkedList<Parametro>();
+	Parametro p = new Parametro(str[0], str[1]);
+	
+	pa.add(p);
+	
+	RESULT = pa; 
+:}
 
-| variableDeclaration:v COMMA parameters:p {: 
-	Elemento e = (Elemento) v;
-	Elemento pa = (Elemento) p;
-	Elemento r = new Elemento(e.getAtributo("string"));
-	r.setAtributo("code", e.getAtributo("code") + ", " + pa.getAtributo("code"));
-	r.setAtributo("string", e.getAtributo("string") + "," + pa.getAtributo("string"));
-	RESULT = r; 
+| variableDeclaration:v COMMA parameters:p {:
+	LinkedList<Parametro> pa = (LinkedList<Parametro>) p;
+	
+	Elemento vElem = (Elemento) v;
+	String str[] = vElem.getAtributo("string").split(":");
+	
+	Parametro par = new Parametro(str[0], str[1]);
+	
+	pa.add(par);
+	 
+	RESULT = pa; 
 :};
 
 collectionType ::= collectionTypeIdentifier:c LEFT_PAR typeName:t RIGHT_PAR {:
-	RESULT = c.toString() + "(" + t.toString() + ")";
+	Elemento r = new Elemento(c.toString() + "(" + t.toString() + ")");
+	r.setAtributo("code", c.toString() + "(" + t.toString() + ")");
+	RESULT = r;
 :};
 
 collectionTypeIdentifier ::= COLLECTION:c {: RESULT = c.toString(); :};
 			 
 typeName ::= primaryTypes:p {: RESULT = p; :} 
 			| pathName:pna {: RESULT = pna.toString(); :}
-			| collectionType:c {: RESULT = c.toString(); :};
+			| collectionType:c {: RESULT = c; :};
 
 primaryTypes ::= 
 STRINGTYPE:s {:
@@ -508,7 +521,7 @@ ifExp ::= IF:ifToken oclExpression:exp THEN oclExpression:exp1 ELSE oclExpressio
 		res.setAtributo("tipo", Elemento.max(val1.getAtributo("tipo"), val2.getAtributo("tipo")));
 	}
 	
-	Gerador.getInstance().gen(TemplateCode.IF(val.getAtributo("code"), val1.getAtributo("code"), val2.getAtributo("code")));  
+	Gerador.getInstance().addIF(val.getAtributo("code"), val1.getAtributo("code"), val2.getAtributo("code"), res.getAtributo("tipo"));  
 	
 	RESULT = res;
 :}
