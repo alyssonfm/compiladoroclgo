@@ -1,2 +1,2 @@
-context ProgramaFidelidade::obtemServicos() : Set(Servico)
-body: if not(true and true) then 1 else -(2*2) endif
+context Conta::debitar(pts:Integer):Boolean
+body: transacoes->exists(pontos > 10) = true

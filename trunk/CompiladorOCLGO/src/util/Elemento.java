@@ -8,6 +8,7 @@ public class Elemento {
 	public String valor;
 	public Integer left;
 	public Integer right;
+	public Elemento parametro;
 	private HashMap<String, String> map;
 	
 	public Elemento() {

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import cvslogic.ClasseComp;
 import cvslogic.XMIParser;
 
 public class XMIParserBasic extends XMIParser {
@@ -14,12 +15,14 @@ public class XMIParserBasic extends XMIParser {
 	private boolean navegando;
 	private static String path;
 	private HashMap<String, String> variaveis;
+	private List<ClasseComp> classes;
 	
 	private XMIParserBasic() {
 		super();
 		context = new Stack<String>();
 		navegando = false;
 		variaveis = new HashMap<String, String>();
+		classes = super.loadAllClassesComp();
 	}
 	
 	public static void setPath(String path){
@@ -44,7 +47,7 @@ public class XMIParserBasic extends XMIParser {
 	}
 	
 	public void setTempContext(String context){
-		if(super.getSuperType(context, context) != null){
+		if(existClasse(context)){
 			this.context.push(context);
 		}
 	}
@@ -101,6 +104,37 @@ public class XMIParserBasic extends XMIParser {
 		}
 	}
 	
+	public boolean existClasse(String classe){
+		List<ClasseComp> list = loadAllClassesComp();
+		for(ClasseComp c : list){
+			if(c.getNome().equalsIgnoreCase(classe)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public String getAttributeTypeConsulta(String identifier) {
+		String str = null;
+		if(variaveis.containsKey(identifier)){
+			str = variaveis.get(identifier);
+			Gerador.getInstance().addParametroConsulta(identifier, str, identifier);
+			return str;
+		}
+		if(isNavegando()){
+			str = super.getAttributeType(context.lastElement(), identifier);
+			if(str != null){
+				Gerador.getInstance().addParametroConsulta(identifier, str, "atual.valor." + identifier);
+			}
+			return str;
+		}
+		str = super.getAttributeType(identifier);
+		if(str != null){
+			Gerador.getInstance().addParametroConsulta(identifier, str, "self." + str);
+		}
+		return str;
+	}
+	
 	@Override
 	public String getAttributeType(String identifier) {
 		if(variaveis.containsKey(identifier)){
@@ -142,6 +176,10 @@ public class XMIParserBasic extends XMIParser {
 			return super.getParametersType(context.lastElement(), operation);
 		}
 		return super.getParametersType(operation);
+	}
+	
+	public static List<ClasseComp> loadAllClassesComp(){
+		return getInstancia().classes;
 	}
 	
 }
