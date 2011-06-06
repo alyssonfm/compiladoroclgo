@@ -9,6 +9,7 @@ import java.util.List;
 import util.Constants;
 import util.xmi.ConstantsXML;
 
+import com.pavelvlasov.uml.Attribute;
 import com.pavelvlasov.uml.Classifier;
 import com.pavelvlasov.uml.CompositeAcceptor;
 import com.pavelvlasov.uml.Element;
@@ -91,9 +92,16 @@ public class XMIParser {
 			ClasseComp classeComp = new ClasseComp(classe.getName());
 
 			for (Object att : classe.getAttributes()) {
-				AtributoComp attr = new AtributoComp(((Element) att).getName(),
-						ParserAuxiliar.filterOperationCollection(ParserAuxiliar
-								.filterType(((Element) att).getType())));
+				String nome = ((Element) att).getName();
+				String tipo = ParserAuxiliar.filterOperationCollection(ParserAuxiliar
+						.filterType(((Element) att).getType()));
+				if (nome.equals("") && tipo.equals("")){
+					continue;
+				}
+				if (nome.equals("")){
+					nome = tipo.toLowerCase();
+				}
+				AtributoComp attr = new AtributoComp(nome,tipo);
 				classeComp.addAtributo(attr);
 			}
 
