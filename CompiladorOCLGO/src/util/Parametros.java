@@ -5,9 +5,19 @@ import java.util.LinkedList;
 public class Parametros {
 	
 	public LinkedList<String> lista;
+	public LinkedList<Elemento> elementos;
 	
 	public Parametros() {
 		lista = new LinkedList<String>();
+		elementos = new LinkedList<Elemento>();
+	}
+	
+	public Elemento getFirstElemento(){
+		return elementos.get(0);
+	}
+	
+	public void addElemento(Elemento e){
+		elementos.addFirst(e);
 	}
 	
 	public void push(String tipo){

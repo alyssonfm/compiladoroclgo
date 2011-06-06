@@ -152,8 +152,7 @@ operation ::= IDENTIFIER:id pathNameOperation:pno LEFT_PAR operationParAux:ope R
 	Elemento val = new Elemento(id.toString() + pno.toString(), idleft, idright);
 	String[] splited = pno.toString().split("::");
 	val.setAtributo("operacao", splited[splited.length - 1]);
-	
-	Gerador.getInstance().addFuncao(splited[splited.length - 2], splited[splited.length - 1], opeParametros, typeElem.getAtributo("code"));
+	Gerador.getInstance().addFuncao(id.toString(), splited[splited.length - 1], opeParametros, typeElem.getAtributo("code"));
 	val.setAtributo("string", id.toString() + pno.toString() + "(" + Elemento.parametrosToString(opeParametros) + ")" + ":" + typeElem.toString());
 	
 	RESULT =  val;
@@ -449,6 +448,14 @@ postfixExpressionAux:aux {:
 				res.setAtributo("tipo", "Collection(" + res.getAtributo("tipo") + ")");
 			}
 		}
+		if(post.getAtributo("operacao") == "->"){
+			if(post.getAtributo("code") == null)
+				res.setAtributo("code", Gerador.getInstance().addFuncaoCONSULTA(post.valor, post.parametro, source));
+			else
+				res.setAtributo("code", Gerador.getInstance().addFuncaoCONSULTA(post.valor, post.parametro, source) + post.getAtributo("code"));
+		}else{
+			res.setAtributo("code", source.getAtributo("code") + post.getAtributo("code"));
+		}
 		RESULT = res;
 	}else{
 		RESULT = pri;
@@ -484,10 +491,12 @@ postfixExpressionAux:aux {:
 			LoggerSemantico.getInstance().addError(StringErro.atributoOperacaoInvalida(pro.toString()));
 			throw new ErroFatal();
 		}
+		pro.setAtributo("code", "." + pro.getAtributo("code"));
 	}
 	if(aux != null){
 		Elemento post = (Elemento) aux;
     	Elemento res = new Elemento(pro.valor, pleft, pright);
+    	res.parametro = pro.parametro;
     	res.setAtributo("tipo", post.getAtributo("tipo"));
 		if(post.getAtributo("collection") == "true"){
 			if(!Elemento.ehCollection(pro.getAtributo("tipo"))){
@@ -505,6 +514,13 @@ postfixExpressionAux:aux {:
 			}
 		}
 		res.setAtributo("operacao",op.toString());
+		if(op.toString() == "->"){
+			res.setAtributo("code", post.getAtributo("code"));
+		}else if(post.getAtributo("operacao") == "->"){
+			res.setAtributo("code", Gerador.getInstance().addFuncaoCONSULTA(post.valor, post.parametro, pro) + post.getAtributo("code"));
+		}else{
+			res.setAtributo("code", pro.getAtributo("code") + post.getAtributo("code"));
+		}
 		RESULT = res;
 	}else{
 		if(pro.valor.equalsIgnoreCase("any") || pro.valor.equalsIgnoreCase("forAll") || pro.valor.equalsIgnoreCase("exists")){
@@ -582,7 +598,12 @@ ifExp ::= IF:ifToken oclExpression:exp THEN oclExpression:exp1 ELSE oclExpressio
 :}
 ;
 
-propertyCall ::= pathName:p qualifiers propertyCallParameters:par {:
+propertyCall ::= pathName:p {:
+	if(Elemento.ehOperacaoColecao(p.toString())){
+		Gerador.getInstance().setFuncaoConsulta();
+	}
+:}
+qualifiers propertyCallParameters:par {:
 	String tipo = XMIParserBasic.getInstancia().getOperationType(p.toString());
 	Elemento val = new Elemento(p.toString(), pleft, pright);
 	
@@ -596,13 +617,20 @@ propertyCall ::= pathName:p qualifiers propertyCallParameters:par {:
 			LoggerSemantico.getInstance().addError(StringErro.naoExiste("Funcao", val.toString()));
 			throw new ErroFatal();
 		}
+		val.setAtributo("code", val.valor);
+		if(!Elemento.ehOperacaoColecao(p.toString())){
+			XMIParserBasic.getInstancia().getAttributeTypeConsulta(p.toString());
+		}
 	}else{
 	    
 		LinkedList<String> parametros = (LinkedList<String>) XMIParserBasic.getInstancia().getParametersType(p.toString());
-			
-		if(!((Parametros) par).parametrosValidos(parametros)){
-			LoggerSemantico.getInstance().addError(StringErro.parametrosInvalidos(val.toString(), parametros, ((Parametros) par).lista));
+		Parametros pa = (Parametros) par;
+		if(!pa.parametrosValidos(parametros)){
+			LoggerSemantico.getInstance().addError(StringErro.parametrosInvalidos(val.toString(), parametros, pa.lista));
 			throw new ErroFatal();
+		}
+		if(Elemento.ehOperacaoColecao(val.valor)){
+			val.parametro = pa.getFirstElemento();
 		}
 	}
 	val.setAtributo("collection", "false");
@@ -610,6 +638,7 @@ propertyCall ::= pathName:p qualifiers propertyCallParameters:par {:
 		val.setAtributo("collection", "true");
 	}
 	val.setAtributo("tipo", tipo);
+	Gerador.getInstance().desativarConsulta();
 	RESULT = val;
 	
 :};
@@ -671,6 +700,7 @@ colonPathName ::= COLON pathName:pa {: RESULT = pa.toString(); :} |;
 expressionParameter ::= oclExpression:exp expressionParameterAux:aux {:
 	Elemento val = (Elemento) exp;
 	Parametros p = (Parametros) aux;
+	p.addElemento(val);
 	p.push(val.getAtributo("tipo"));
 	RESULT = p;
 :}
@@ -683,7 +713,9 @@ expressionParameter ::= oclExpression:exp expressionParameterAux:aux {:
 	}
 	
 	val.setAtributo("tipo", tipo);
+	val.setAtributo("code", val.valor);
 	Parametros p = (Parametros) aux;
+	p.addElemento(val);
 	p.push(tipo);
 	RESULT = p;
 :}
@@ -692,6 +724,7 @@ expressionParameter ::= oclExpression:exp expressionParameterAux:aux {:
 expressionParameterAux ::= COMMA oclExpression:exp expressionParameterAux:aux {:
 	Elemento val = (Elemento) exp;
 	Parametros p = (Parametros) aux;
+	p.addElemento(val);
 	p.push(val.getAtributo("tipo"));
 	RESULT = p;
 :}
@@ -704,7 +737,9 @@ expressionParameterAux ::= COMMA oclExpression:exp expressionParameterAux:aux {:
 	}
 	
 	val.setAtributo("tipo", tipo);
+	val.setAtributo("code", val.valor);
 	Parametros p = (Parametros) aux;
+	p.addElemento(val);
 	p.push(tipo);
 	RESULT = p;
 :} 

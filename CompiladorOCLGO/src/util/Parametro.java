@@ -10,6 +10,9 @@ public class Parametro {
 		this.tipo = tipo;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return nome + " " + tipo;
+	}
 
 }
