@@ -226,9 +226,14 @@ private void compile(){
 		messages.append("Erro, escolha o arquivo XML ...");
 	}else{
 		try{
-			Process p = Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");
+			Process p = Runtime.getRuntime().exec("c:\\Go\\bin\\8g files\\out\\code.go");				  
+			BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream())); 				  
+			String line = "";  
+			while ((line = br.readLine()) != null) {
+				messages.append(line);
+			}
 			if(p.waitFor() != 0){
-				messages.append("Nao foi possivel compilar o arquivo...");
+				messages.append("\nNao foi possivel compilar o arquivo...");
 			} else{
 				Runtime.getRuntime().exec("c:\\Go\\bin\\8l files\\out\\code.8");
 				messages.append("Compilou...");
