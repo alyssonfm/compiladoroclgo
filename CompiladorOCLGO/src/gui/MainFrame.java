@@ -194,8 +194,8 @@ public MainFrame() {
     other.add(0, 3, 2, 1, messages);
     
     other.add(2, 1, radioPanel);
-    other.add(2, 2, compile);
-    other.add(2, 3, execute);
+    //other.add(2, 2, compile);
+    //other.add(2, 3, execute);
     north.add(2,0, quit);
     north.add(2,2, generate);
  
