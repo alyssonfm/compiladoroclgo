@@ -105,6 +105,8 @@ public class XMIParserBasic extends XMIParser {
 	}
 	
 	public boolean existClasse(String classe){
+		if(Gerador.typePrimitiveOCL(classe))
+			return true;
 		List<ClasseComp> list = loadAllClassesComp();
 		for(ClasseComp c : list){
 			if(c.getNome().equalsIgnoreCase(classe)){
